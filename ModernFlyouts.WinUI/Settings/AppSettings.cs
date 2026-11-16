@@ -57,6 +57,7 @@ namespace ModernFlyouts.WinUI.Settings
         };
 
         private Timer? _saveTimer;
+        private readonly object _saveLock = new();
 
         public static AppSettings Instance { get; } = Load();
 
@@ -248,18 +249,31 @@ namespace ModernFlyouts.WinUI.Settings
             _saveTimer.Change(500, Timeout.Infinite);
         }
 
+        /// <summary>Writes a pending change now (used on exit).</summary>
+        public void Flush()
+        {
+            if (_saveTimer != null)
+            {
+                _saveTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                Save();
+            }
+        }
+
         private void Save()
         {
-            try
+            lock (_saveLock) // the timer and Flush() may both save
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
-                string temp = FilePath + ".tmp";
-                File.WriteAllText(temp, JsonSerializer.Serialize(this, JsonOptions));
-                File.Move(temp, FilePath, overwrite: true);
-            }
-            catch (Exception ex)
-            {
-                App.Log($"settings save failed: {ex.Message}");
+                try
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
+                    string temp = FilePath + ".tmp";
+                    File.WriteAllText(temp, JsonSerializer.Serialize(this, JsonOptions));
+                    File.Move(temp, FilePath, overwrite: true);
+                }
+                catch (Exception ex)
+                {
+                    App.Log($"settings save failed: {ex.Message}");
+                }
             }
         }
 

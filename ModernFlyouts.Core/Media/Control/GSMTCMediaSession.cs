@@ -15,6 +15,14 @@ namespace ModernFlyouts.Core.Media.Control
         private SourceAppInfo sourceAppInfo;
         private int currentTrackNumber;
 
+        // Players (e.g. browsers) report the position rarely, often only when playback starts, so
+        // the shown position is advanced from the last report while playing.
+        private readonly UiTimer timelineTimer = new() { Interval = TimeSpan.FromMilliseconds(500) };
+        private TimeSpan reportedPosition;
+        private DateTimeOffset reportedAtUtc;
+        private double playbackRate = 1.0;
+        private bool playbackStateKnown;
+
         public GSMTCMediaSession(GlobalSystemMediaTransportControlsSession globalSystemMediaTransportControlsSession)
         {
             GSMTCSession = globalSystemMediaTransportControlsSession;
@@ -34,12 +42,15 @@ namespace ModernFlyouts.Core.Media.Control
             GSMTCSession.MediaPropertiesChanged += GSMTCSession_MediaPropertiesChanged;
             GSMTCSession.PlaybackInfoChanged += GSMTCSession_PlaybackInfoChanged;
             GSMTCSession.TimelinePropertiesChanged += GSMTCSession_TimelinePropertiesChanged;
+            timelineTimer.Tick += (_, _) => AdvanceTimeline();
 
             UpdateSessionInfo(GSMTCSession);
         }
 
         public override void Disconnect()
         {
+            timelineTimer.Stop();
+
             if (GSMTCSession != null)
             {
                 GSMTCSession.MediaPropertiesChanged -= GSMTCSession_MediaPropertiesChanged;
@@ -99,7 +110,18 @@ namespace ModernFlyouts.Core.Media.Control
                     var playback = session.GetPlaybackInfo();
                     if (playback != null)
                     {
-                        IsPlaying = playback.PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing;
+                        bool playing = playback.PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing;
+                        if (playbackStateKnown && playing != IsPlaying)
+                        {
+                            // Players don't always report the position on pause/resume: keep the
+                            // shown position and count elapsed time from now on.
+                            reportedPosition = CalculatePosition();
+                            reportedAtUtc = DateTimeOffset.UtcNow;
+                        }
+
+                        IsPlaying = playing;
+                        playbackStateKnown = true;
+                        playbackRate = playback.PlaybackRate is double rate && rate > 0 ? rate : 1.0;
                         IsShuffleActive = playback.IsShuffleActive;
                         AutoRepeatMode = playback.AutoRepeatMode switch
                         {
@@ -112,6 +134,8 @@ namespace ModernFlyouts.Core.Media.Control
                 }
             }
             catch { }
+
+            UpdateTimelineTimer();
         }
 
         private void UpdateTimelineInfo(GlobalSystemMediaTransportControlsSession session)
@@ -120,11 +144,14 @@ namespace ModernFlyouts.Core.Media.Control
             {
                 var timeline = session.GetTimelineProperties();
 
-                if (session.GetPlaybackInfo().Controls.IsPlaybackPositionEnabled && timeline != null)
+                // Shown (read-only) even when the player doesn't allow seeking.
+                if (timeline != null && timeline.EndTime > timeline.StartTime)
                 {
                     TimelineStartTime = timeline.StartTime;
                     TimelineEndTime = timeline.EndTime;
-                    SetPlaybackPosition(timeline.Position);
+                    reportedPosition = timeline.Position;
+                    reportedAtUtc = GetReportTime(timeline);
+                    SetPlaybackPosition(CalculatePosition());
 
                     IsTimelinePropertiesEnabled = true;
                 }
@@ -138,6 +165,64 @@ namespace ModernFlyouts.Core.Media.Control
                 }
             }
             catch { }
+
+            UpdateTimelineTimer();
+        }
+
+        /// <summary>When the position was reported (LastUpdatedTime), or now if that is unusable.</summary>
+        private static DateTimeOffset GetReportTime(GlobalSystemMediaTransportControlsSessionTimelineProperties timeline)
+        {
+            var now = DateTimeOffset.UtcNow;
+            var updated = timeline.LastUpdatedTime;
+            if (updated.Year < 2000 || updated > now || now - updated > TimeSpan.FromHours(12))
+            {
+                return now;
+            }
+
+            return updated.ToUniversalTime();
+        }
+
+        private TimeSpan CalculatePosition()
+        {
+            var position = reportedPosition;
+            if (IsPlaying)
+            {
+                var elapsed = DateTimeOffset.UtcNow - reportedAtUtc;
+                if (elapsed > TimeSpan.Zero)
+                {
+                    position += TimeSpan.FromTicks((long)(elapsed.Ticks * playbackRate));
+                }
+            }
+
+            if (position < TimelineStartTime) position = TimelineStartTime;
+            if (position > TimelineEndTime) position = TimelineEndTime;
+            return position;
+        }
+
+        private void AdvanceTimeline()
+        {
+            if (!IsPlaying || !IsTimelinePropertiesEnabled)
+            {
+                timelineTimer.Stop();
+                return;
+            }
+
+            SetPlaybackPosition(CalculatePosition());
+        }
+
+        private void UpdateTimelineTimer()
+        {
+            if (IsPlaying && IsTimelinePropertiesEnabled)
+            {
+                if (!timelineTimer.IsEnabled)
+                {
+                    timelineTimer.Start();
+                }
+            }
+            else
+            {
+                timelineTimer.Stop();
+            }
         }
 
         private async void UpdateSessionInfo(GlobalSystemMediaTransportControlsSession session)
@@ -192,9 +277,10 @@ namespace ModernFlyouts.Core.Media.Control
                     };
                 }
 
-                UpdateTimelineInfo(session);
-
+                // Playback state first: the timeline uses it to advance the reported position.
                 UpdatePlaybackInfo(session);
+
+                UpdateTimelineInfo(session);
 
                 Thumbnail = await GetThumbnailImageSourceAsync(mediaInfo?.Thumbnail);
             }

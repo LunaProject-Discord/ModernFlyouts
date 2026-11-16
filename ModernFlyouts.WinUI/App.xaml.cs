@@ -214,7 +214,13 @@ namespace ModernFlyouts.WinUI
             _keyboardHook = null;
             _airplaneModeWatcher?.Stop();
             _flyout?.HideFlyout();
+            S.Flush(); // a change made just before exiting is still waiting for the save timer
+
             Exit();
+
+            // Exit() only closes the XAML side; background work (media/audio callbacks, timers)
+            // can keep the process alive with no UI. Make sure it ends.
+            System.Threading.Tasks.Task.Delay(1500).ContinueWith(_ => Environment.Exit(0));
         }
 
         private void ShowFromShell(bool moduleEnabled, Action show)
