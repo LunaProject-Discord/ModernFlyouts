@@ -7,6 +7,7 @@ using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.UI.Xaml;
 using ModernFlyouts.Core.Media.Control;
+using ModernFlyouts.Core.UI;
 
 namespace ModernFlyouts.WinUI.Settings
 {
@@ -81,7 +82,23 @@ namespace ModernFlyouts.WinUI.Settings
 
         #region Layout
 
-        // Manual position of the flyout (top-left of its content, physical pixels); null = automatic.
+        private FlyoutWindowPlacementMode placementMode = FlyoutWindowPlacementMode.Auto;
+        /// <summary>Auto: <see cref="FlyoutAlignment"/> + <see cref="FlyoutMargin"/>; Manual: dragged position.</summary>
+        public FlyoutWindowPlacementMode PlacementMode { get => placementMode; set => Set(ref placementMode, value); }
+
+        private FlyoutWindowAlignments flyoutAlignment = FlyoutWindowAlignments.Bottom;
+        /// <summary>Flags: Top/Bottom and Left/Right; Center (0) on an axis means centered.</summary>
+        public FlyoutWindowAlignments FlyoutAlignment { get => flyoutAlignment; set => Set(ref flyoutAlignment, value); }
+
+        private int flyoutMargin = 48;
+        /// <summary>Distance from the work area edges in DIP (automatic placement).</summary>
+        public int FlyoutMargin { get => flyoutMargin; set => Set(ref flyoutMargin, Math.Clamp(value, 0, 400)); }
+
+        private string flyoutMonitorId = string.Empty;
+        /// <summary>Device id of the display to use; empty = primary display.</summary>
+        public string FlyoutMonitorId { get => flyoutMonitorId; set => Set(ref flyoutMonitorId, value ?? string.Empty); }
+
+        // Manual position of the flyout (top-left of its content, physical pixels).
         private int? flyoutPositionX;
         public int? FlyoutPositionX { get => flyoutPositionX; set => Set(ref flyoutPositionX, value); }
 

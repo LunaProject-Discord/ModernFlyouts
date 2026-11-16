@@ -36,6 +36,9 @@
                 <NavigationViewItem Tag="personalization" Content="{x:Bind res:Strings.Settings_Personalization}">
                     <NavigationViewItem.Icon><FontIcon Glyph="&#xE771;" /></NavigationViewItem.Icon>
                 </NavigationViewItem>
+                <NavigationViewItem Tag="layout" Content="{x:Bind res:Strings.Settings_Layout}">
+                    <NavigationViewItem.Icon><FontIcon Glyph="&#xE8A1;" /></NavigationViewItem.Icon>
+                </NavigationViewItem>
                 <NavigationViewItemSeparator />
                 <NavigationViewItemHeader Content="{x:Bind res:Strings.Settings_Modules}" />
                 <NavigationViewItem Tag="audio" Content="{x:Bind res:Strings.Settings_Modules_Audio}">

@@ -1278,6 +1278,30 @@ namespace ModernFlyouts.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Settings.
         /// </summary>
+        public static string Settings_FlyoutMargin {
+            get {
+                return ResourceManager.GetString("Settings.FlyoutMargin", resourceCulture);
+            }
+        }
+
+        public static string Settings_PrimaryDisplay {
+            get {
+                return ResourceManager.GetString("Settings.PrimaryDisplay", resourceCulture);
+            }
+        }
+
+        public static string Settings_FlyoutPosition {
+            get {
+                return ResourceManager.GetString("Settings.FlyoutPosition", resourceCulture);
+            }
+        }
+
+        public static string Settings_ManualPlacementDescription {
+            get {
+                return ResourceManager.GetString("Settings.ManualPlacementDescription", resourceCulture);
+            }
+        }
+
         public static string SettingsItem {
             get {
                 return ResourceManager.GetString("SettingsItem", resourceCulture);

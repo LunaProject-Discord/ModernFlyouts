@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using ModernFlyouts.Core.Display;
+using ModernFlyouts.Core.UI;
 using ModernFlyouts.Properties;
 using ModernFlyouts.WinUI.Audio;
 using ModernFlyouts.WinUI.Interop;
@@ -37,7 +38,6 @@ namespace ModernFlyouts.WinUI
     public sealed partial class FlyoutWindow : Window
     {
         private const double WidthDip = 360;
-        private const double BottomMarginDip = 48;
 
         // Fluent motion: decelerate in (slide up + fade in), fade out quickly.
         private const double ShowDurationMs = 250;
@@ -114,7 +114,7 @@ namespace ModernFlyouts.WinUI
             MediaPanel.ShowPlayerInfo = s.ShowMediaPlayerInfo;
             MediaPanel.ShowSeekbar = s.ShowMediaSeekbar;
             UpdateTopBar();
-            AlignButton.IsEnabled = s.FlyoutPositionX.HasValue;
+            AlignButton.IsEnabled = s.PlacementMode == FlyoutWindowPlacementMode.Manual;
             UpdateMediaVisibility();
 
             if (IsShown)
@@ -239,7 +239,8 @@ namespace ModernFlyouts.WinUI
 
             var s = AppSettings.Instance;
             PointInt32 position;
-            if (s.FlyoutPositionX is int savedX && s.FlyoutPositionY is int savedY)
+            if (s.PlacementMode == FlyoutWindowPlacementMode.Manual
+                && s.FlyoutPositionX is int savedX && s.FlyoutPositionY is int savedY)
             {
                 // Keep a saved position on screen (monitor layout may have changed).
                 var area = DisplayArea.GetFromPoint(new PointInt32(savedX, savedY), DisplayAreaFallback.Nearest).WorkArea;
@@ -249,10 +250,8 @@ namespace ModernFlyouts.WinUI
             }
             else
             {
-                var area = DisplayArea.Primary.WorkArea;
-                position = new PointInt32(
-                    area.X + (area.Width - _clientSize.Width) / 2,
-                    area.Y + area.Height - _clientSize.Height - (int)Math.Round(BottomMarginDip * scale));
+                position = GetAlignedPosition(GetTargetDisplay().WorkArea, s.FlyoutAlignment,
+                    (int)Math.Round(s.FlyoutMargin * scale));
             }
 
             _clientPosition = position;
@@ -275,6 +274,37 @@ namespace ModernFlyouts.WinUI
                 }
                 MoveClientTo(position.X, position.Y);
             }
+        }
+
+        /// <summary>One of 9 positions in the work area, <paramref name="margin"/> away from the edges.</summary>
+        private PointInt32 GetAlignedPosition(RectInt32 area, FlyoutWindowAlignments alignment, int margin)
+        {
+            int x = alignment.HasFlag(FlyoutWindowAlignments.Left) ? area.X + margin
+                : alignment.HasFlag(FlyoutWindowAlignments.Right) ? area.X + area.Width - _clientSize.Width - margin
+                : area.X + (area.Width - _clientSize.Width) / 2;
+            int y = alignment.HasFlag(FlyoutWindowAlignments.Top) ? area.Y + margin
+                : alignment.HasFlag(FlyoutWindowAlignments.Bottom) ? area.Y + area.Height - _clientSize.Height - margin
+                : area.Y + (area.Height - _clientSize.Height) / 2;
+            return new PointInt32(x, y);
+        }
+
+        /// <summary>The display chosen in settings, or the primary one (also when it was unplugged).</summary>
+        private static DisplayArea GetTargetDisplay()
+        {
+            string id = AppSettings.Instance.FlyoutMonitorId;
+            if (!string.IsNullOrEmpty(id) && DisplayManager.Instance != null)
+            {
+                foreach (var monitor in DisplayManager.Instance.DisplayMonitors)
+                {
+                    if (monitor.DeviceId == id)
+                    {
+                        var displayId = Microsoft.UI.Win32Interop.GetDisplayIdFromMonitor(monitor.HMonitor);
+                        return DisplayArea.GetFromDisplayId(displayId) ?? DisplayArea.Primary;
+                    }
+                }
+            }
+
+            return DisplayArea.Primary;
         }
 
         private void AnimationStep()
@@ -349,8 +379,7 @@ namespace ModernFlyouts.WinUI
 
         private void AlignButton_Click(object sender, RoutedEventArgs e)
         {
-            AppSettings.Instance.FlyoutPositionX = null;
-            AppSettings.Instance.FlyoutPositionY = null;
+            AppSettings.Instance.PlacementMode = FlyoutWindowPlacementMode.Auto;
             RestartHideTimer();
         }
 
@@ -376,6 +405,7 @@ namespace ModernFlyouts.WinUI
             _clientPosition = new PointInt32(client.X, client.Y);
             AppSettings.Instance.FlyoutPositionX = client.X;
             AppSettings.Instance.FlyoutPositionY = client.Y;
+            AppSettings.Instance.PlacementMode = FlyoutWindowPlacementMode.Manual;
             RestartHideTimer();
         }
 

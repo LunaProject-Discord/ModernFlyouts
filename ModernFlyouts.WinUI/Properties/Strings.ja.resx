@@ -452,4 +452,16 @@
   <data name="Enums.PinnedAppPriorityMode.AlwaysPreferPinnedIfEligible" xml:space="preserve">
     <value>可能なときは常に固定したアプリを優先</value>
   </data>
+  <data name="Settings.FlyoutMargin" xml:space="preserve">
+    <value>画面の端からの距離</value>
+  </data>
+  <data name="Settings.PrimaryDisplay" xml:space="preserve">
+    <value>メイン ディスプレイ</value>
+  </data>
+  <data name="Settings.FlyoutPosition" xml:space="preserve">
+    <value>表示位置</value>
+  </data>
+  <data name="Settings.ManualPlacementDescription" xml:space="preserve">
+    <value>フライアウト上部のつまみをドラッグすると移動できます。移動した位置は記憶されます。</value>
+  </data>
 </root>

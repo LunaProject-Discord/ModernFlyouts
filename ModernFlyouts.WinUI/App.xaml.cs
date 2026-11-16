@@ -156,6 +156,9 @@ namespace ModernFlyouts.WinUI
 
         private static bool CanShowOurFlyouts => S.DefaultFlyout == DefaultFlyout.ModernFlyouts;
 
+        /// <summary>Shows the volume flyout so placement changes can be checked from the settings.</summary>
+        public void PreviewFlyout() => _flyout?.ShowVolume();
+
         public void ShowSettings()
         {
             _settingsWindow ??= new SettingsWindow();

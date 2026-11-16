@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="ModernFlyouts.WinUI.Pages.LayoutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:ModernFlyouts.WinUI.Controls"
+    xmlns:res="using:ModernFlyouts.Properties">
+
+    <Page.Resources>
+        <!-- One cell of the 3x3 position picker -->
+        <Style x:Key="PositionCellStyle" TargetType="ToggleButton" BasedOn="{StaticResource DefaultToggleButtonStyle}">
+            <Setter Property="Width" Value="40" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="CornerRadius" Value="4" />
+        </Style>
+    </Page.Resources>
+
+    <ScrollViewer>
+        <StackPanel Style="{StaticResource SettingsPagePanelStyle}">
+            <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_FlyoutPlacement}" />
+
+            <controls:SettingsCard x:Name="ModeCard" Glyph="&#xE7C2;" Header="{x:Bind res:Strings.Settings_FlyoutPlacementMode}">
+                <ComboBox x:Name="ModeCombo" MinWidth="200" />
+            </controls:SettingsCard>
+
+            <StackPanel x:Name="AutoPanel">
+                <controls:SettingsCard Glyph="&#xE8A1;" Header="{x:Bind res:Strings.Settings_FlyoutPosition}">
+                    <Grid x:Name="PositionGrid" RowSpacing="4" ColumnSpacing="4">
+                        <Grid.RowDefinitions>
+                            <RowDefinition /><RowDefinition /><RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition /><ColumnDefinition /><ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </controls:SettingsCard>
+
+                <controls:SettingsCard Glyph="&#xE9A6;" Header="{x:Bind res:Strings.Settings_FlyoutMargin}">
+                    <NumberBox x:Name="MarginBox" MinWidth="200" Minimum="0" Maximum="400"
+                               SmallChange="4" LargeChange="16" SpinButtonPlacementMode="Inline" />
+                </controls:SettingsCard>
+            </StackPanel>
+
+            <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_Display}" />
+
+            <controls:SettingsCard Glyph="&#xE7F4;" Header="{x:Bind res:Strings.Settings_DisplayDescription}">
+                <ComboBox x:Name="DisplayCombo" MinWidth="200" />
+            </controls:SettingsCard>
+
+            <controls:SettingsCard Glyph="&#xE7B3;" Header="{x:Bind res:Strings.Settings_AlignFlyout}">
+                <Button Content="{x:Bind res:Strings.Settings_AlignFlyout}" Click="PreviewButton_Click" />
+            </controls:SettingsCard>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

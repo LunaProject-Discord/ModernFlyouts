@@ -85,6 +85,7 @@ namespace ModernFlyouts.WinUI
             (Type page, object? parameter) = (item.Tag as string) switch
             {
                 "personalization" => (typeof(PersonalizationPage), null),
+                "layout" => (typeof(LayoutPage), null),
                 "audio" => (typeof(AudioPage), null),
                 "brightness" => (typeof(ModuleTogglePage), ToggleModule.Brightness),
                 "airplane" => (typeof(ModuleTogglePage), ToggleModule.AirplaneMode),

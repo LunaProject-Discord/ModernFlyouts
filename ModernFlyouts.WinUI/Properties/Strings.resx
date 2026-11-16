@@ -557,4 +557,16 @@
   <data name="VirtualDesktopFlyoutHelper.DefaultName" xml:space="preserve">
     <value>Desktop {0}</value>
   </data>
+  <data name="Settings.FlyoutMargin" xml:space="preserve">
+    <value>Distance from the screen edge</value>
+  </data>
+  <data name="Settings.PrimaryDisplay" xml:space="preserve">
+    <value>Primary display</value>
+  </data>
+  <data name="Settings.FlyoutPosition" xml:space="preserve">
+    <value>Position</value>
+  </data>
+  <data name="Settings.ManualPlacementDescription" xml:space="preserve">
+    <value>Drag the handle at the top of the flyout to move it. The position is remembered.</value>
+  </data>
 </root>
