@@ -49,9 +49,19 @@ namespace ModernFlyouts.WinUI.Audio
             }
         }
 
+        private long _lastChangeTick;
+
         private void OnVolumeNotification(AudioVolumeNotificationData data)
         {
+            System.Threading.Interlocked.Exchange(ref _lastChangeTick, Environment.TickCount64);
             VolumeChanged?.Invoke(Math.Round(data.MasterVolume * 100), data.Muted);
+        }
+
+        /// <summary>Whether the volume or mute state changed within the given period.</summary>
+        public bool HasRecentChange(TimeSpan within)
+        {
+            long last = System.Threading.Interlocked.Read(ref _lastChangeTick);
+            return last != 0 && Environment.TickCount64 - last <= within.TotalMilliseconds;
         }
 
         public void Dispose()

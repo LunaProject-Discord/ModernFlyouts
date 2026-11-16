@@ -10,30 +10,75 @@
         <DesktopAcrylicBackdrop />
     </Window.SystemBackdrop>
 
+    <!-- Every row uses the same 48 | * | 48 layout as the WPF flyouts. Only one row is visible at a time. -->
     <StackPanel x:Name="RootPanel" VerticalAlignment="Top"
                 PointerEntered="RootPanel_PointerEntered" PointerExited="RootPanel_PointerExited">
-        <!-- Same 48 | * | 48 layout as the WPF volume flyout -->
-        <Grid Height="56" Padding="4,0">
+
+        <!-- Volume -->
+        <Grid x:Name="VolumeRow" Height="56" Padding="4,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="48" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="48" />
             </Grid.ColumnDefinitions>
-
             <Button x:Name="MuteButton" Style="{StaticResource MediaButtonStyle}"
                     HorizontalAlignment="Center" VerticalAlignment="Center" Click="MuteButton_Click">
                 <FontIcon x:Name="VolumeGlyph" Glyph="&#xE995;" FontSize="16" />
             </Button>
-
             <Slider x:Name="VolumeSlider" Grid.Column="1" Minimum="0" Maximum="100" StepFrequency="1"
                     VerticalAlignment="Center" Margin="8,0" IsThumbToolTipEnabled="False"
                     ValueChanged="VolumeSlider_ValueChanged" />
-
             <TextBlock x:Name="VolumeText" Grid.Column="2" Text="0"
                        HorizontalAlignment="Center" VerticalAlignment="Center"
                        Style="{StaticResource SubtitleTextBlockStyle}" />
         </Grid>
 
+        <!-- Brightness -->
+        <Grid x:Name="BrightnessRow" Height="56" Padding="4,0" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="48" />
+            </Grid.ColumnDefinitions>
+            <FontIcon x:Name="BrightnessGlyph" Glyph="&#xE706;" FontSize="16"
+                      HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <Slider x:Name="BrightnessSlider" Grid.Column="1" Minimum="0" Maximum="100" StepFrequency="1"
+                    VerticalAlignment="Center" Margin="8,0" IsThumbToolTipEnabled="False"
+                    ValueChanged="BrightnessSlider_ValueChanged" />
+            <TextBlock x:Name="BrightnessText" Grid.Column="2" Text="0"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Style="{StaticResource SubtitleTextBlockStyle}" />
+        </Grid>
+
+        <!-- Icon + message (airplane mode, lock keys) -->
+        <Grid x:Name="InfoRow" Height="48" Padding="4,0" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="48" />
+            </Grid.ColumnDefinitions>
+            <FontIcon x:Name="InfoGlyph" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <TextBlock x:Name="InfoText" Grid.Column="1" FontSize="16" TextTrimming="CharacterEllipsis"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Style="{StaticResource BodyStrongTextBlockStyle}" />
+        </Grid>
+
+        <!-- Virtual desktop -->
+        <Grid x:Name="DesktopRow" Height="56" Padding="4,0" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="48" />
+            </Grid.ColumnDefinitions>
+            <FontIcon Glyph="&#xE7C4;" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
+                <TextBlock x:Name="DesktopNameText" FontSize="15" HorizontalAlignment="Center"
+                           TextTrimming="CharacterEllipsis" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                <StackPanel x:Name="DesktopDots" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Media (below the volume row) -->
         <StackPanel x:Name="MediaSection" Visibility="Collapsed">
             <Border Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
             <controls:MediaPanel x:Name="MediaPanel" />
