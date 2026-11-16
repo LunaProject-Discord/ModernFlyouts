@@ -2,8 +2,8 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Windows.Interop;
-using System.Windows.Threading;
+using System.Threading;
+using ModernFlyouts.Core.Threading;
 using static ModernFlyouts.Core.Interop.NativeMethods;
 
 namespace ModernFlyouts.Core.Interop
@@ -174,7 +174,8 @@ namespace ModernFlyouts.Core.Interop
         private WinEventDelegate _procDelegate;
         private IntPtr HHookID = IntPtr.Zero;
 
-        private DispatcherTimer rehooktimer;
+        // Polls every 3 s for the shell OSD host after explorer restarted (runs on the UI thread).
+        private Timer rehooktimer;
 
         public event EventHandler NativeFlyoutShown;
 
@@ -190,8 +191,7 @@ namespace ModernFlyouts.Core.Interop
             Debug.WriteLine($"{nameof(NativeFlyoutHandler)}: Native Flyout Host has been created - {_hasNativeFlyoutCreated}");
             Hook();
 
-            rehooktimer = new DispatcherTimer() { Interval = TimeSpan.FromSeconds(3), IsEnabled = false };
-            rehooktimer.Tick += (_, __) => TryRehook();
+            rehooktimer = new Timer(_ => UiDispatcher.Post(TryRehook), null, Timeout.Infinite, Timeout.Infinite);
         }
 
         #region Native Flyout Hooking
@@ -293,7 +293,7 @@ namespace ModernFlyouts.Core.Interop
             HWndDUI = IntPtr.Zero;
             ShellProcessId = 0;
             _hasNativeFlyoutCreated = false;
-            rehooktimer.Start();
+            rehooktimer.Change(TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(3));
         }
 
         private void Rehook()
@@ -318,7 +318,7 @@ namespace ModernFlyouts.Core.Interop
             ShellProcessId = (uint)GetShellProcessId();
             if (ShellProcessId != 0)
             {
-                rehooktimer.Stop();
+                rehooktimer.Change(Timeout.Infinite, Timeout.Infinite);
                 Rehook();
             }
         }

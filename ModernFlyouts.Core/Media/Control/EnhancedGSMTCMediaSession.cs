@@ -1,9 +1,7 @@
 using CommunityToolkit.Mvvm.Input;
 using ModernFlyouts.Core.AppInformation;
-using ModernFlyouts.Core.Helpers;
+using ModernFlyouts.Core.Threading;
 using System;
-using System.Windows;
-using System.Windows.Threading;
 
 namespace ModernFlyouts.Core.Media.Control
 {
@@ -12,7 +10,7 @@ namespace ModernFlyouts.Core.Media.Control
         private readonly MediaSessionService service;
         private readonly TimelineController timelineController = new();
         private readonly Func<bool> isTimelineDisplayActive;
-        private readonly DispatcherTimer timelineTimer;
+        private readonly UiTimer timelineTimer;
         private MediaSessionSnapshot currentSnapshot;
         private SourceAppInfo sourceAppInfo;
         private string currentSourceAppUserModelId = string.Empty;
@@ -26,7 +24,7 @@ namespace ModernFlyouts.Core.Media.Control
         {
             this.service = service ?? throw new ArgumentNullException(nameof(service));
             this.isTimelineDisplayActive = isTimelineDisplayActive ?? (() => false);
-            timelineTimer = new DispatcherTimer(DispatcherPriority.Background, Application.Current.Dispatcher)
+            timelineTimer = new UiTimer
             {
                 Interval = TimeSpan.FromMilliseconds(500)
             };
@@ -292,14 +290,13 @@ namespace ModernFlyouts.Core.Media.Control
 
         private void SourceAppInfo_InfoFetched(object sender, EventArgs e)
         {
-            var dispatcher = Application.Current?.Dispatcher;
-            if (dispatcher == null || dispatcher.CheckAccess())
+            if (UiDispatcher.CheckAccess())
             {
                 ApplySourceAppInfo();
             }
             else
             {
-                dispatcher.BeginInvoke(new Action(ApplySourceAppInfo));
+                UiDispatcher.Post(ApplySourceAppInfo);
             }
         }
 
@@ -317,10 +314,7 @@ namespace ModernFlyouts.Core.Media.Control
                 MediaSourceName = sourceAppInfo.DisplayName;
             }
 
-            if (BitmapHelper.TryCreateBitmapImageFromStream(sourceAppInfo.LogoStream, out var bitmap))
-            {
-                MediaSourceIcon = bitmap;
-            }
+            SetMediaSourceIconFromStream(sourceAppInfo.LogoStream);
         }
     }
 }

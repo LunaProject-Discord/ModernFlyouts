@@ -1,7 +1,5 @@
 using ModernFlyouts.Core.Media.Control;
 using System;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Xunit;
 
 namespace ModernFlyouts.Core.Tests
@@ -59,10 +57,10 @@ namespace ModernFlyouts.Core.Tests
             };
         }
 
-        private static ImageSource CreateImage()
+        private static MediaArtwork CreateImage()
         {
             var pixels = new byte[] { 255, 255, 255, 255 };
-            return BitmapSource.Create(1, 1, 96, 96, PixelFormats.Bgra32, null, pixels, 4);
+            return new MediaArtwork(pixels, 1, 1);
         }
     }
 }

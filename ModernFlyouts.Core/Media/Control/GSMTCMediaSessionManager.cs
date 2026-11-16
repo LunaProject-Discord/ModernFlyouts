@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows;
+using ModernFlyouts.Core.Threading;
 using Windows.Media.Control;
 
 namespace ModernFlyouts.Core.Media.Control
@@ -25,12 +25,12 @@ namespace ModernFlyouts.Core.Media.Control
 
         private void GSMTCSessionsChanged(GlobalSystemMediaTransportControlsSessionManager sender, SessionsChangedEventArgs args)
         {
-            Application.Current.Dispatcher.Invoke(LoadSessions);
+            UiDispatcher.Invoke(LoadSessions);
         }
 
         private void GSMTCCurrentSessionChanged(GlobalSystemMediaTransportControlsSessionManager sender, CurrentSessionChangedEventArgs args)
         {
-            Application.Current.Dispatcher.Invoke(UpdateCurrentSession);
+            UiDispatcher.Invoke(UpdateCurrentSession);
         }
 
         private void UpdateCurrentSession()

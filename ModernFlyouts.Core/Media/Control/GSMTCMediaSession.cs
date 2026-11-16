@@ -1,13 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using ModernFlyouts.Core.AppInformation;
-using ModernFlyouts.Core.Helpers;
+using ModernFlyouts.Core.Threading;
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Windows.Media.Control;
 using Windows.Storage.Streams;
 
@@ -60,7 +56,7 @@ namespace ModernFlyouts.Core.Media.Control
 
         private void GSMTCSession_MediaPropertiesChanged(GlobalSystemMediaTransportControlsSession session, MediaPropertiesChangedEventArgs args)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            UiDispatcher.Invoke(() =>
             {
                 UpdateSessionInfo(session);
             });
@@ -68,7 +64,7 @@ namespace ModernFlyouts.Core.Media.Control
 
         private void GSMTCSession_PlaybackInfoChanged(GlobalSystemMediaTransportControlsSession session, PlaybackInfoChangedEventArgs args)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            UiDispatcher.Invoke(() =>
             {
                 UpdatePlaybackInfo(session);
             });
@@ -76,7 +72,7 @@ namespace ModernFlyouts.Core.Media.Control
 
         private void GSMTCSession_TimelinePropertiesChanged(GlobalSystemMediaTransportControlsSession session, TimelinePropertiesChangedEventArgs args)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            UiDispatcher.Invoke(() =>
             {
                 UpdateTimelineInfo(session);
             });
@@ -89,10 +85,7 @@ namespace ModernFlyouts.Core.Media.Control
             sourceAppInfo.InfoFetched -= SourceAppInfo_InfoFetched;
             MediaSourceName = sourceAppInfo.DisplayName;
 
-            if (BitmapHelper.TryCreateBitmapImageFromStream(sourceAppInfo.LogoStream, out var bitmap))
-            {
-                MediaSourceIcon = bitmap;
-            }
+            SetMediaSourceIconFromStream(sourceAppInfo.LogoStream);
         }
 
         #region Updating Properties
@@ -218,57 +211,31 @@ namespace ModernFlyouts.Core.Media.Control
         private bool IsSourceAppSpotify() => string.Equals(GSMTCSession.SourceAppUserModelId, SpotifyPackagedAUMID)
             || string.Equals(GSMTCSession.SourceAppUserModelId, SpotifyUnpackagedAUMID);
 
-        private async Task<ImageSource> GetThumbnailImageSourceAsync(IRandomAccessStreamReference thumbnail)
+        private async Task<MediaArtwork> GetThumbnailImageSourceAsync(IRandomAccessStreamReference thumbnail)
         {
-            if (thumbnail != null)
-            {
-                using var strm = await thumbnail.OpenReadAsync();
-                if (strm != null && strm.Size > 0)
-                {
-                    using var dreader = new DataReader(strm);
-                    await dreader.LoadAsync((uint)strm.Size);
-                    var buffer = new byte[(int)strm.Size];
-                    dreader.ReadBytes(buffer);
-
-                    using var nstream = new MemoryStream(buffer);
-                    nstream.Seek(0, SeekOrigin.Begin);
-                    if (nstream != null && nstream.Length > 0)
-                    {
-                        return GetModifiedThumbnail(BitmapFrame.Create(nstream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad));
-                    }
-                }
-            }
-
-            return null;
+            return GetModifiedThumbnail(await MediaArtwork.DecodeAsync(thumbnail));
         }
 
-        private BitmapSource GetModifiedThumbnail(BitmapSource bitmapSource)
+        private MediaArtwork GetModifiedThumbnail(MediaArtwork artwork)
         {
-            if (IsSourceAppSpotify())
+            if (artwork != null && IsSourceAppSpotify())
             {
-                return GetModifiedThumbnailForSpotify(bitmapSource);
+                return GetModifiedThumbnailForSpotify(artwork);
             }
 
-            return bitmapSource;
+            return artwork;
         }
 
         /// <summary>
         /// Gets a modified version of the original thumbnail provided by Spotify.
         /// It crops and removes extra padding and Spotify branding from the original thumbnail provided by Spotify.
         /// </summary>
-        /// <param name="bitmapSource">The original thumbnail provided by the source.</param>
+        /// <param name="artwork">The original thumbnail provided by the source.</param>
         /// <returns>A cropped variant of the original thumbnail with extra padding and Spotify branding removed.</returns>
         /// <remarks>F*** you Spotify!</remarks>
-        private BitmapSource GetModifiedThumbnailForSpotify(BitmapSource bitmapSource)
+        private static MediaArtwork GetModifiedThumbnailForSpotify(MediaArtwork artwork)
         {
-            CroppedBitmap croppedBitmap = null;
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                croppedBitmap = new CroppedBitmap(bitmapSource, new Int32Rect(33, 0, 234, 234));
-            });
-
-            return croppedBitmap;
+            return artwork.Crop(33, 0, 234, 234);
         }
 
         #endregion

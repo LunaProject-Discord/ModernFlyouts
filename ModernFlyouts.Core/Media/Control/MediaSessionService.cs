@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using ModernFlyouts.Core.AppInformation;
 using Windows.Media.Control;
 
@@ -555,54 +552,35 @@ namespace ModernFlyouts.Core.Media.Control
             };
         }
 
-        private static BitmapSource TransformThumbnail(string sourceAppUserModelId, BitmapSource bitmapSource)
+        private static MediaArtwork TransformThumbnail(string sourceAppUserModelId, MediaArtwork artwork)
         {
-            if (bitmapSource == null)
+            if (artwork == null)
             {
-                return bitmapSource;
+                return artwork;
             }
 
             if (!IsSourceAppSpotify(sourceAppUserModelId))
             {
-                var dispatcherForTrim = Application.Current?.Dispatcher;
-                return dispatcherForTrim != null && !dispatcherForTrim.CheckAccess()
-                    ? dispatcherForTrim.Invoke(() => TrimLetterbox(bitmapSource))
-                    : TrimLetterbox(bitmapSource);
+                return TrimLetterbox(artwork);
             }
 
-            if (bitmapSource.PixelWidth < 267 || bitmapSource.PixelHeight < 234)
+            // Spotify pads its thumbnails and adds branding; keep the centered 234x234 cover.
+            if (artwork.PixelWidth < 267 || artwork.PixelHeight < 234)
             {
-                return bitmapSource;
+                return artwork;
             }
 
-            BitmapSource croppedBitmap = null;
-
-            var dispatcher = Application.Current?.Dispatcher;
-            if (dispatcher != null && !dispatcher.CheckAccess())
-            {
-                dispatcher.Invoke(() =>
-                {
-                    croppedBitmap = new CroppedBitmap(bitmapSource, new Int32Rect(33, 0, 234, 234));
-                });
-            }
-            else
-            {
-                croppedBitmap = new CroppedBitmap(bitmapSource, new Int32Rect(33, 0, 234, 234));
-            }
-
-            return croppedBitmap ?? bitmapSource;
+            return artwork.Crop(33, 0, 234, 234);
         }
 
         private const byte LetterboxMaxChannel = 24;
 
-        private static BitmapSource TrimLetterbox(BitmapSource source)
+        private static MediaArtwork TrimLetterbox(MediaArtwork source)
         {
-            var bgra = new FormatConvertedBitmap(source, PixelFormats.Bgra32, null, 0);
-            int width = bgra.PixelWidth;
-            int height = bgra.PixelHeight;
-            int stride = width * 4;
-            var pixels = new byte[stride * height];
-            bgra.CopyPixels(pixels, stride, 0);
+            byte[] pixels = source.Pixels;
+            int width = source.PixelWidth;
+            int height = source.PixelHeight;
+            int stride = source.Stride;
 
             int top = 0;
             while (top < height / 4 && IsDarkRow(pixels, stride, top))
@@ -622,7 +600,7 @@ namespace ModernFlyouts.Core.Media.Control
                 return source;
             }
 
-            return new CroppedBitmap(source, new Int32Rect(0, top, width, height - top - bottom));
+            return source.Crop(0, top, width, height - top - bottom);
         }
 
         private static bool IsDarkRow(byte[] pixels, int stride, int row)

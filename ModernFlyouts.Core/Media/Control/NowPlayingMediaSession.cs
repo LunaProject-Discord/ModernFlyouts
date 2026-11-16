@@ -1,12 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using ModernFlyouts.Core.AppInformation;
-using ModernFlyouts.Core.Helpers;
 using ModernFlyouts.Core.Threading;
 using NPSMLib;
 using System;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace ModernFlyouts.Core.Media.Control
 {
@@ -64,7 +60,7 @@ namespace ModernFlyouts.Core.Media.Control
 
         private void MediaPlaybackDataSource_MediaPlaybackDataChanged(object sender, MediaPlaybackDataChangedArgs e)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            UiDispatcher.Invoke(() =>
             {
                 switch (e.DataChangedEvent)
                 {
@@ -110,10 +106,7 @@ namespace ModernFlyouts.Core.Media.Control
                 sourceAppInfo.InfoFetched -= SourceAppInfo_InfoFetched;
                 MediaSourceName = sourceAppInfo.DisplayName;
 
-                if (BitmapHelper.TryCreateBitmapImageFromStream(sourceAppInfo.LogoStream, out var bitmap))
-                {
-                    MediaSourceIcon = bitmap;
-                }
+                SetMediaSourceIconFromStream(sourceAppInfo.LogoStream);
             }
         }
 
@@ -214,7 +207,7 @@ namespace ModernFlyouts.Core.Media.Control
 
             UpdatePlaybackInfo();
 
-            Thumbnail = GetThumbnailImageSource();
+            LoadThumbnailAsync();
 
             RaiseMediaPropertiesChanged();
         }
@@ -227,51 +220,41 @@ namespace ModernFlyouts.Core.Media.Control
         private bool IsSourceAppSpotify() => string.Equals(sourceAppId, SpotifyPackagedAUMID)
             || string.Equals(sourceAppId, SpotifyUnpackagedAUMID);
 
-        private ImageSource GetThumbnailImageSource()
+        private async void LoadThumbnailAsync()
         {
+            MediaArtwork artwork = null;
             try
             {
                 if (mediaPlaybackDataSource != null)
                 {
-                    var thumbnail = mediaPlaybackDataSource.GetThumbnailStream();
-                    if (BitmapHelper.TryCreateBitmapImageFromStream(thumbnail, out var bitmap))
-                    {
-                        return GetModifiedThumbnail(bitmap);
-                    }
+                    artwork = GetModifiedThumbnail(await MediaArtwork.DecodeAsync(mediaPlaybackDataSource.GetThumbnailStream()));
                 }
             }
             catch { }
 
-            return null;
+            UiDispatcher.Post(() => Thumbnail = artwork);
         }
 
-        private BitmapSource GetModifiedThumbnail(BitmapSource bitmapSource)
+        private MediaArtwork GetModifiedThumbnail(MediaArtwork artwork)
         {
-            if (IsSourceAppSpotify())
+            if (artwork != null && IsSourceAppSpotify())
             {
-                return GetModifiedThumbnailForSpotify(bitmapSource);
+                return GetModifiedThumbnailForSpotify(artwork);
             }
 
-            return bitmapSource;
+            return artwork;
         }
 
         /// <summary>
         /// Gets a modified version of the original thumbnail provided by Spotify.
         /// It crops and removes extra padding and Spotify branding from the original thumbnail provided by Spotify.
         /// </summary>
-        /// <param name="bitmapSource">The original thumbnail provided by the source.</param>
+        /// <param name="artwork">The original thumbnail provided by the source.</param>
         /// <returns>A cropped variant of the original thumbnail with extra padding and Spotify branding removed.</returns>
         /// <remarks>F*** you Spotify!</remarks>
-        private BitmapSource GetModifiedThumbnailForSpotify(BitmapSource bitmapSource)
+        private static MediaArtwork GetModifiedThumbnailForSpotify(MediaArtwork artwork)
         {
-            CroppedBitmap croppedBitmap = null;
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                croppedBitmap = new CroppedBitmap(bitmapSource, new Int32Rect(33, 0, 234, 234));
-            });
-
-            return croppedBitmap;
+            return artwork.Crop(33, 0, 234, 234);
         }
 
         #endregion

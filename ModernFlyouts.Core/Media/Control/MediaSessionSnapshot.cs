@@ -1,5 +1,4 @@
 using System;
-using System.Windows.Media;
 using Windows.Media.Control;
 
 namespace ModernFlyouts.Core.Media.Control
@@ -18,7 +17,7 @@ namespace ModernFlyouts.Core.Media.Control
 
         public string AlbumTitle { get; init; } = string.Empty;
 
-        public ImageSource ThumbnailImage { get; init; }
+        public MediaArtwork ThumbnailImage { get; init; }
 
         public MediaSessionPlaybackStatus PlaybackStatus { get; init; } = MediaSessionPlaybackStatus.Unknown;
 

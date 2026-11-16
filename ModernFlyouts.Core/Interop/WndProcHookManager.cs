@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace ModernFlyouts.Core.Interop
 {
+    public delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
     internal interface IWndProcObject
     {
     }
@@ -38,11 +40,6 @@ namespace ModernFlyouts.Core.Interop
             }
 
             return null;
-        }
-
-        public static WndProcHookManager GetForBandWindow(BandWindow bandWindow)
-        {
-            return GetForIWndProcObject(bandWindow);
         }
 
         public void RegisterHookHandler(IWndProcHookHandler hookHandler)

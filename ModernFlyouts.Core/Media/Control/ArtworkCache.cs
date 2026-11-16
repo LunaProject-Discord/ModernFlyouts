@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Windows.Storage.Streams;
 
 namespace ModernFlyouts.Core.Media.Control
@@ -41,7 +37,7 @@ namespace ModernFlyouts.Core.Media.Control
             }
         }
 
-        public ImageSource GetPreviousArtwork(MediaSessionSnapshot snapshot, DateTimeOffset utcNow)
+        public MediaArtwork GetPreviousArtwork(MediaSessionSnapshot snapshot, DateTimeOffset utcNow)
         {
             if (snapshot == null)
             {
@@ -85,7 +81,7 @@ namespace ModernFlyouts.Core.Media.Control
             }
         }
 
-        public void StoreDecoded(MediaSessionSnapshot snapshot, ImageSource image, DateTimeOffset? utcNow = null)
+        public void StoreDecoded(MediaSessionSnapshot snapshot, MediaArtwork image, DateTimeOffset? utcNow = null)
         {
             if (snapshot == null || image == null)
             {
@@ -97,10 +93,10 @@ namespace ModernFlyouts.Core.Media.Control
             Store(key, GetLogicalIdentity(snapshot), image, now);
         }
 
-        public async Task<ImageSource> GetOrDecodeAsync(
+        public async Task<MediaArtwork> GetOrDecodeAsync(
             MediaSessionSnapshot snapshot,
             IRandomAccessStreamReference thumbnail,
-            Func<BitmapSource, BitmapSource> transform = null,
+            Func<MediaArtwork, MediaArtwork> transform = null,
             DateTimeOffset? utcNow = null)
         {
             var now = utcNow ?? DateTimeOffset.UtcNow;
@@ -215,16 +211,11 @@ namespace ModernFlyouts.Core.Media.Control
             }
         }
 
-        private void Store(string key, string logicalIdentity, ImageSource image, DateTimeOffset utcNow)
+        private void Store(string key, string logicalIdentity, MediaArtwork image, DateTimeOffset utcNow)
         {
             if (image == null)
             {
                 return;
-            }
-
-            if (image.CanFreeze)
-            {
-                image.Freeze();
             }
 
             lock (gate)
@@ -261,32 +252,17 @@ namespace ModernFlyouts.Core.Media.Control
             }
         }
 
-        private static async Task<ImageSource> DecodeThumbnailAsync(
+        private static async Task<MediaArtwork> DecodeThumbnailAsync(
             IRandomAccessStreamReference thumbnail,
-            Func<BitmapSource, BitmapSource> transform)
+            Func<MediaArtwork, MediaArtwork> transform)
         {
-            using var stream = await thumbnail.OpenReadAsync();
-            if (stream == null || stream.Size == 0)
-            {
-                return null;
-            }
-
-            using var reader = new DataReader(stream);
-            await reader.LoadAsync((uint)stream.Size);
-
-            var buffer = new byte[(int)stream.Size];
-            reader.ReadBytes(buffer);
-
-            using var managedStream = new MemoryStream(buffer);
-            var bitmap = BitmapFrame.Create(managedStream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
-
+            var bitmap = await MediaArtwork.DecodeAsync(thumbnail);
             if (bitmap == null)
             {
                 return null;
             }
 
-            BitmapSource result = transform?.Invoke(bitmap) ?? bitmap;
-            return result;
+            return transform?.Invoke(bitmap) ?? bitmap;
         }
 
         private void EvictExpiredLocked(DateTimeOffset utcNow)
@@ -353,7 +329,7 @@ namespace ModernFlyouts.Core.Media.Control
 
             public string SourceAppUserModelId { get; init; }
 
-            public ImageSource Image { get; init; }
+            public MediaArtwork Image { get; init; }
 
             public DateTimeOffset CreatedAtUtc { get; init; }
 

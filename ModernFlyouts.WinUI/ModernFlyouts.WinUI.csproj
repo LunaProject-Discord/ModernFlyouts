@@ -26,4 +26,8 @@
     <PackageReference Include="NAudio.Wasapi" Version="2.2.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ModernFlyouts.Core\ModernFlyouts.Core.csproj" />
+  </ItemGroup>
+
 </Project>

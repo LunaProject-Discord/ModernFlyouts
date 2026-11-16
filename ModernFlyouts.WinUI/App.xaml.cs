@@ -1,8 +1,10 @@
 using System;
 using System.IO;
+using System.Threading;
 using Microsoft.UI.Xaml;
+using ModernFlyouts.Core.Interop;
+using ModernFlyouts.Core.Threading;
 using ModernFlyouts.WinUI.Audio;
-using ModernFlyouts.WinUI.Interop;
 
 namespace ModernFlyouts.WinUI
 {
@@ -17,7 +19,6 @@ namespace ModernFlyouts.WinUI
         private VolumeService? _volume;
         private FlyoutWindow? _flyout;
         private KeyboardHook? _keyboardHook;
-        private NativeOsdSuppressor? _osd;
 
         public App()
         {
@@ -28,6 +29,10 @@ namespace ModernFlyouts.WinUI
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
             Log("launch");
+
+            // Core marshals media/brightness updates to the UI thread through this.
+            UiDispatcher.Initialize(SynchronizationContext.Current
+                ?? throw new InvalidOperationException("No UI SynchronizationContext"));
 
             _volume = new VolumeService();
             _flyout = new FlyoutWindow(_volume);
@@ -41,9 +46,15 @@ namespace ModernFlyouts.WinUI
                 }
             };
 
-            // Covers volume changes that don't come through the keyboard (touchpad, headset buttons).
-            _osd = new NativeOsdSuppressor();
-            _osd.NativeOsdShown += () => _flyout.DispatcherQueue.TryEnqueue(() => _flyout.ShowFlyout());
+            // Hides the shell OSD and covers volume changes that don't come through the
+            // keyboard (touchpad, headset buttons). Re-hooks after explorer restarts.
+            NativeFlyoutHandler.Instance = new NativeFlyoutHandler();
+            NativeFlyoutHandler.Instance.Initialize();
+            NativeFlyoutHandler.Instance.NativeFlyoutShown += (_, _) =>
+            {
+                NativeFlyoutHandler.Instance.HideNativeFlyout();
+                _flyout.ShowFlyout();
+            };
 
             Log("ready");
         }

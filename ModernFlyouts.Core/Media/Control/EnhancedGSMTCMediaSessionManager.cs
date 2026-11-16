@@ -1,5 +1,5 @@
+using ModernFlyouts.Core.Threading;
 using System;
-using System.Windows;
 
 namespace ModernFlyouts.Core.Media.Control
 {
@@ -55,7 +55,7 @@ namespace ModernFlyouts.Core.Media.Control
                 service = null;
             }
 
-            Application.Current?.Dispatcher.Invoke(ClearDisplaySession);
+            UiDispatcher.Invoke(ClearDisplaySession);
         }
 
         public override bool ContainsAnySession()
@@ -65,14 +65,13 @@ namespace ModernFlyouts.Core.Media.Control
 
         private void Service_SelectionChanged(object sender, MediaSessionSelection selection)
         {
-            var dispatcher = Application.Current?.Dispatcher;
-            if (dispatcher == null || dispatcher.CheckAccess())
+            if (UiDispatcher.CheckAccess())
             {
                 ApplySelection(selection);
             }
             else
             {
-                dispatcher.BeginInvoke(new Action(() => ApplySelection(selection)));
+                UiDispatcher.Post(() => ApplySelection(selection));
             }
         }
 

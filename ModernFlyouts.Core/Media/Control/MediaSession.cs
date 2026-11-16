@@ -1,9 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
-using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace ModernFlyouts.Core.Media.Control
 {
@@ -278,9 +276,9 @@ namespace ModernFlyouts.Core.Media.Control
             protected set => SetProperty(ref artist, value);
         }
 
-        private ImageSource thumbnail;
+        private MediaArtwork thumbnail;
 
-        public ImageSource Thumbnail
+        public MediaArtwork Thumbnail
         {
             get => thumbnail;
             protected set => SetProperty(ref thumbnail, value);
@@ -339,12 +337,26 @@ namespace ModernFlyouts.Core.Media.Control
 
         #region Media Source
 
-        private ImageSource mediaSourceIcon;
+        private MediaArtwork mediaSourceIcon;
 
-        public ImageSource MediaSourceIcon
+        public MediaArtwork MediaSourceIcon
         {
             get => mediaSourceIcon;
             protected set => SetProperty(ref mediaSourceIcon, value);
+        }
+
+        /// <summary>Decodes an app logo stream off the UI thread and assigns <see cref="MediaSourceIcon"/>.</summary>
+        protected async void SetMediaSourceIconFromStream(System.IO.Stream logoStream)
+        {
+            try
+            {
+                var icon = await MediaArtwork.DecodeAsync(logoStream);
+                ModernFlyouts.Core.Threading.UiDispatcher.Post(() => MediaSourceIcon = icon);
+            }
+            catch (System.Exception ex)
+            {
+                MediaDiagnostics.Exception("Media source icon decode failed", ex);
+            }
         }
 
         private string mediaSourceName = string.Empty;
@@ -367,12 +379,13 @@ namespace ModernFlyouts.Core.Media.Control
 
         #region Calculated Values
 
-        private Visibility calculatedMoreControlsButtonVisibility = Visibility.Collapsed;
+        private bool isMoreControlsButtonVisible;
 
-        public Visibility CalculatedMoreControlsButtonVisibility
+        /// <summary>True when shuffle, repeat or stop is available (shown behind the "more" button).</summary>
+        public bool IsMoreControlsButtonVisible
         {
-            get => calculatedMoreControlsButtonVisibility;
-            private set => SetProperty(ref calculatedMoreControlsButtonVisibility, value);
+            get => isMoreControlsButtonVisible;
+            private set => SetProperty(ref isMoreControlsButtonVisible, value);
         }
 
         #endregion
@@ -395,8 +408,7 @@ namespace ModernFlyouts.Core.Media.Control
 
         private void CalculateMoreControlsButtonVisibility()
         {
-            CalculatedMoreControlsButtonVisibility = (IsShuffleEnabled || IsRepeatEnabled || IsStopEnabled) ?
-                Visibility.Visible : Visibility.Collapsed;
+            IsMoreControlsButtonVisible = IsShuffleEnabled || IsRepeatEnabled || IsStopEnabled;
         }
 
         private void PlayOrPause()

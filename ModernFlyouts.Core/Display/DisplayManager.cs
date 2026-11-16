@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Management;
 using System.Runtime.InteropServices;
-using System.Windows;
+using Windows.Foundation;
 using static ModernFlyouts.Core.Interop.NativeMethods;
 
 namespace ModernFlyouts.Core.Display

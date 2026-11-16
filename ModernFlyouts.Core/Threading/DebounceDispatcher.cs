@@ -1,38 +1,29 @@
 ﻿using System;
-using System.Windows.Threading;
+using System.Threading;
 
 namespace ModernFlyouts.Core.Threading
 {
-    public class DebounceDispatcher
+    /// <summary>
+    /// Runs the last action passed to <see cref="Debounce"/> on the UI thread once
+    /// <c>interval</c> has elapsed without another call.
+    /// </summary>
+    public class DebounceDispatcher : IDisposable
     {
-        private DispatcherTimer timer;
+        private readonly Timer timer;
 
         private Action _action;
 
-        public DebounceDispatcher(DispatcherPriority priority = DispatcherPriority.ApplicationIdle,
-            Dispatcher dispatcher = null)
+        public DebounceDispatcher()
         {
-            if (dispatcher == null)
-                dispatcher = Dispatcher.CurrentDispatcher;
-            timer = new DispatcherTimer(priority, dispatcher);
-            timer.Tick += Timer_Tick;
-        }
-
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            timer.Stop();
-            _action?.Invoke();
+            timer = new Timer(_ => UiDispatcher.Post(() => _action?.Invoke()), null, Timeout.Infinite, Timeout.Infinite);
         }
 
         public void Debounce(TimeSpan interval, Action action)
         {
-            timer.Stop();
-
             _action = action;
-
-            timer.Interval = interval;
-
-            timer.Start();
+            timer.Change(interval, Timeout.InfiniteTimeSpan);
         }
+
+        public void Dispose() => timer.Dispose();
     }
 }
