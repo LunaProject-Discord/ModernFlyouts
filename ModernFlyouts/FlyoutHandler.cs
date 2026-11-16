@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using static ModernFlyouts.Core.Interop.NativeMethods;
@@ -346,11 +347,10 @@ namespace ModernFlyouts
                 // we show the volume flyout as a fallback.
                 // Only volume flyout is shown as a fallback
                 // because other triggers are always detected perfectly.
-                ProcessFlyoutTrigger(new()
-                {
-                    TriggerType = FlyoutTriggerType.Volume,
-                    IsExpired = true
-                });
+                // On Windows 11 the same host window also shows non-volume
+                // indicators such as the virtual desktop switcher, so the
+                // fallback only fires when the volume actually changed.
+                ShowVolumeFlyoutIfVolumeChanged();
             }
             else if (DefaultFlyout == DefaultFlyout.None)
             {
@@ -360,6 +360,31 @@ namespace ModernFlyouts
             {
                 NativeFlyoutHandler.Instance.ShowNativeFlyout();
             }
+        }
+
+        private static readonly TimeSpan FallbackVolumeChangeWindow = TimeSpan.FromMilliseconds(500);
+
+        private static readonly TimeSpan FallbackVolumeChangeGrace = TimeSpan.FromMilliseconds(300);
+
+        private async void ShowVolumeFlyoutIfVolumeChanged()
+        {
+            // The volume notification and the native flyout event arrive
+            // asynchronously, so give the notification a moment to land.
+            if (!AudioFlyoutHelper.HasRecentVolumeChange(FallbackVolumeChangeWindow))
+            {
+                await Task.Delay(FallbackVolumeChangeGrace);
+
+                if (!AudioFlyoutHelper.HasRecentVolumeChange(FallbackVolumeChangeWindow + FallbackVolumeChangeGrace))
+                {
+                    return;
+                }
+            }
+
+            ProcessFlyoutTrigger(new()
+            {
+                TriggerType = FlyoutTriggerType.Volume,
+                IsExpired = true
+            });
         }
 
         internal void ProcessFlyoutTrigger(FlyoutTriggerData triggerData = null)

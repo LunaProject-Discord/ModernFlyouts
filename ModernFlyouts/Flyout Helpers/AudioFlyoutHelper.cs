@@ -363,9 +363,21 @@ namespace ModernFlyouts
             else { Application.Current.Dispatcher.Invoke(() => PrimaryContent = noDeviceMessageBlock); }
         }
 
+        private long lastVolumeNotificationTick;
+
         private void AudioEndpointVolume_OnVolumeNotification(AudioVolumeNotificationData data)
         {
+            Interlocked.Exchange(ref lastVolumeNotificationTick, Environment.TickCount64);
             UpdateVolume(data.MasterVolume * 100);
+        }
+
+        /// <summary>
+        /// Whether the default endpoint's volume or mute state changed within the given period.
+        /// </summary>
+        public bool HasRecentVolumeChange(TimeSpan within)
+        {
+            long last = Interlocked.Read(ref lastVolumeNotificationTick);
+            return last != 0 && Environment.TickCount64 - last <= within.TotalMilliseconds;
         }
 
         private bool _isInCodeValueChange; //Prevents a LOOP between changing volume.
