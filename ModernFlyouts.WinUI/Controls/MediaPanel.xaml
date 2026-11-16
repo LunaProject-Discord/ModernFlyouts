@@ -55,11 +55,9 @@
             </Border>
         </Grid>
 
-        <!-- Timeline: thin progress until the seek bar is opened with the chevron -->
-        <Grid x:Name="ProgressPanel" Padding="20,12,20,0">
-            <ProgressBar x:Name="TimelineProgress" />
-        </Grid>
-        <Grid x:Name="SeekPanel" Padding="20,4,20,0" ColumnSpacing="8" Visibility="Collapsed">
+        <!-- Timeline: position | seek slider | duration. When the player doesn't allow changing
+             the position, a progress bar takes the slider's place. -->
+        <Grid x:Name="SeekPanel" Padding="20,8,20,0" ColumnSpacing="8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -69,6 +67,7 @@
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
             <Slider x:Name="TimelineSlider" Grid.Column="1" IsThumbToolTipEnabled="False" VerticalAlignment="Center"
                     ValueChanged="TimelineSlider_ValueChanged" />
+            <ProgressBar x:Name="TimelineProgress" Grid.Column="1" VerticalAlignment="Center" Visibility="Collapsed" />
             <TextBlock x:Name="DurationText" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
         </Grid>
@@ -110,11 +109,6 @@
                     <FontIcon Glyph="&#xE71A;" FontSize="16" />
                 </Button>
             </StackPanel>
-
-            <ToggleButton x:Name="TimelineButton" Grid.Column="2" Style="{StaticResource MediaToggleButtonStyle}"
-                          HorizontalAlignment="Center" Checked="TimelineButton_Toggled" Unchecked="TimelineButton_Toggled">
-                <FontIcon x:Name="TimelineGlyph" Glyph="&#xE70E;" FontSize="12" />
-            </ToggleButton>
         </Grid>
     </StackPanel>
     </Grid>

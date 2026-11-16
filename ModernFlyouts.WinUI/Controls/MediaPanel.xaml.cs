@@ -39,7 +39,6 @@ namespace ModernFlyouts.WinUI.Controls
             ToolTipService.SetToolTip(NextButton, Strings.SessionControl_Next);
             ToolTipService.SetToolTip(StopButton, Strings.SessionControl_Stop);
             ToolTipService.SetToolTip(MoreButton, Strings.SessionControl_MoreControls);
-            ToolTipService.SetToolTip(TimelineButton, Strings.SessionControl_TimelineInfo);
 
             ShuffleButton.Click += (_, _) => { Execute(_session?.ChangeShuffleActiveCommand); UpdateAll(); };
             RepeatButton.Click += (_, _) => { Execute(_session?.ChangeAutoRepeatModeCommand); UpdateAll(); };
@@ -220,12 +219,18 @@ namespace ModernFlyouts.WinUI.Controls
             double start = s.TimelineStartTime.TotalSeconds;
             double end = s.TimelineEndTime.TotalSeconds;
             bool hasTimeline = _showSeekbar && s.IsTimelinePropertiesEnabled && end > start;
-            bool expanded = hasTimeline && TimelineButton.IsChecked == true;
+            bool canSeek = s.IsPlaybackPositionEnabled;
 
-            TimelineButton.Visibility = hasTimeline ? Visibility.Visible : Visibility.Collapsed;
-            TimelineGlyph.Glyph = expanded ? "" : ""; // chevron down / up
-            ProgressPanel.Visibility = hasTimeline && !expanded ? Visibility.Visible : Visibility.Collapsed;
-            SeekPanel.Visibility = expanded ? Visibility.Visible : Visibility.Collapsed;
+            var visibility = hasTimeline ? Visibility.Visible : Visibility.Collapsed;
+            if (SeekPanel.Visibility != visibility)
+            {
+                SeekPanel.Visibility = visibility;
+                LayoutChanged?.Invoke(this, EventArgs.Empty);
+            }
+
+            // Seek slider normally; a read-only progress bar when the position can't be changed.
+            TimelineSlider.Visibility = canSeek ? Visibility.Visible : Visibility.Collapsed;
+            TimelineProgress.Visibility = canSeek ? Visibility.Collapsed : Visibility.Visible;
 
             if (!hasTimeline)
             {
@@ -237,7 +242,6 @@ namespace ModernFlyouts.WinUI.Controls
             TimelineProgress.Maximum = end;
             TimelineProgress.Value = position;
 
-            TimelineSlider.IsEnabled = s.IsPlaybackPositionEnabled;
             DurationText.Text = Format(s.TimelineEndTime);
 
             if (_scrubbing)
@@ -260,12 +264,6 @@ namespace ModernFlyouts.WinUI.Controls
             Interacted?.Invoke(this, EventArgs.Empty);
         }
 
-        private void TimelineButton_Toggled(object sender, RoutedEventArgs e)
-        {
-            UpdateTimeline();
-            Interacted?.Invoke(this, EventArgs.Empty);
-            LayoutChanged?.Invoke(this, EventArgs.Empty);
-        }
 
         private void TimelineSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {

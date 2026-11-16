@@ -94,6 +94,10 @@ namespace ModernFlyouts.WinUI
             {
                 _media.DemoSession = new DemoMediaSession();
             }
+            else if (Array.IndexOf(Environment.GetCommandLineArgs(), "--demo-media-noseek") > 0)
+            {
+                _media.DemoSession = new DemoMediaSession(canSeek: false);
+            }
 #endif
             _flyout.AttachMedia(_media);
             StartMediaAsync();

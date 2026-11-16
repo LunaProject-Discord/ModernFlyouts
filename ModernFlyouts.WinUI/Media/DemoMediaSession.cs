@@ -11,7 +11,8 @@ namespace ModernFlyouts.WinUI.Media
     /// </summary>
     internal sealed class DemoMediaSession : MediaSession
     {
-        public DemoMediaSession()
+        /// <param name="canSeek">false mimics players like Apple Music that don't allow seeking.</param>
+        public DemoMediaSession(bool canSeek = true)
         {
             Title = "Design check track";
             Artist = "ModernFlyouts";
@@ -25,7 +26,7 @@ namespace ModernFlyouts.WinUI.Media
             IsShuffleActive = false;
             AutoRepeatMode = MediaPlaybackAutoRepeatMode.List;
             IsTimelinePropertiesEnabled = true;
-            IsPlaybackPositionEnabled = true;
+            IsPlaybackPositionEnabled = canSeek;
             TimelineStartTime = TimeSpan.Zero;
             TimelineEndTime = TimeSpan.FromSeconds(225);
             PlaybackPosition = TimeSpan.FromSeconds(83);
