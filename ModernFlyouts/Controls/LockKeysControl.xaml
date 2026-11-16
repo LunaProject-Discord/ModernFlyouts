@@ -6,13 +6,20 @@
              xmlns:root="clr-namespace:ModernFlyouts"
              xmlns:ui="http://schemas.modernwpf.com/2019" xmlns:utils="clr-namespace:ModernFlyouts.Utilities"
              mc:Ignorable="d"
-             Height="64" d:DesignWidth="354" DataContext="{x:Static root:FlyoutHandler.Instance}">
+             Height="48" d:DesignWidth="354" DataContext="{x:Static root:FlyoutHandler.Instance}">
 
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-        <ui:FontIcon x:Name="LockGlyph" Glyph="{x:Static utils:CommonGlyphs.Lock}" FontSize="24" />
-        <TextBlock x:Name="txt" HorizontalAlignment="Left" VerticalAlignment="Center"
-                   Style="{DynamicResource BaseTextBlockStyle}" FontSize="18"
-                   Margin="20" Text="Lock key is on" />
-    </StackPanel>
+    <!-- Same 48 | * | 48 columns as the volume and brightness flyouts -->
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="48" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="48" />
+        </Grid.ColumnDefinitions>
+        <ui:FontIcon x:Name="LockGlyph" Glyph="{x:Static utils:CommonGlyphs.Lock}" FontSize="16"
+                     HorizontalAlignment="Center" VerticalAlignment="Center" />
+        <TextBlock x:Name="txt" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Style="{DynamicResource BaseTextBlockStyle}" FontSize="16"
+                   TextTrimming="CharacterEllipsis" Text="Lock key is on" />
+    </Grid>
 
 </UserControl>

@@ -21,6 +21,8 @@ namespace ModernFlyouts.Helpers
 
         public const bool LockKeysModuleEnabled = true;
 
+        public const bool VirtualDesktopModuleEnabled = true;
+
         public const DefaultFlyout PreferredDefaultFlyout = DefaultFlyout.ModernFlyouts;
 
         public static BindablePoint DefaultFlyoutPosition => new(50, 60);

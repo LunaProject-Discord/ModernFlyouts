@@ -30,6 +30,8 @@
 
         public const string Airplane = "\uE709";
 
+        public const string TaskView = "\uE7C4";
+
         public const string SignalBars = "\uEC3B";
 
         public const string Audio = "\uE189";

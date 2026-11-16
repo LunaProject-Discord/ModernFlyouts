@@ -548,4 +548,13 @@
   <data name="Enums.PinnedAppPriorityMode.AlwaysPreferPinnedIfEligible" xml:space="preserve">
     <value>Always prefer pinned app if eligible</value>
   </data>
+  <data name="Settings.Modules.VirtualDesktop" xml:space="preserve">
+    <value>Virtual desktops</value>
+  </data>
+  <data name="Settings.EnableModule.VirtualDesktop" xml:space="preserve">
+    <value>Enable Virtual desktop Flyout</value>
+  </data>
+  <data name="VirtualDesktopFlyoutHelper.DefaultName" xml:space="preserve">
+    <value>Desktop {0}</value>
+  </data>
 </root>

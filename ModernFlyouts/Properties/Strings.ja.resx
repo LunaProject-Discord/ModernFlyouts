@@ -389,4 +389,13 @@
   <data name="Settings.VerticalAlignment" xml:space="preserve">
     <value>垂直方向の配置</value>
   </data>
+  <data name="Settings.Modules.VirtualDesktop" xml:space="preserve">
+    <value>仮想デスクトップ</value>
+  </data>
+  <data name="Settings.EnableModule.VirtualDesktop" xml:space="preserve">
+    <value>仮想デスクトップのフライアウトを有効化</value>
+  </data>
+  <data name="VirtualDesktopFlyoutHelper.DefaultName" xml:space="preserve">
+    <value>デスクトップ {0}</value>
+  </data>
 </root>

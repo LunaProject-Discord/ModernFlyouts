@@ -9,11 +9,17 @@
              xmlns:resx="clr-namespace:ModernFlyouts.Properties"
              xmlns:toolkit="http://schemas.modernwpf.com/toolkit"
              mc:Ignorable="d"
-             Height="64" d:DesignWidth="354" DataContext="{x:Static root:FlyoutHandler.Instance}">
+             Height="48" d:DesignWidth="354" DataContext="{x:Static root:FlyoutHandler.Instance}">
 
-    <StackPanel DataContext="{Binding AirplaneModeFlyoutHelper.AirplaneMode}"
-                Orientation="Horizontal" HorizontalAlignment="Center">
-        <ui:FontIcon d:Glyph="{x:Static utils:CommonGlyphs.Info}" FontSize="24">
+    <!-- Same 48 | * | 48 columns as the volume and brightness flyouts -->
+    <Grid DataContext="{Binding AirplaneModeFlyoutHelper.AirplaneMode}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="48" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="48" />
+        </Grid.ColumnDefinitions>
+        <ui:FontIcon d:Glyph="{x:Static utils:CommonGlyphs.Info}" FontSize="16"
+                     HorizontalAlignment="Center" VerticalAlignment="Center">
             <ui:FontIcon.Glyph>
                 <Binding>
                     <Binding.Converter>
@@ -25,9 +31,9 @@
             </ui:FontIcon.Glyph>
         </ui:FontIcon>
 
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center"
-                   Style="{DynamicResource BaseTextBlockStyle}" FontSize="18"
-                   Margin="20" d:Text="{x:Static resx:Strings.AirplaneMode_NotAvailable}">
+        <TextBlock Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   Style="{DynamicResource BaseTextBlockStyle}" FontSize="16"
+                   TextTrimming="CharacterEllipsis" d:Text="{x:Static resx:Strings.AirplaneMode_NotAvailable}">
             <TextBlock.Text>
                 <Binding>
                     <Binding.Converter>
@@ -38,6 +44,6 @@
                 </Binding>
             </TextBlock.Text>
         </TextBlock>
-    </StackPanel>
+    </Grid>
 
 </UserControl>

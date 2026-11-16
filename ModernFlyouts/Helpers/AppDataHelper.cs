@@ -134,6 +134,12 @@ namespace ModernFlyouts.Helpers
             set => SetValue(value);
         }
 
+        public static bool VirtualDesktopModuleEnabled
+        {
+            get => GetValue(DefaultValuesStore.VirtualDesktopModuleEnabled);
+            set => SetValue(value);
+        }
+
         public static DefaultFlyout DefaultFlyout
         {
             get => GetValue(DefaultValuesStore.PreferredDefaultFlyout);

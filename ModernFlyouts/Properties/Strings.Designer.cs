@@ -1130,6 +1130,33 @@ namespace ModernFlyouts.Properties {
                 return ResourceManager.GetString("Settings.Modules.LockKeys", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Virtual desktops.
+        /// </summary>
+        public static string Settings_Modules_VirtualDesktop {
+            get {
+                return ResourceManager.GetString("Settings.Modules.VirtualDesktop", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Enable Virtual desktop Flyout.
+        /// </summary>
+        public static string Settings_EnableModule_VirtualDesktop {
+            get {
+                return ResourceManager.GetString("Settings.EnableModule.VirtualDesktop", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Desktop {0}.
+        /// </summary>
+        public static string VirtualDesktopFlyoutHelper_DefaultName {
+            get {
+                return ResourceManager.GetString("VirtualDesktopFlyoutHelper.DefaultName", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Off.

@@ -58,6 +58,8 @@ namespace ModernFlyouts
 
         public BrightnessFlyoutHelper BrightnessFlyoutHelper { get; set; }
 
+        public VirtualDesktopFlyoutHelper VirtualDesktopFlyoutHelper { get; set; }
+
         private DefaultFlyout defaultFlyout = DefaultValuesStore.PreferredDefaultFlyout;
 
         public DefaultFlyout DefaultFlyout
@@ -147,6 +149,7 @@ namespace ModernFlyouts
             var apmdEnabled = AppDataHelper.AirplaneModeModuleEnabled;
             var lkkyEnabled = AppDataHelper.LockKeysModuleEnabled;
             var brEnabled = AppDataHelper.BrightnessModuleEnabled;
+            var vdEnabled = AppDataHelper.VirtualDesktopModuleEnabled;
 
             DefaultFlyout = AppDataHelper.DefaultFlyout;
 
@@ -183,11 +186,15 @@ namespace ModernFlyouts
             AirplaneModeFlyoutHelper = new AirplaneModeFlyoutHelper() { IsEnabled = apmdEnabled };
             LockKeysFlyoutHelper = new LockKeysFlyoutHelper() { IsEnabled = lkkyEnabled };
             BrightnessFlyoutHelper = new BrightnessFlyoutHelper() { IsEnabled = brEnabled };
+            VirtualDesktopFlyoutHelper = new VirtualDesktopFlyoutHelper() { IsEnabled = vdEnabled };
 
             flyoutHelpers.Add(AudioFlyoutHelper);
             flyoutHelpers.Add(AirplaneModeFlyoutHelper);
             flyoutHelpers.Add(LockKeysFlyoutHelper);
             flyoutHelpers.Add(BrightnessFlyoutHelper);
+            flyoutHelpers.Add(VirtualDesktopFlyoutHelper);
+
+            lastVirtualDesktopId = VirtualDesktopManager.Instance.TryGetCurrentDesktop()?.Id;
 
             foreach (var flyoutHelper in flyoutHelpers)
             {
@@ -333,6 +340,12 @@ namespace ModernFlyouts
                 if (Handled())
                     NativeFlyoutHandler.Instance.HideNativeFlyout();
 
+                // Windows 11 shows the virtual desktop switcher in the same host window.
+                if (TryShowVirtualDesktopFlyout())
+                {
+                    return;
+                }
+
                 if (prevTriggerData != null
                     && !prevTriggerData.IsExpired)
                 {
@@ -376,6 +389,8 @@ namespace ModernFlyouts
 
                 if (!AudioFlyoutHelper.HasRecentVolumeChange(FallbackVolumeChangeWindow + FallbackVolumeChangeGrace))
                 {
+                    // The shell may update the current desktop after showing its switcher.
+                    TryShowVirtualDesktopFlyout();
                     return;
                 }
             }
@@ -385,6 +400,33 @@ namespace ModernFlyouts
                 TriggerType = FlyoutTriggerType.Volume,
                 IsExpired = true
             });
+        }
+
+        private Guid? lastVirtualDesktopId;
+
+        private bool TryShowVirtualDesktopFlyout()
+        {
+            var desktop = VirtualDesktopManager.Instance.TryGetCurrentDesktop();
+            if (desktop == null)
+            {
+                return false;
+            }
+
+            bool changed = lastVirtualDesktopId.HasValue && lastVirtualDesktopId != desktop.Id;
+            lastVirtualDesktopId = desktop.Id;
+
+            if (!changed)
+            {
+                return false;
+            }
+
+            ProcessFlyoutTrigger(new()
+            {
+                TriggerType = FlyoutTriggerType.VirtualDesktop,
+                Data = desktop,
+                IsExpired = true
+            });
+            return true;
         }
 
         internal void ProcessFlyoutTrigger(FlyoutTriggerData triggerData = null)

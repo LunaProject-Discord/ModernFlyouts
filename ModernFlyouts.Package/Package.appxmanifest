@@ -11,7 +11,7 @@
   <Identity
     Name="LunaProject.ModernFlyouts"
     Publisher="CN=Luna Project"
-    Version="0.10.4.0" />
+    Version="0.10.8.0" />
 
   <Properties>
     <DisplayName>ms-resource:Resources/PackageDisplayName</DisplayName>
