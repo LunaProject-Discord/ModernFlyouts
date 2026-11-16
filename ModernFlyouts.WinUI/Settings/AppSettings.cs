@@ -10,6 +10,14 @@ using ModernFlyouts.Core.Media.Control;
 
 namespace ModernFlyouts.WinUI.Settings
 {
+    /// <summary>Top bar of the flyout (settings / reset position / drag handle / close).</summary>
+    public enum TopBarVisibility
+    {
+        Visible,
+        AutoHide,
+        Collapsed,
+    }
+
     /// <summary>Which flyout is shown for volume/brightness/... events.</summary>
     public enum DefaultFlyout
     {
@@ -62,6 +70,23 @@ namespace ModernFlyouts.WinUI.Settings
 
         private bool trayIconEnabled = true;
         public bool TrayIconEnabled { get => trayIconEnabled; set => Set(ref trayIconEnabled, value); }
+
+        private bool flyoutAnimationEnabled = true;
+        public bool FlyoutAnimationEnabled { get => flyoutAnimationEnabled; set => Set(ref flyoutAnimationEnabled, value); }
+
+        private TopBarVisibility topBarVisibility = TopBarVisibility.Visible;
+        public TopBarVisibility TopBarVisibility { get => topBarVisibility; set => Set(ref topBarVisibility, value); }
+
+        #endregion
+
+        #region Layout
+
+        // Manual position of the flyout (top-left of its content, physical pixels); null = automatic.
+        private int? flyoutPositionX;
+        public int? FlyoutPositionX { get => flyoutPositionX; set => Set(ref flyoutPositionX, value); }
+
+        private int? flyoutPositionY;
+        public int? FlyoutPositionY { get => flyoutPositionY; set => Set(ref flyoutPositionY, value); }
 
         #endregion
 

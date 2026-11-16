@@ -55,6 +55,11 @@ namespace ModernFlyouts.WinUI.Interop
                 return;
             }
 
+            if ((long)wParam is HSHELL_BRIGHTNESS or HSHELL_APPCOMMAND)
+            {
+                App.Log($"shellhook w={(long)wParam} l={(long)lParam}");
+            }
+
             switch ((long)wParam)
             {
                 case HSHELL_BRIGHTNESS:

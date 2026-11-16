@@ -21,7 +21,10 @@ namespace ModernFlyouts.WinUI.Media
 
         /// <summary>Session to display, or null when nothing is playing.</summary>
         public MediaSession? CurrentSession =>
-            _manager?.CurrentMediaSession ?? (_manager?.MediaSessions.Count > 0 ? _manager.MediaSessions[0] : null);
+            DemoSession ?? _manager?.CurrentMediaSession ?? (_manager?.MediaSessions.Count > 0 ? _manager.MediaSessions[0] : null);
+
+        /// <summary>Debug builds: a sample session shown instead of the real one (--demo-media).</summary>
+        public MediaSession? DemoSession { get; set; }
 
         public string BackendName { get; private set; } = "none";
 

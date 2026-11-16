@@ -10,31 +10,68 @@
         <DesktopAcrylicBackdrop />
     </Window.SystemBackdrop>
 
-    <!-- Every row uses the same 48 | * | 48 layout as the WPF flyouts. Only one row is visible at a time. -->
+    <!--
+        Layout follows the WPF flyout (360 wide, 48 high rows in a 48 | * | 48 grid, 16 px icons,
+        32 px top bar) with Fluent details: 4 px control radius, divider strokes, theme text brushes.
+    -->
     <StackPanel x:Name="RootPanel" VerticalAlignment="Top"
                 PointerEntered="RootPanel_PointerEntered" PointerExited="RootPanel_PointerExited">
 
+        <!-- Top bar: settings / reset position | drag handle | close -->
+        <Grid x:Name="TopBar" Height="32" Padding="2,2,2,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" Spacing="2">
+                <Button Style="{StaticResource FlyoutTopBarButtonStyle}" Click="SettingsButton_Click"
+                        ToolTipService.ToolTip="{x:Bind SettingsText}">
+                    <FontIcon Glyph="&#xE713;" FontSize="14" />
+                </Button>
+                <Button x:Name="AlignButton" Style="{StaticResource FlyoutTopBarButtonStyle}" Click="AlignButton_Click"
+                        ToolTipService.ToolTip="{x:Bind AlignText}">
+                    <FontIcon Glyph="&#xECE9;" FontSize="14" />
+                </Button>
+            </StackPanel>
+            <!-- Drag handle (moves the flyout; the position is remembered) -->
+            <Border x:Name="DragArea" Grid.Column="1" Background="Transparent" Margin="8,0"
+                    PointerPressed="DragArea_PointerPressed">
+                <Border Width="32" Height="4" CornerRadius="2" VerticalAlignment="Center"
+                        Background="{ThemeResource TextFillColorTertiaryBrush}" />
+            </Border>
+            <Button Grid.Column="2" Style="{StaticResource FlyoutTopBarButtonStyle}" Click="CloseButton_Click"
+                    ToolTipService.ToolTip="{x:Bind CloseText}">
+                <FontIcon Glyph="&#xE8BB;" FontSize="12" />
+            </Button>
+        </Grid>
+
         <!-- Volume -->
-        <Grid x:Name="VolumeRow" Height="56" Padding="4,0">
+        <Grid x:Name="VolumeRow" Height="48">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="48" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="48" />
             </Grid.ColumnDefinitions>
-            <Button x:Name="MuteButton" Style="{StaticResource MediaButtonStyle}"
-                    HorizontalAlignment="Center" VerticalAlignment="Center" Click="MuteButton_Click">
-                <FontIcon x:Name="VolumeGlyph" Glyph="&#xE995;" FontSize="16" />
+            <Button Style="{StaticResource MediaButtonStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Click="MuteButton_Click">
+                <!-- Full speaker in a faint tone behind the current level (as in the WPF flyout) -->
+                <Grid>
+                    <FontIcon x:Name="VolumeShadowGlyph" Glyph="&#xE995;" FontSize="16"
+                              Foreground="{ThemeResource TextFillColorDisabledBrush}" />
+                    <FontIcon x:Name="VolumeGlyph" Glyph="&#xE995;" FontSize="16" />
+                </Grid>
             </Button>
             <Slider x:Name="VolumeSlider" Grid.Column="1" Minimum="0" Maximum="100" StepFrequency="1"
                     VerticalAlignment="Center" Margin="8,0" IsThumbToolTipEnabled="False"
                     ValueChanged="VolumeSlider_ValueChanged" />
             <TextBlock x:Name="VolumeText" Grid.Column="2" Text="0"
                        HorizontalAlignment="Center" VerticalAlignment="Center"
-                       Style="{StaticResource SubtitleTextBlockStyle}" />
+                       Style="{StaticResource FlyoutValueTextStyle}" />
         </Grid>
 
         <!-- Brightness -->
-        <Grid x:Name="BrightnessRow" Height="56" Padding="4,0" Visibility="Collapsed">
+        <Grid x:Name="BrightnessRow" Height="48" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="48" />
                 <ColumnDefinition Width="*" />
@@ -47,24 +84,23 @@
                     ValueChanged="BrightnessSlider_ValueChanged" />
             <TextBlock x:Name="BrightnessText" Grid.Column="2" Text="0"
                        HorizontalAlignment="Center" VerticalAlignment="Center"
-                       Style="{StaticResource SubtitleTextBlockStyle}" />
+                       Style="{StaticResource FlyoutValueTextStyle}" />
         </Grid>
 
         <!-- Icon + message (airplane mode, lock keys) -->
-        <Grid x:Name="InfoRow" Height="48" Padding="4,0" Visibility="Collapsed">
+        <Grid x:Name="InfoRow" Height="48" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="48" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="48" />
             </Grid.ColumnDefinitions>
             <FontIcon x:Name="InfoGlyph" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
-            <TextBlock x:Name="InfoText" Grid.Column="1" FontSize="16" TextTrimming="CharacterEllipsis"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                       Style="{StaticResource BodyStrongTextBlockStyle}" />
+            <TextBlock x:Name="InfoText" Grid.Column="1" FontSize="16" FontWeight="SemiBold"
+                       TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Grid>
 
         <!-- Virtual desktop -->
-        <Grid x:Name="DesktopRow" Height="56" Padding="4,0" Visibility="Collapsed">
+        <Grid x:Name="DesktopRow" Height="48" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="48" />
                 <ColumnDefinition Width="*" />
@@ -72,8 +108,8 @@
             </Grid.ColumnDefinitions>
             <FontIcon Glyph="&#xE7C4;" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
             <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
-                <TextBlock x:Name="DesktopNameText" FontSize="15" HorizontalAlignment="Center"
-                           TextTrimming="CharacterEllipsis" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                <TextBlock x:Name="DesktopNameText" FontSize="15" FontWeight="SemiBold"
+                           HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" />
                 <StackPanel x:Name="DesktopDots" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6" />
             </StackPanel>
         </Grid>

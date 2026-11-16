@@ -18,6 +18,14 @@
                 <ComboBox x:Name="AppThemeCombo" MinWidth="200" />
             </controls:SettingsCard>
 
+            <controls:SettingsCard Glyph="&#xE8A0;" Header="{x:Bind res:Strings.Settings_TopBarVisibility}">
+                <ComboBox x:Name="TopBarCombo" MinWidth="200" />
+            </controls:SettingsCard>
+
+            <controls:SettingsCard Glyph="&#xE945;" Header="{x:Bind res:Strings.Settings_FlyoutAnimationEnabled}">
+                <ToggleSwitch IsOn="{x:Bind S.FlyoutAnimationEnabled, Mode=TwoWay}" />
+            </controls:SettingsCard>
+
             <controls:SettingsCard Glyph="&#xE8A5;" Header="{x:Bind res:Strings.Settings_TrayIconEnabled}">
                 <ToggleSwitch IsOn="{x:Bind S.TrayIconEnabled, Mode=TwoWay}" />
             </controls:SettingsCard>

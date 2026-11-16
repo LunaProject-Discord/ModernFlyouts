@@ -80,8 +80,15 @@ namespace ModernFlyouts.WinUI
 
             _volume = new VolumeService();
             _flyout = new FlyoutWindow(_volume);
+            _flyout.SettingsRequested += ShowSettings;
 
             _media = new MediaController(() => _flyout.IsTimelineDisplayed);
+#if DEBUG
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "--demo-media") > 0)
+            {
+                _media.DemoSession = new DemoMediaSession();
+            }
+#endif
             _flyout.AttachMedia(_media);
             StartMediaAsync();
 

@@ -4,7 +4,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
+using ModernFlyouts.Core.Media;
 using ModernFlyouts.Core.Media.Control;
+using ModernFlyouts.Properties;
 using ModernFlyouts.WinUI.Media;
 
 namespace ModernFlyouts.WinUI.Controls
@@ -18,6 +20,8 @@ namespace ModernFlyouts.WinUI.Controls
         private MediaSession? _session;
         private bool _updatingTimeline;
         private bool _scrubbing;
+        private bool _showPlayerInfo = true;
+        private bool _showSeekbar = true;
 
         public MediaPanel()
         {
@@ -26,10 +30,22 @@ namespace ModernFlyouts.WinUI.Controls
             TimelineSlider.AddHandler(PointerPressedEvent, new PointerEventHandler((_, _) => BeginScrub()), true);
             TimelineSlider.AddHandler(PointerReleasedEvent, new PointerEventHandler((_, _) => EndScrub()), true);
             TimelineSlider.AddHandler(PointerCaptureLostEvent, new PointerEventHandler((_, _) => EndScrub()), true);
+
+            ToolTipService.SetToolTip(PreviousButton, Strings.SessionControl_Previous);
+            ToolTipService.SetToolTip(NextButton, Strings.SessionControl_Next);
+            ToolTipService.SetToolTip(StopButton, Strings.SessionControl_Stop);
+            ToolTipService.SetToolTip(MoreButton, Strings.SessionControl_MoreControls);
+            ToolTipService.SetToolTip(TimelineButton, Strings.SessionControl_TimelineInfo);
+
+            ShuffleButton.Click += (_, _) => { Execute(_session?.ChangeShuffleActiveCommand); UpdateAll(); };
+            RepeatButton.Click += (_, _) => { Execute(_session?.ChangeAutoRepeatModeCommand); UpdateAll(); };
         }
 
-        private bool _showPlayerInfo = true;
-        private bool _showSeekbar = true;
+        /// <summary>Raised whenever the user interacts, so the flyout can postpone hiding.</summary>
+        public event EventHandler? Interacted;
+
+        /// <summary>Raised when the panel's height changes (seek bar / controls toggled).</summary>
+        public event EventHandler? LayoutChanged;
 
         public bool ShowPlayerInfo
         {
@@ -42,9 +58,6 @@ namespace ModernFlyouts.WinUI.Controls
             get => _showSeekbar;
             set { _showSeekbar = value; UpdateTimeline(); }
         }
-
-        /// <summary>Raised whenever the user interacts, so the flyout can postpone hiding.</summary>
-        public event EventHandler? Interacted;
 
         public MediaSession? Session
         {
@@ -68,6 +81,8 @@ namespace ModernFlyouts.WinUI.Controls
                     _session.PropertyChanged += Session_PropertyChanged;
                 }
 
+                // A different player starts with the default controls.
+                MoreButton.IsChecked = false;
                 UpdateAll();
             }
         }
@@ -99,23 +114,53 @@ namespace ModernFlyouts.WinUI.Controls
 
             SourceName.Text = s.MediaSourceName ?? string.Empty;
             SourceIcon.Source = ArtworkImages.ToImageSource(s.MediaSourceIcon);
+            SourceIcon.Visibility = SourceIcon.Source != null ? Visibility.Visible : Visibility.Collapsed;
             SourcePanel.Visibility = _showPlayerInfo && !string.IsNullOrEmpty(SourceName.Text) ? Visibility.Visible : Visibility.Collapsed;
 
             TitleText.Text = s.Title ?? string.Empty;
             ArtistText.Text = s.Artist ?? string.Empty;
             ArtistText.Visibility = string.IsNullOrEmpty(ArtistText.Text) ? Visibility.Collapsed : Visibility.Visible;
             Artwork.Source = ArtworkImages.ToImageSource(s.Thumbnail);
+            ArtworkPlaceholder.Visibility = Artwork.Source == null ? Visibility.Visible : Visibility.Collapsed;
 
             PreviousButton.Command = s.PreviousTrackCommand;
             PlayPauseButton.Command = s.PlayOrPauseCommand;
             NextButton.Command = s.NextTrackCommand;
+            StopButton.Command = s.StopCommand;
             PreviousButton.IsEnabled = s.IsPreviousEnabled;
             PlayPauseButton.IsEnabled = s.IsPlayOrPauseEnabled;
             NextButton.IsEnabled = s.IsNextEnabled;
             PlayPauseGlyph.Glyph = s.IsPlaying ? "" : "";
-            ToolTipService.SetToolTip(PlayPauseButton, s.IsPlaying ? "Pause" : "Play");
+            ToolTipService.SetToolTip(PlayPauseButton, s.IsPlaying ? Strings.SessionControl_Pause : Strings.SessionControl_Play);
+
+            // "More" holds shuffle / repeat / stop.
+            MoreButton.Visibility = s.IsMoreControlsButtonVisible ? Visibility.Visible : Visibility.Collapsed;
+            if (!s.IsMoreControlsButtonVisible)
+            {
+                MoreButton.IsChecked = false;
+            }
+
+            ShuffleButton.Visibility = s.IsShuffleEnabled ? Visibility.Visible : Visibility.Collapsed;
+            ShuffleButton.IsChecked = s.IsShuffleActive == true;
+            RepeatButton.Visibility = s.IsRepeatEnabled ? Visibility.Visible : Visibility.Collapsed;
+            RepeatButton.IsChecked = s.AutoRepeatMode != MediaPlaybackAutoRepeatMode.None;
+            RepeatGlyph.Glyph = s.AutoRepeatMode switch
+            {
+                MediaPlaybackAutoRepeatMode.Track => "", // repeat one
+                MediaPlaybackAutoRepeatMode.List => "",  // repeat all
+                _ => "",                                 // repeat off
+            };
+            StopButton.Visibility = s.IsStopEnabled ? Visibility.Visible : Visibility.Collapsed;
+            UpdateControlsMode();
 
             UpdateTimeline();
+        }
+
+        private void UpdateControlsMode()
+        {
+            bool more = MoreButton.IsChecked == true;
+            MainControls.Visibility = more ? Visibility.Collapsed : Visibility.Visible;
+            MoreControls.Visibility = more ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void UpdateTimeline()
@@ -128,12 +173,23 @@ namespace ModernFlyouts.WinUI.Controls
 
             double start = s.TimelineStartTime.TotalSeconds;
             double end = s.TimelineEndTime.TotalSeconds;
-            bool visible = _showSeekbar && s.IsTimelinePropertiesEnabled && end > start;
-            TimelinePanel.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
-            if (!visible)
+            bool hasTimeline = _showSeekbar && s.IsTimelinePropertiesEnabled && end > start;
+            bool expanded = hasTimeline && TimelineButton.IsChecked == true;
+
+            TimelineButton.Visibility = hasTimeline ? Visibility.Visible : Visibility.Collapsed;
+            TimelineGlyph.Glyph = expanded ? "" : ""; // chevron down / up
+            ProgressPanel.Visibility = hasTimeline && !expanded ? Visibility.Visible : Visibility.Collapsed;
+            SeekPanel.Visibility = expanded ? Visibility.Visible : Visibility.Collapsed;
+
+            if (!hasTimeline)
             {
                 return;
             }
+
+            double position = Math.Clamp(s.PlaybackPosition.TotalSeconds, start, end);
+            TimelineProgress.Minimum = start;
+            TimelineProgress.Maximum = end;
+            TimelineProgress.Value = position;
 
             TimelineSlider.IsEnabled = s.IsPlaybackPositionEnabled;
             DurationText.Text = Format(s.TimelineEndTime);
@@ -146,9 +202,23 @@ namespace ModernFlyouts.WinUI.Controls
             _updatingTimeline = true;
             TimelineSlider.Minimum = start;
             TimelineSlider.Maximum = end;
-            TimelineSlider.Value = Math.Clamp(s.PlaybackPosition.TotalSeconds, start, end);
+            TimelineSlider.Value = position;
             _updatingTimeline = false;
             PositionText.Text = Format(s.PlaybackPosition);
+        }
+
+        // Checked/Unchecked (not Click) so keyboard and UI Automation toggles work too.
+        private void MoreButton_Toggled(object sender, RoutedEventArgs e)
+        {
+            UpdateControlsMode();
+            Interacted?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void TimelineButton_Toggled(object sender, RoutedEventArgs e)
+        {
+            UpdateTimeline();
+            Interacted?.Invoke(this, EventArgs.Empty);
+            LayoutChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void TimelineSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
@@ -180,6 +250,15 @@ namespace ModernFlyouts.WinUI.Controls
 
             _scrubbing = false;
             (_session as EnhancedGSMTCMediaSession)?.EndTimelineScrub();
+        }
+
+        private void Execute(System.Windows.Input.ICommand? command)
+        {
+            if (command?.CanExecute(null) == true)
+            {
+                command.Execute(null);
+            }
+            Interacted?.Invoke(this, EventArgs.Empty);
         }
 
         private static string Format(TimeSpan time) =>
