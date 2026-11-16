@@ -505,7 +505,7 @@ namespace ModernFlyouts.Core.Media.Control
                 MinSeekTime = timeline?.MinSeekTime ?? timeline?.StartTime ?? TimeSpan.Zero,
                 MaxSeekTime = timeline?.MaxSeekTime ?? timeline?.EndTime ?? TimeSpan.Zero,
                 RawPosition = timeline?.Position ?? TimeSpan.Zero,
-                LastTimelineSnapshotAtUtc = now,
+                LastTimelineSnapshotAtUtc = GetTimelineTimestamp(timeline, now),
                 PlaybackRate = playbackRate,
                 LastPlaybackChangedAtUtc = now,
                 LastMetadataChangedAtUtc = now,
@@ -519,6 +519,22 @@ namespace ModernFlyouts.Core.Media.Control
                 now);
 
             return snapshotWithoutArtwork with { ThumbnailImage = artwork };
+        }
+
+        /// <summary>
+        /// When the reported position was taken. Browsers update the timeline only every few seconds
+        /// (or on state changes), so the position has to be advanced from this time, not from "now".
+        /// </summary>
+        private static DateTimeOffset GetTimelineTimestamp(
+            GlobalSystemMediaTransportControlsSessionTimelineProperties timeline, DateTimeOffset now)
+        {
+            var updated = timeline?.LastUpdatedTime ?? default;
+            if (updated.Year < 2000 || updated > now || now - updated > TimeSpan.FromHours(12))
+            {
+                return now;
+            }
+
+            return updated.ToUniversalTime();
         }
 
         private static MediaPlaybackType MapPlaybackType(GlobalSystemMediaTransportControlsSessionPlaybackInfo playback)

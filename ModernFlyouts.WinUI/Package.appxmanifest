@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
@@ -11,7 +11,7 @@
   <Identity
     Name="LunaProject.ModernFlyouts"
     Publisher="CN=Luna Project"
-    Version="0.11.2.0" />
+    Version="0.11.3.0" />
 
   <Properties>
     <DisplayName>ModernFlyouts</DisplayName>
@@ -23,8 +23,39 @@
     <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0" />
   </Dependencies>
 
+  <!-- Languages with translations (Properties\Strings.*.resx). Listing them lets Windows pick
+       the user's language for the app instead of falling back to English. -->
   <Resources>
-    <Resource Language="x-generate" />
+    <Resource Language="en-US" />
+    <Resource Language="en-GB" />
+    <Resource Language="af" />
+    <Resource Language="ar" />
+    <Resource Language="da-DK" />
+    <Resource Language="de" />
+    <Resource Language="el" />
+    <Resource Language="es" />
+    <Resource Language="fa" />
+    <Resource Language="fr" />
+    <Resource Language="he" />
+    <Resource Language="hi" />
+    <Resource Language="hu" />
+    <Resource Language="id" />
+    <Resource Language="is" />
+    <Resource Language="it" />
+    <Resource Language="ja" />
+    <Resource Language="ko" />
+    <Resource Language="ms" />
+    <Resource Language="nb" />
+    <Resource Language="nl" />
+    <Resource Language="pl" />
+    <Resource Language="pt" />
+    <Resource Language="ru" />
+    <Resource Language="sv" />
+    <Resource Language="tr" />
+    <Resource Language="uk" />
+    <Resource Language="vi" />
+    <Resource Language="zh-CN" />
+    <Resource Language="zh-TW" />
   </Resources>
 
   <Applications>

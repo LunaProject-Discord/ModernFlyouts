@@ -50,6 +50,8 @@ namespace ModernFlyouts.WinUI
 
         public App()
         {
+            // Before any UI is created, so every string and WinUI control uses the chosen language.
+            Localization.Apply();
             InitializeComponent();
             UnhandledException += (_, e) => Log($"Unhandled: {e.Exception}");
         }

@@ -41,6 +41,9 @@
     <AppxSymbolPackageEnabled>false</AppxSymbolPackageEnabled>
     <AppxAutoIncrementPackageRevision>false</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>true</GenerateTestArtifacts>
+    <!-- Keep translations (satellite assemblies) in the main package: language resource packs
+         were dropped from the bundle, leaving the installed app English-only. -->
+    <AppxBundleAutoResourcePackageQualifiers>Scale|DXFeatureLevel</AppxBundleAutoResourcePackageQualifiers>
   </PropertyGroup>
 
   <ItemGroup>

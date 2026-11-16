@@ -14,6 +14,11 @@
                 <ToggleSwitch IsOn="{x:Bind S.RunAtStartup, Mode=TwoWay}" />
             </controls:SettingsCard>
 
+            <controls:SettingsCard Glyph="&#xF2B7;" Header="{x:Bind res:Strings.Settings_Language}"
+                                   Description="{x:Bind res:Strings.Settings_LanguageDescription}">
+                <ComboBox x:Name="LanguageCombo" MinWidth="200" />
+            </controls:SettingsCard>
+
             <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_DefaultFlyout}" />
 
             <controls:SettingsCard Glyph="&#xE737;" Header="{x:Bind res:Strings.Settings_DefaultFlyoutDescription}">

@@ -53,6 +53,10 @@ namespace ModernFlyouts.WinUI.Settings
         private bool runAtStartup;
         public bool RunAtStartup { get => runAtStartup; set => Set(ref runAtStartup, value); }
 
+        private string language = string.Empty;
+        /// <summary>UI culture name (e.g. "ja"); empty = Windows display language. Applied at startup.</summary>
+        public string Language { get => language; set => Set(ref language, value ?? string.Empty); }
+
         private DefaultFlyout defaultFlyout = DefaultFlyout.ModernFlyouts;
         public DefaultFlyout DefaultFlyout { get => defaultFlyout; set => Set(ref defaultFlyout, value); }
 

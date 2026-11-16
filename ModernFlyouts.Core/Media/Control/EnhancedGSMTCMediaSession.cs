@@ -103,7 +103,7 @@ namespace ModernFlyouts.Core.Media.Control
             IsShuffleEnabled = snapshot.CanChangeShuffle;
             IsRepeatEnabled = snapshot.CanChangeRepeat;
             IsPlaybackPositionEnabled = snapshot.CanSeek;
-            IsTimelinePropertiesEnabled = snapshot.CanSeek && snapshot.EndTime > snapshot.StartTime;
+            IsTimelinePropertiesEnabled = snapshot.EndTime > snapshot.StartTime; // shown read-only when seeking is off
             IsShuffleActive = snapshot.ShuffleActive;
             AutoRepeatMode = snapshot.RepeatMode;
             TimelineStartTime = snapshot.StartTime;
@@ -250,7 +250,10 @@ namespace ModernFlyouts.Core.Media.Control
 
         private bool ShouldRunTimelineTimer()
         {
-            return currentSnapshot?.CanSeek == true &&
+            // The position is shown (progress bar) even when the player doesn't allow seeking,
+            // so tick whenever there is a timeline to advance.
+            return currentSnapshot != null &&
+                currentSnapshot.EndTime > currentSnapshot.StartTime &&
                 currentSnapshot.PlaybackStatus == MediaSessionPlaybackStatus.Playing &&
                 isTimelineDisplayActive();
         }

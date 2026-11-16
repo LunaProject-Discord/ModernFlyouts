@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using ModernFlyouts.WinUI.Settings;
@@ -13,6 +14,20 @@ namespace ModernFlyouts.WinUI.Pages
             EnumChoices.Bind(DefaultFlyoutCombo, () => S.DefaultFlyout, v => S.DefaultFlyout = v);
             UpdateWarning();
             DefaultFlyoutCombo.SelectionChanged += (_, _) => UpdateWarning();
+
+            foreach (var (name, display) in Localization.GetChoices())
+            {
+                LanguageCombo.Items.Add(new ComboBoxItem { Content = display, Tag = name });
+            }
+            LanguageCombo.SelectedItem = LanguageCombo.Items.OfType<ComboBoxItem>()
+                .FirstOrDefault(i => (string)i.Tag == S.Language) ?? LanguageCombo.Items[0];
+            LanguageCombo.SelectionChanged += (_, _) =>
+            {
+                if (LanguageCombo.SelectedItem is ComboBoxItem item)
+                {
+                    S.Language = (string)item.Tag;
+                }
+            };
         }
 
         public AppSettings S => AppSettings.Instance;

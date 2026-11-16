@@ -106,10 +106,17 @@ namespace ModernFlyouts.Core.Media.Control
         {
             lock (gate)
             {
-                position = snapshot?.RawPosition ?? TimeSpan.Zero;
-
-                if (pendingSeek == null || snapshot == null)
+                if (snapshot == null)
                 {
+                    position = TimeSpan.Zero;
+                    return true;
+                }
+
+                if (pendingSeek == null)
+                {
+                    // Players (e.g. browsers) report their position rarely; advance it by the
+                    // elapsed time so the timeline keeps moving between reports.
+                    position = CalculateDisplayPosition(snapshot, utcNow);
                     return true;
                 }
 
