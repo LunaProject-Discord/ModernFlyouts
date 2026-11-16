@@ -3,33 +3,40 @@
     x:Class="ModernFlyouts.WinUI.FlyoutWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:ModernFlyouts.WinUI.Controls"
     Title="ModernFlyouts">
 
     <Window.SystemBackdrop>
         <DesktopAcrylicBackdrop />
     </Window.SystemBackdrop>
 
-    <!-- Same 48 | * | 48 layout as the WPF volume flyout -->
-    <Grid x:Name="RootGrid" Height="56" Padding="4,0"
-          PointerEntered="RootGrid_PointerEntered" PointerExited="RootGrid_PointerExited">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="48" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="48" />
-        </Grid.ColumnDefinitions>
+    <StackPanel x:Name="RootPanel" VerticalAlignment="Top"
+                PointerEntered="RootPanel_PointerEntered" PointerExited="RootPanel_PointerExited">
+        <!-- Same 48 | * | 48 layout as the WPF volume flyout -->
+        <Grid Height="56" Padding="4,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="48" />
+            </Grid.ColumnDefinitions>
 
-        <Button x:Name="MuteButton" Width="40" Height="40" Padding="0"
-                HorizontalAlignment="Center" VerticalAlignment="Center"
-                Background="Transparent" BorderThickness="0" Click="MuteButton_Click">
-            <FontIcon x:Name="VolumeGlyph" Glyph="&#xE995;" FontSize="16" />
-        </Button>
+            <Button x:Name="MuteButton" Style="{StaticResource MediaButtonStyle}"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Click="MuteButton_Click">
+                <FontIcon x:Name="VolumeGlyph" Glyph="&#xE995;" FontSize="16" />
+            </Button>
 
-        <Slider x:Name="VolumeSlider" Grid.Column="1" Minimum="0" Maximum="100" StepFrequency="1"
-                VerticalAlignment="Center" Margin="8,0" IsThumbToolTipEnabled="False"
-                ValueChanged="VolumeSlider_ValueChanged" />
+            <Slider x:Name="VolumeSlider" Grid.Column="1" Minimum="0" Maximum="100" StepFrequency="1"
+                    VerticalAlignment="Center" Margin="8,0" IsThumbToolTipEnabled="False"
+                    ValueChanged="VolumeSlider_ValueChanged" />
 
-        <TextBlock x:Name="VolumeText" Grid.Column="2" Text="0"
-                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                   Style="{StaticResource SubtitleTextBlockStyle}" />
-    </Grid>
+            <TextBlock x:Name="VolumeText" Grid.Column="2" Text="0"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Style="{StaticResource SubtitleTextBlockStyle}" />
+        </Grid>
+
+        <StackPanel x:Name="MediaSection" Visibility="Collapsed">
+            <Border Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+            <controls:MediaPanel x:Name="MediaPanel" />
+        </StackPanel>
+    </StackPanel>
 </Window>

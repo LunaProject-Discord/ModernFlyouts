@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml;
 using ModernFlyouts.Core.Interop;
 using ModernFlyouts.Core.Threading;
 using ModernFlyouts.WinUI.Audio;
+using ModernFlyouts.WinUI.Media;
 
 namespace ModernFlyouts.WinUI
 {
@@ -19,6 +20,7 @@ namespace ModernFlyouts.WinUI
         private VolumeService? _volume;
         private FlyoutWindow? _flyout;
         private KeyboardHook? _keyboardHook;
+        private MediaController? _media;
 
         public App()
         {
@@ -36,6 +38,10 @@ namespace ModernFlyouts.WinUI
 
             _volume = new VolumeService();
             _flyout = new FlyoutWindow(_volume);
+
+            _media = new MediaController(() => _flyout.IsTimelineDisplayed);
+            _flyout.AttachMedia(_media);
+            StartMediaAsync();
 
             _keyboardHook = new KeyboardHook();
             _keyboardHook.KeyDown += vk =>
@@ -57,6 +63,19 @@ namespace ModernFlyouts.WinUI
             };
 
             Log("ready");
+        }
+
+        private async void StartMediaAsync()
+        {
+            try
+            {
+                await _media!.StartAsync();
+                Log($"media backend: {_media.BackendName}");
+            }
+            catch (Exception ex)
+            {
+                Log($"media backend failed: {ex}");
+            }
         }
 
         internal static void Log(string message)

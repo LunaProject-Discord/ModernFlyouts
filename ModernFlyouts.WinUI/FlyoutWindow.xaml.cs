@@ -6,25 +6,29 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using ModernFlyouts.WinUI.Audio;
 using ModernFlyouts.WinUI.Interop;
+using ModernFlyouts.WinUI.Media;
+using Windows.Foundation;
 using Windows.Graphics;
 using WinRT.Interop;
 
 namespace ModernFlyouts.WinUI
 {
     /// <summary>
-    /// Prototype on-screen flyout: borderless acrylic window that stays on top,
-    /// never takes focus, is hidden from the taskbar/Alt+Tab and hides itself after a timeout.
+    /// On-screen flyout: borderless acrylic window that stays on top, never takes focus,
+    /// is hidden from the taskbar/Alt+Tab and hides itself after a timeout.
+    /// Shows the volume row and, when something is playing, the media panel below it.
     /// </summary>
     public sealed partial class FlyoutWindow : Window
     {
         private const double WidthDip = 360;
-        private const double HeightDip = 56;
         private const double BottomMarginDip = 48;
 
         private readonly IntPtr _hwnd;
         private readonly DispatcherQueueTimer _hideTimer;
         private readonly VolumeService _volume;
+        private MediaController? _media;
         private bool _updatingFromSystem;
+        private bool _pointerOver;
 
         public FlyoutWindow(VolumeService volume)
         {
@@ -41,9 +45,35 @@ namespace ModernFlyouts.WinUI
 
             _volume.VolumeChanged += (v, muted) => DispatcherQueue.TryEnqueue(() => UpdateVolume(v, muted));
             UpdateVolume(_volume.Volume, _volume.IsMuted);
+
+            MediaPanel.Interacted += (_, _) => RestartHideTimer();
         }
 
         public bool IsShown { get; private set; }
+
+        /// <summary>True while the media timeline is actually on screen (drives the enhanced backend's ticker).</summary>
+        public bool IsTimelineDisplayed => IsShown && MediaSection.Visibility == Visibility.Visible;
+
+        public void AttachMedia(MediaController media)
+        {
+            _media = media;
+            _media.CurrentSessionChanged += (_, _) => UpdateMediaSession();
+            UpdateMediaSession();
+        }
+
+        private void UpdateMediaSession()
+        {
+            var session = _media?.CurrentSession;
+            MediaPanel.Session = session;
+            MediaSection.Visibility = session != null ? Visibility.Visible : Visibility.Collapsed;
+
+            if (IsShown)
+            {
+                PlaceAtBottomCenter();
+            }
+
+            _media?.RefreshTimelineActivity();
+        }
 
         private void ConfigureWindow()
         {
@@ -79,6 +109,7 @@ namespace ModernFlyouts.WinUI
             {
                 AppWindow.Show(false); // do not activate
                 IsShown = true;
+                _media?.RefreshTimelineActivity();
             }
 
             // Re-assert topmost every time; other topmost windows may have been raised since.
@@ -93,6 +124,7 @@ namespace ModernFlyouts.WinUI
             _hideTimer.Stop();
             AppWindow.Hide();
             IsShown = false;
+            _media?.RefreshTimelineActivity();
         }
 
         private void PlaceAtBottomCenter()
@@ -100,8 +132,12 @@ namespace ModernFlyouts.WinUI
             double scale = Native.GetDpiForWindow(_hwnd) / 96.0;
             var workArea = DisplayArea.Primary.WorkArea;
 
+            // Size the window to its content (volume row, plus the media panel when visible).
+            RootPanel.Measure(new Size(WidthDip, double.PositiveInfinity));
+            double heightDip = Math.Ceiling(RootPanel.DesiredSize.Height);
+
             int width = (int)Math.Round(WidthDip * scale);
-            int height = (int)Math.Round(HeightDip * scale);
+            int height = (int)Math.Round(heightDip * scale);
             int x = workArea.X + (workArea.Width - width) / 2;
             int y = workArea.Y + workArea.Height - height - (int)Math.Round(BottomMarginDip * scale);
 
@@ -111,7 +147,10 @@ namespace ModernFlyouts.WinUI
         private void RestartHideTimer()
         {
             _hideTimer.Stop();
-            _hideTimer.Start();
+            if (!_pointerOver)
+            {
+                _hideTimer.Start();
+            }
         }
 
         private void UpdateVolume(double volume, bool muted)
@@ -143,8 +182,16 @@ namespace ModernFlyouts.WinUI
             RestartHideTimer();
         }
 
-        private void RootGrid_PointerEntered(object sender, PointerRoutedEventArgs e) => _hideTimer.Stop();
+        private void RootPanel_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            _pointerOver = true;
+            _hideTimer.Stop();
+        }
 
-        private void RootGrid_PointerExited(object sender, PointerRoutedEventArgs e) => RestartHideTimer();
+        private void RootPanel_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            _pointerOver = false;
+            RestartHideTimer();
+        }
     }
 }

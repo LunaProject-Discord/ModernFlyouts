@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="ModernFlyouts.WinUI.Controls.MediaPanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Padding="16,12,16,8" RowSpacing="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Source app -->
+        <StackPanel x:Name="SourcePanel" Orientation="Horizontal" Spacing="8">
+            <Image x:Name="SourceIcon" Width="16" Height="16" />
+            <TextBlock x:Name="SourceName" Style="{StaticResource CaptionTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+        </StackPanel>
+
+        <!-- Title / artist + artwork -->
+        <Grid Grid.Row="1" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel VerticalAlignment="Center" Spacing="2">
+                <TextBlock x:Name="TitleText" Style="{StaticResource BodyStrongTextBlockStyle}"
+                           TextTrimming="CharacterEllipsis" MaxLines="2" TextWrapping="Wrap" />
+                <TextBlock x:Name="ArtistText" Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+            <Border Grid.Column="1" Width="72" Height="72" CornerRadius="6"
+                    Background="{ThemeResource ControlFillColorSecondaryBrush}">
+                <Image x:Name="Artwork" Stretch="UniformToFill" />
+            </Border>
+        </Grid>
+
+        <!-- Timeline -->
+        <Grid x:Name="TimelinePanel" Grid.Row="2" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="PositionText" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center" />
+            <Slider x:Name="TimelineSlider" Grid.Column="1" IsThumbToolTipEnabled="False" VerticalAlignment="Center"
+                    ValueChanged="TimelineSlider_ValueChanged" />
+            <TextBlock x:Name="DurationText" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center" />
+        </Grid>
+
+        <!-- Transport controls -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
+            <Button x:Name="PreviousButton" Style="{StaticResource MediaButtonStyle}">
+                <FontIcon Glyph="&#xE892;" FontSize="16" />
+            </Button>
+            <Button x:Name="PlayPauseButton" Style="{StaticResource MediaButtonStyle}">
+                <FontIcon x:Name="PlayPauseGlyph" Glyph="&#xE768;" FontSize="16" />
+            </Button>
+            <Button x:Name="NextButton" Style="{StaticResource MediaButtonStyle}">
+                <FontIcon Glyph="&#xE893;" FontSize="16" />
+            </Button>
+        </StackPanel>
+    </Grid>
+</UserControl>
