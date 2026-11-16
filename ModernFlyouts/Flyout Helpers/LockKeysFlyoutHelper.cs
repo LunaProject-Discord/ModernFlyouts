@@ -90,15 +90,12 @@ namespace ModernFlyouts
             OnEnabled();
         }
 
-        private bool IsKeyPressed;
+        // Only the lock key itself is tracked, so holding a modifier
+        // (e.g. Shift + Caps Lock on JIS keyboards) doesn't swallow the press.
+        private Key? pressedLockKey;
 
         private void KeyPressed(Key key, int virtualKey)
         {
-            if (IsKeyPressed)
-            {
-                return;
-            }
-            IsKeyPressed = true;
             LockKeys? lockKey = key switch
             {
                 Key.CapsLock => LockKeys.CapsLock,
@@ -110,6 +107,12 @@ namespace ModernFlyouts
 
             if (lockKey.HasValue)
             {
+                if (pressedLockKey == key)
+                {
+                    return;
+                }
+                pressedLockKey = key;
+
                 var lk = lockKey.Value;
                 if ((lk == LockKeys.CapsLock && !capsLockEnabled) || (lk == LockKeys.NumLock && !numLockEnabled)
                     || (lk == LockKeys.ScrollLock && !scrollLockEnabled) || (lk == LockKeys.Insert && !insertEnabled))
@@ -129,7 +132,10 @@ namespace ModernFlyouts
 
         private void KeyReleased(Key key, int virtualKey)
         {
-            IsKeyPressed = false;
+            if (pressedLockKey == key)
+            {
+                pressedLockKey = null;
+            }
         }
 
         private void Prepare(LockKeys key, bool islock)
