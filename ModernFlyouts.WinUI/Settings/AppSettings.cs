@@ -19,6 +19,18 @@ namespace ModernFlyouts.WinUI.Settings
         Collapsed,
     }
 
+    public enum SessionsOrientation
+    {
+        Horizontal,
+        Vertical,
+    }
+
+    public enum StackingDirection
+    {
+        Ascending,
+        Descending,
+    }
+
     /// <summary>Which flyout is shown for volume/brightness/... events.</summary>
     public enum DefaultFlyout
     {
@@ -82,6 +94,13 @@ namespace ModernFlyouts.WinUI.Settings
         private TopBarVisibility topBarVisibility = TopBarVisibility.Visible;
         public TopBarVisibility TopBarVisibility { get => topBarVisibility; set => Set(ref topBarVisibility, value); }
 
+        private double flyoutBackgroundOpacity = 100;
+        /// <summary>Opacity of the flyout background in percent (content stays opaque).</summary>
+        public double FlyoutBackgroundOpacity { get => flyoutBackgroundOpacity; set => Set(ref flyoutBackgroundOpacity, Math.Clamp(value, 0, 100)); }
+
+        private bool useColoredTrayIcon = true;
+        public bool UseColoredTrayIcon { get => useColoredTrayIcon; set => Set(ref useColoredTrayIcon, value); }
+
         #endregion
 
         #region Layout
@@ -109,6 +128,18 @@ namespace ModernFlyouts.WinUI.Settings
         private int? flyoutPositionY;
         public int? FlyoutPositionY { get => flyoutPositionY; set => Set(ref flyoutPositionY, value); }
 
+        // Bottom edge of the dragged flyout (physical pixels), kept for growing upwards.
+        private int? flyoutPositionBottom;
+        public int? FlyoutPositionBottom { get => flyoutPositionBottom; set => Set(ref flyoutPositionBottom, value); }
+
+        private FlyoutWindowExpandDirection expandDirection = FlyoutWindowExpandDirection.Auto;
+        /// <summary>Manual placement: which edge stays put when the flyout grows (Auto: the one nearer the screen edge).</summary>
+        public FlyoutWindowExpandDirection ExpandDirection { get => expandDirection; set => Set(ref expandDirection, value); }
+
+        private StackingDirection contentStackingDirection = StackingDirection.Ascending;
+        /// <summary>Ascending: volume above media; Descending: media above volume.</summary>
+        public StackingDirection ContentStackingDirection { get => contentStackingDirection; set => Set(ref contentStackingDirection, value); }
+
         #endregion
 
         #region Modules
@@ -127,6 +158,43 @@ namespace ModernFlyouts.WinUI.Settings
 
         private EnhancedMediaBackendMode enhancedMediaBackendMode = EnhancedMediaBackendMode.Auto;
         public EnhancedMediaBackendMode EnhancedMediaBackendMode { get => enhancedMediaBackendMode; set => Set(ref enhancedMediaBackendMode, value); }
+
+        private bool showVolumeControlInMediaFlyout = true;
+        /// <summary>Show the volume row when the flyout is opened by a media key.</summary>
+        public bool ShowVolumeControlInMediaFlyout { get => showVolumeControlInMediaFlyout; set => Set(ref showVolumeControlInMediaFlyout, value); }
+
+        private bool showMediaShuffle = true;
+        public bool ShowMediaShuffle { get => showMediaShuffle; set => Set(ref showMediaShuffle, value); }
+
+        private bool showMediaRepeat = true;
+        public bool ShowMediaRepeat { get => showMediaRepeat; set => Set(ref showMediaRepeat, value); }
+
+        private bool useThumbnailAsBackground = true;
+        public bool UseThumbnailAsBackground { get => useThumbnailAsBackground; set => Set(ref useThumbnailAsBackground, value); }
+
+        private bool alignThumbnailToRight = true;
+        public bool AlignThumbnailToRight { get => alignThumbnailToRight; set => Set(ref alignThumbnailToRight, value); }
+
+        private SessionsOrientation sessionsPanelOrientation = SessionsOrientation.Horizontal;
+        /// <summary>How several media sessions are laid out (side by side, or stacked).</summary>
+        public SessionsOrientation SessionsPanelOrientation { get => sessionsPanelOrientation; set => Set(ref sessionsPanelOrientation, value); }
+
+        private int maxVerticalSessionControlsCount = 1;
+        /// <summary>Stacked layout: how many sessions are visible before scrolling.</summary>
+        public int MaxVerticalSessionControlsCount { get => maxVerticalSessionControlsCount; set => Set(ref maxVerticalSessionControlsCount, Math.Clamp(value, 1, 5)); }
+
+        private string pinnedMediaAppUserModelId = string.Empty;
+        public string PinnedMediaAppUserModelId { get => pinnedMediaAppUserModelId; set => Set(ref pinnedMediaAppUserModelId, value ?? string.Empty); }
+
+        private PinnedAppPriorityMode pinnedAppPriorityMode = PinnedAppPriorityMode.PreferPinnedOnlyWhenPlaying;
+        public PinnedAppPriorityMode PinnedAppPriorityMode { get => pinnedAppPriorityMode; set => Set(ref pinnedAppPriorityMode, value); }
+
+        private MediaAppFilteringMode mediaAppFilteringMode = MediaAppFilteringMode.Disabled;
+        public MediaAppFilteringMode MediaAppFilteringMode { get => mediaAppFilteringMode; set => Set(ref mediaAppFilteringMode, value); }
+
+        private string mediaAppFilterList = string.Empty;
+        /// <summary>App IDs separated by commas, semicolons or new lines.</summary>
+        public string MediaAppFilterList { get => mediaAppFilterList; set => Set(ref mediaAppFilterList, value ?? string.Empty); }
 
         private bool brightnessModuleEnabled = true;
         public bool BrightnessModuleEnabled { get => brightnessModuleEnabled; set => Set(ref brightnessModuleEnabled, value); }

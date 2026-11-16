@@ -19,13 +19,18 @@ namespace ModernFlyouts.WinUI.Settings
                 return Strings.Settings_SystemDefault;
             }
 
-            return Strings.ResourceManager.GetString($"Enums.{value.GetType().Name}.{value}", Strings.Culture)
+            // SessionsOrientation reuses the WPF version's "Orientation" translations.
+            string typeName = value is SessionsOrientation ? "Orientation" : value.GetType().Name;
+            return Strings.ResourceManager.GetString($"Enums.{typeName}.{value}", Strings.Culture)
                 ?? value.ToString()!;
         }
 
         public static void Bind<T>(ComboBox comboBox, Func<T> get, Action<T> set) where T : struct, Enum
+            => Bind(comboBox, Enum.GetValues<T>(), get, set);
+
+        /// <summary>Only the given <paramref name="values"/> are offered.</summary>
+        public static void Bind<T>(ComboBox comboBox, T[] values, Func<T> get, Action<T> set) where T : struct, Enum
         {
-            var values = Enum.GetValues<T>();
             comboBox.ItemsSource = values.Select(v => GetDisplayName(v)).ToList();
             comboBox.SelectedIndex = Array.IndexOf(values, get());
             comboBox.SelectionChanged += (_, _) =>

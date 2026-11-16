@@ -1325,5 +1325,32 @@ namespace ModernFlyouts.Properties {
                 return ResourceManager.GetString("UnpinTopBar", resourceCulture);
             }
         }
-    }
+            /// <summary>
+        ///   Choose from media apps
+        /// </summary>
+        public static string Settings_ChooseFromMediaApps {
+            get {
+                return ResourceManager.GetString("Settings.ChooseFromMediaApps", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   No media apps detected yet. Play something and try again.
+        /// </summary>
+        public static string Settings_NoMediaAppsYet {
+            get {
+                return ResourceManager.GetString("Settings.NoMediaAppsYet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Used when the flyout has been moved by dragging
+        /// </summary>
+        public static string Settings_ExpandDirectionDescription {
+            get {
+                return ResourceManager.GetString("Settings.ExpandDirectionDescription", resourceCulture);
+            }
+        }
+        
+}
 }

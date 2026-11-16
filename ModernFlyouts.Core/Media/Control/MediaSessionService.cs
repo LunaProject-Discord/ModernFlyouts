@@ -42,6 +42,9 @@ namespace ModernFlyouts.Core.Media.Control
 
         public MediaSessionSelection CurrentSelection => stateStore.CurrentSelection;
 
+        /// <summary>Every known session (eligible or not), e.g. to offer apps for pinning/filtering.</summary>
+        public IReadOnlyList<MediaSessionSnapshot> GetSessions() => stateStore.GetSessionsSnapshot();
+
         public async Task InitializeAsync()
         {
             ThrowIfDisposed();

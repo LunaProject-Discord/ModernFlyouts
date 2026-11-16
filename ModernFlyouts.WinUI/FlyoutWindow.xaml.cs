@@ -1,6 +1,7 @@
 using System;
-using System.ComponentModel;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -12,6 +13,7 @@ using ModernFlyouts.Core.Display;
 using ModernFlyouts.Core.UI;
 using ModernFlyouts.Properties;
 using ModernFlyouts.WinUI.Audio;
+using ModernFlyouts.WinUI.Controls;
 using ModernFlyouts.WinUI.Interop;
 using ModernFlyouts.WinUI.Media;
 using ModernFlyouts.WinUI.Settings;
@@ -33,7 +35,7 @@ namespace ModernFlyouts.WinUI
     /// On-screen flyout: borderless acrylic window that stays on top, never takes focus,
     /// is hidden from the taskbar/Alt+Tab and hides itself after a timeout.
     /// Shows one row at a time (volume, brightness, info or virtual desktop); the media
-    /// panel is added below the volume row while something is playing.
+    /// sessions are added next to the volume row while something is playing.
     /// </summary>
     public sealed partial class FlyoutWindow : Window
     {
@@ -48,9 +50,10 @@ namespace ModernFlyouts.WinUI
         private readonly DispatcherQueueTimer _hideTimer;
         private readonly DispatcherQueueTimer _animationTimer;
         private readonly VolumeService _volume;
+        private readonly List<MediaPanel> _mediaPanels = new();
         private MediaController? _media;
-        private BrightnessController? _brightness;
         private FlyoutKind _kind = FlyoutKind.Volume;
+        private bool _mediaKeyMode;
         private bool _updatingFromSystem;
         private bool _pointerOver;
 
@@ -81,9 +84,7 @@ namespace ModernFlyouts.WinUI
 
             _volume.VolumeChanged += (v, muted) => DispatcherQueue.TryEnqueue(() => UpdateVolume(v, muted));
             UpdateVolume(_volume.Volume, _volume.IsMuted);
-
-            MediaPanel.Interacted += (_, _) => RestartHideTimer();
-            MediaPanel.LayoutChanged += (_, _) => { if (IsShown) PlaceWindow(animate: false); };
+            VolumeSlider.AddHandler(UIElement.PointerWheelChangedEvent, new PointerEventHandler(VolumeSlider_PointerWheelChanged), true);
 
             ApplySettings();
             AppSettings.Instance.PropertyChanged += (_, _) => DispatcherQueue.TryEnqueue(ApplySettings);
@@ -111,11 +112,15 @@ namespace ModernFlyouts.WinUI
             var s = AppSettings.Instance;
             _hideTimer.Interval = TimeSpan.FromMilliseconds(s.FlyoutTimeout);
             RootPanel.RequestedTheme = s.FlyoutTheme;
-            MediaPanel.ShowPlayerInfo = s.ShowMediaPlayerInfo;
-            MediaPanel.ShowSeekbar = s.ShowMediaSeekbar;
+            Backdrop.BackgroundOpacity = s.FlyoutBackgroundOpacity / 100.0;
+            foreach (var panel in _mediaPanels)
+            {
+                ApplyPanelSettings(panel);
+            }
             UpdateTopBar();
             AlignButton.IsEnabled = s.PlacementMode == FlyoutWindowPlacementMode.Manual;
-            UpdateMediaVisibility();
+            ApplyStackingDirection();
+            UpdateRows();
 
             if (IsShown)
             {
@@ -125,14 +130,22 @@ namespace ModernFlyouts.WinUI
 
         #region Showing
 
-        public void ShowVolume() => ShowKind(FlyoutKind.Volume);
+        public void ShowVolume()
+        {
+            _mediaKeyMode = false;
+            ShowKind(FlyoutKind.Volume);
+        }
+
+        /// <summary>Media key: the media sessions, with the volume row only if enabled in settings.</summary>
+        public void ShowMedia()
+        {
+            _mediaKeyMode = true;
+            ShowKind(FlyoutKind.Volume);
+        }
 
         public void ShowBrightness()
         {
-            AttachBrightness(BrightnessManager.Instance?.DefaultBrightnessController
-                ?? (BrightnessManager.Instance?.BrightnessControllers.Count > 0 ? BrightnessManager.Instance.BrightnessControllers[0] : null));
-
-            if (_brightness == null)
+            if (!BuildBrightnessRows())
             {
                 return; // nothing to control (e.g. desktop without DDC/CI)
             }
@@ -169,12 +182,13 @@ namespace ModernFlyouts.WinUI
 
         private void ShowKind(FlyoutKind kind)
         {
+            if (kind != FlyoutKind.Volume)
+            {
+                _mediaKeyMode = false;
+            }
+
             _kind = kind;
-            VolumeRow.Visibility = kind == FlyoutKind.Volume ? Visibility.Visible : Visibility.Collapsed;
-            BrightnessRow.Visibility = kind == FlyoutKind.Brightness ? Visibility.Visible : Visibility.Collapsed;
-            InfoRow.Visibility = kind == FlyoutKind.Info ? Visibility.Visible : Visibility.Collapsed;
-            DesktopRow.Visibility = kind == FlyoutKind.VirtualDesktop ? Visibility.Visible : Visibility.Collapsed;
-            UpdateMediaVisibility();
+            UpdateRows();
 
             bool appearing = !IsShown || _animatingOut;
             PlaceWindow(animate: appearing);
@@ -191,6 +205,22 @@ namespace ModernFlyouts.WinUI
 
             _media?.RefreshTimelineActivity();
             RestartHideTimer();
+        }
+
+        /// <summary>Which rows are visible for the current kind (and media sessions).</summary>
+        private void UpdateRows()
+        {
+            var s = AppSettings.Instance;
+            bool hasMedia = _mediaPanels.Count > 0;
+            bool showMedia = _kind == FlyoutKind.Volume && hasMedia && (_mediaKeyMode || s.ShowMediaInVolumeFlyout);
+            bool showVolume = _kind == FlyoutKind.Volume && (!_mediaKeyMode || !showMedia || s.ShowVolumeControlInMediaFlyout);
+
+            VolumeRow.Visibility = showVolume ? Visibility.Visible : Visibility.Collapsed;
+            BrightnessRow.Visibility = _kind == FlyoutKind.Brightness ? Visibility.Visible : Visibility.Collapsed;
+            InfoRow.Visibility = _kind == FlyoutKind.Info ? Visibility.Visible : Visibility.Collapsed;
+            DesktopRow.Visibility = _kind == FlyoutKind.VirtualDesktop ? Visibility.Visible : Visibility.Collapsed;
+            MediaSection.Visibility = showMedia ? Visibility.Visible : Visibility.Collapsed;
+            MediaDivider.Visibility = showVolume ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public void HideFlyout()
@@ -227,12 +257,13 @@ namespace ModernFlyouts.WinUI
 
         /// <summary>
         /// Sizes the client area to the content (exactly <see cref="WidthDip"/> wide; the frame
-        /// is added outside) and places it at the saved position or bottom-center of the work area.
+        /// is added outside) and places it at the saved position or the aligned position.
         /// </summary>
         private void PlaceWindow(bool animate)
         {
             double scale = Native.GetDpiForWindow(_hwnd) / 96.0;
 
+            UpdateSessionsLayout();
             RootPanel.Measure(new Size(WidthDip, double.PositiveInfinity));
             double heightDip = Math.Ceiling(RootPanel.DesiredSize.Height);
             _clientSize = new SizeInt32((int)Math.Round(WidthDip * scale), (int)Math.Round(heightDip * scale));
@@ -242,11 +273,29 @@ namespace ModernFlyouts.WinUI
             if (s.PlacementMode == FlyoutWindowPlacementMode.Manual
                 && s.FlyoutPositionX is int savedX && s.FlyoutPositionY is int savedY)
             {
-                // Keep a saved position on screen (monitor layout may have changed).
                 var area = DisplayArea.GetFromPoint(new PointInt32(savedX, savedY), DisplayAreaFallback.Nearest).WorkArea;
+
+                // Grow upwards (keep the bottom edge) when asked to, or automatically when the
+                // flyout sits in the lower half of the screen.
+                int y = savedY;
+                if (s.FlyoutPositionBottom is int savedBottom)
+                {
+                    bool up = s.ExpandDirection switch
+                    {
+                        FlyoutWindowExpandDirection.Up => true,
+                        FlyoutWindowExpandDirection.Down => false,
+                        _ => (savedY + savedBottom) / 2 > area.Y + area.Height / 2,
+                    };
+                    if (up)
+                    {
+                        y = savedBottom - _clientSize.Height;
+                    }
+                }
+
+                // Keep a saved position on screen (monitor layout may have changed).
                 position = new PointInt32(
                     Math.Clamp(savedX, area.X, Math.Max(area.X, area.X + area.Width - _clientSize.Width)),
-                    Math.Clamp(savedY, area.Y, Math.Max(area.Y, area.Y + area.Height - _clientSize.Height)));
+                    Math.Clamp(y, area.Y, Math.Max(area.Y, area.Y + area.Height - _clientSize.Height)));
             }
             else
             {
@@ -305,6 +354,28 @@ namespace ModernFlyouts.WinUI
             }
 
             return DisplayArea.Primary;
+        }
+
+        /// <summary>Volume/brightness/... rows and the media section, in the configured order.</summary>
+        private void ApplyStackingDirection()
+        {
+            bool mediaFirst = AppSettings.Instance.ContentStackingDirection == StackingDirection.Descending;
+            int mediaIndex = RootPanel.Children.IndexOf(MediaSection);
+            int wanted = mediaFirst ? 1 : RootPanel.Children.Count - 1; // index 0 is the top bar
+            if (mediaIndex != wanted)
+            {
+                RootPanel.Children.RemoveAt(mediaIndex);
+                RootPanel.Children.Insert(wanted, MediaSection);
+            }
+
+            // The divider sits between the media and the volume row.
+            int dividerIndex = MediaSection.Children.IndexOf(MediaDivider);
+            int wantedDivider = mediaFirst ? MediaSection.Children.Count - 1 : 0;
+            if (dividerIndex != wantedDivider)
+            {
+                MediaSection.Children.RemoveAt(dividerIndex);
+                MediaSection.Children.Insert(wantedDivider, MediaDivider);
+            }
         }
 
         private void AnimationStep()
@@ -369,6 +440,9 @@ namespace ModernFlyouts.WinUI
             var mode = AppSettings.Instance.TopBarVisibility;
             TopBar.Visibility = mode == TopBarVisibility.Collapsed ? Visibility.Collapsed : Visibility.Visible;
             TopBar.Opacity = mode == TopBarVisibility.AutoHide && !_pointerOver ? 0 : 1;
+            // Pinned = always visible; unpinned = only while the pointer is over the flyout.
+            PinGlyph.Glyph = mode == TopBarVisibility.AutoHide ? "" : "";
+            ToolTipService.SetToolTip(PinButton, mode == TopBarVisibility.AutoHide ? Strings.PinTopBar : Strings.UnpinTopBar);
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
@@ -381,6 +455,12 @@ namespace ModernFlyouts.WinUI
         {
             AppSettings.Instance.PlacementMode = FlyoutWindowPlacementMode.Auto;
             RestartHideTimer();
+        }
+
+        private void PinButton_Click(object sender, RoutedEventArgs e)
+        {
+            var s = AppSettings.Instance;
+            s.TopBarVisibility = s.TopBarVisibility == TopBarVisibility.AutoHide ? TopBarVisibility.Visible : TopBarVisibility.AutoHide;
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e) => HideFlyout();
@@ -403,9 +483,11 @@ namespace ModernFlyouts.WinUI
             var client = new Native.POINT();
             Native.ClientToScreen(_hwnd, ref client);
             _clientPosition = new PointInt32(client.X, client.Y);
-            AppSettings.Instance.FlyoutPositionX = client.X;
-            AppSettings.Instance.FlyoutPositionY = client.Y;
-            AppSettings.Instance.PlacementMode = FlyoutWindowPlacementMode.Manual;
+            var s = AppSettings.Instance;
+            s.FlyoutPositionX = client.X;
+            s.FlyoutPositionY = client.Y;
+            s.FlyoutPositionBottom = client.Y + _clientSize.Height;
+            s.PlacementMode = FlyoutWindowPlacementMode.Manual;
             RestartHideTimer();
         }
 
@@ -416,14 +498,39 @@ namespace ModernFlyouts.WinUI
         public void AttachMedia(MediaController media)
         {
             _media = media;
-            _media.CurrentSessionChanged += (_, _) => UpdateMediaSession();
-            UpdateMediaSession();
+            _media.CurrentSessionChanged += (_, _) => UpdateMediaSessions();
+            UpdateMediaSessions();
         }
 
-        private void UpdateMediaSession()
+        /// <summary>One <see cref="MediaPanel"/> per session (the selected session first).</summary>
+        private void UpdateMediaSessions()
         {
-            MediaPanel.Session = _media?.CurrentSession;
-            UpdateMediaVisibility();
+            var sessions = _media?.Sessions ?? Array.Empty<Core.Media.Control.MediaSession>();
+
+            while (_mediaPanels.Count > sessions.Count)
+            {
+                var last = _mediaPanels[^1];
+                last.Session = null;
+                SessionsPanel.Children.Remove(last);
+                _mediaPanels.RemoveAt(_mediaPanels.Count - 1);
+            }
+
+            while (_mediaPanels.Count < sessions.Count)
+            {
+                var panel = new MediaPanel { Width = WidthDip };
+                panel.Interacted += (_, _) => RestartHideTimer();
+                panel.LayoutChanged += (_, _) => { if (IsShown) PlaceWindow(animate: false); };
+                ApplyPanelSettings(panel);
+                _mediaPanels.Add(panel);
+                SessionsPanel.Children.Add(panel);
+            }
+
+            for (int i = 0; i < sessions.Count; i++)
+            {
+                _mediaPanels[i].Session = sessions[i];
+            }
+
+            UpdateRows();
 
             if (IsShown)
             {
@@ -433,11 +540,89 @@ namespace ModernFlyouts.WinUI
             _media?.RefreshTimelineActivity();
         }
 
-        private void UpdateMediaVisibility()
+        private static void ApplyPanelSettings(MediaPanel panel)
         {
-            bool show = _kind == FlyoutKind.Volume && MediaPanel.Session != null
-                && AppSettings.Instance.ShowMediaInVolumeFlyout;
-            MediaSection.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
+            var s = AppSettings.Instance;
+            panel.ShowPlayerInfo = s.ShowMediaPlayerInfo;
+            panel.ShowSeekbar = s.ShowMediaSeekbar;
+            panel.ShowShuffle = s.ShowMediaShuffle;
+            panel.ShowRepeat = s.ShowMediaRepeat;
+            panel.UseThumbnailAsBackground = s.UseThumbnailAsBackground;
+            panel.AlignThumbnailToRight = s.AlignThumbnailToRight;
+        }
+
+        /// <summary>
+        /// Several sessions: side by side, one page each (with dots), or stacked with at most
+        /// <see cref="AppSettings.MaxVerticalSessionControlsCount"/> visible before scrolling.
+        /// </summary>
+        private void UpdateSessionsLayout()
+        {
+            var s = AppSettings.Instance;
+            bool horizontal = s.SessionsPanelOrientation == SessionsOrientation.Horizontal;
+            int count = _mediaPanels.Count;
+
+            SessionsPanel.Orientation = horizontal ? Orientation.Horizontal : Orientation.Vertical;
+            SessionsScroller.HorizontalScrollMode = horizontal ? ScrollMode.Enabled : ScrollMode.Disabled;
+            SessionsScroller.HorizontalScrollBarVisibility = horizontal ? ScrollBarVisibility.Hidden : ScrollBarVisibility.Disabled;
+            SessionsScroller.VerticalScrollMode = horizontal ? ScrollMode.Disabled : ScrollMode.Enabled;
+            SessionsScroller.VerticalScrollBarVisibility = horizontal ? ScrollBarVisibility.Disabled : ScrollBarVisibility.Auto;
+
+            if (horizontal)
+            {
+                SessionsScroller.MaxHeight = double.PositiveInfinity;
+            }
+            else
+            {
+                double max = 0;
+                foreach (var panel in _mediaPanels.Take(s.MaxVerticalSessionControlsCount))
+                {
+                    panel.Measure(new Size(WidthDip, double.PositiveInfinity));
+                    max += panel.DesiredSize.Height;
+                }
+                SessionsScroller.MaxHeight = count > 0 ? Math.Ceiling(max) : double.PositiveInfinity;
+            }
+
+            // Page dots for horizontal paging.
+            bool dots = horizontal && count > 1;
+            SessionDots.Visibility = dots ? Visibility.Visible : Visibility.Collapsed;
+            if (dots && SessionDots.Children.Count != count)
+            {
+                SessionDots.Children.Clear();
+                for (int i = 0; i < count; i++)
+                {
+                    SessionDots.Children.Add(new Border
+                    {
+                        Height = 6,
+                        CornerRadius = new CornerRadius(3),
+                        Background = (Brush)Application.Current.Resources["TextFillColorPrimaryBrush"],
+                    });
+                }
+            }
+            UpdateSessionDots();
+        }
+
+        private void SessionsScroller_ViewChanged(object? sender, ScrollViewerViewChangedEventArgs e)
+        {
+            UpdateSessionDots();
+            RestartHideTimer();
+        }
+
+        private void UpdateSessionDots()
+        {
+            if (SessionDots.Visibility != Visibility.Visible)
+            {
+                return;
+            }
+
+            int page = (int)Math.Round(SessionsScroller.HorizontalOffset / WidthDip);
+            for (int i = 0; i < SessionDots.Children.Count; i++)
+            {
+                var dot = (Border)SessionDots.Children[i];
+                bool current = i == page;
+                dot.Width = current ? 16 : 6;
+                dot.Opacity = current ? 1 : 0.35;
+                dot.Background = (Brush)Application.Current.Resources[current ? "AccentFillColorDefaultBrush" : "TextFillColorPrimaryBrush"];
+            }
         }
 
         #endregion
@@ -522,6 +707,14 @@ namespace ModernFlyouts.WinUI
             RestartHideTimer();
         }
 
+        /// <summary>Mouse wheel over the slider: 1 per notch, as in the WPF version.</summary>
+        private void VolumeSlider_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
+        {
+            int delta = e.GetCurrentPoint(VolumeSlider).Properties.MouseWheelDelta;
+            VolumeSlider.Value = Math.Clamp(VolumeSlider.Value + delta / 120.0, 0, 100);
+            e.Handled = true;
+        }
+
         private void MuteButton_Click(object sender, RoutedEventArgs e)
         {
             _volume.IsMuted = !_volume.IsMuted;
@@ -532,57 +725,31 @@ namespace ModernFlyouts.WinUI
 
         #region Brightness
 
-        private void AttachBrightness(BrightnessController? controller)
+        /// <summary>One row per display that supports brightness; false when there is none.</summary>
+        private bool BuildBrightnessRows()
         {
-            if (ReferenceEquals(_brightness, controller))
+            var controllers = BrightnessManager.Instance?.BrightnessControllers.ToList() ?? new();
+            if (controllers.Count == 0)
             {
-                UpdateBrightness();
-                return;
+                BrightnessRow.Children.Clear();
+                return false;
             }
 
-            if (_brightness != null)
+            bool same = BrightnessRow.Children.Count == controllers.Count
+                && BrightnessRow.Children.Cast<BrightnessRowControl>().Select(r => r.Controller).SequenceEqual(controllers);
+            if (!same)
             {
-                _brightness.PropertyChanged -= Brightness_PropertyChanged;
+                BrightnessRow.Children.Clear();
+                bool several = controllers.Count > 1;
+                foreach (var controller in controllers)
+                {
+                    var row = new BrightnessRowControl(controller, several);
+                    row.Interacted += (_, _) => RestartHideTimer();
+                    BrightnessRow.Children.Add(row);
+                }
             }
 
-            _brightness = controller;
-
-            if (_brightness != null)
-            {
-                _brightness.PropertyChanged += Brightness_PropertyChanged;
-            }
-
-            UpdateBrightness();
-        }
-
-        private void Brightness_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            DispatcherQueue.TryEnqueue(UpdateBrightness);
-        }
-
-        private void UpdateBrightness()
-        {
-            if (_brightness == null)
-            {
-                return;
-            }
-
-            _updatingFromSystem = true;
-            BrightnessSlider.Minimum = _brightness.Minimum;
-            BrightnessSlider.Maximum = _brightness.Maximum;
-            BrightnessSlider.Value = _brightness.Brightness;
-            _updatingFromSystem = false;
-
-            BrightnessText.Text = _brightness.Brightness.ToString("0");
-            // Brightness / LowerBrightness glyphs, as in the WPF version.
-            BrightnessGlyph.Glyph = _brightness.Brightness > 50 ? "" : "";
-        }
-
-        private void BrightnessSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
-        {
-            if (_updatingFromSystem || _brightness == null) return;
-            _brightness.Brightness = e.NewValue;
-            RestartHideTimer();
+            return true;
         }
 
         #endregion

@@ -18,6 +18,14 @@
                 <ComboBox x:Name="AppThemeCombo" MinWidth="200" />
             </controls:SettingsCard>
 
+            <controls:SettingsCard Glyph="&#xEF1F;" Header="{x:Bind res:Strings.Settings_FlyoutBackgroundOpacity}">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <Slider Width="180" Minimum="0" Maximum="100" StepFrequency="1" VerticalAlignment="Center"
+                            Value="{x:Bind S.FlyoutBackgroundOpacity, Mode=TwoWay}" />
+                    <TextBlock Width="40" VerticalAlignment="Center" Text="{x:Bind PercentText(S.FlyoutBackgroundOpacity), Mode=OneWay}" />
+                </StackPanel>
+            </controls:SettingsCard>
+
             <controls:SettingsCard Glyph="&#xE8A0;" Header="{x:Bind res:Strings.Settings_TopBarVisibility}">
                 <ComboBox x:Name="TopBarCombo" MinWidth="200" />
             </controls:SettingsCard>
@@ -28,6 +36,10 @@
 
             <controls:SettingsCard Glyph="&#xE8A5;" Header="{x:Bind res:Strings.Settings_TrayIconEnabled}">
                 <ToggleSwitch IsOn="{x:Bind S.TrayIconEnabled, Mode=TwoWay}" />
+            </controls:SettingsCard>
+
+            <controls:SettingsCard Glyph="&#xE790;" Header="{x:Bind res:Strings.Settings_UseColoredTrayIcon}">
+                <ToggleSwitch IsOn="{x:Bind S.UseColoredTrayIcon, Mode=TwoWay}" />
             </controls:SettingsCard>
 
             <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_Behavior}" />

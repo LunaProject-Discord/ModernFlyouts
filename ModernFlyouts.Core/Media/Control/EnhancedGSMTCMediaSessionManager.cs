@@ -24,6 +24,12 @@ namespace ModernFlyouts.Core.Media.Control
             service?.UpdateSelectionOptions();
         }
 
+        /// <summary>Every session the service knows about, not only the selected one.</summary>
+        public System.Collections.Generic.IReadOnlyList<MediaSessionSnapshot> GetAllSessions()
+        {
+            return service?.GetSessions() ?? Array.Empty<MediaSessionSnapshot>();
+        }
+
         public void RefreshTimelineActivity()
         {
             displaySession?.RefreshTimelineActivity();

@@ -22,6 +22,10 @@ namespace ModernFlyouts.WinUI.Controls
         private bool _scrubbing;
         private bool _showPlayerInfo = true;
         private bool _showSeekbar = true;
+        private bool _showShuffle = true;
+        private bool _showRepeat = true;
+        private bool _useThumbnailAsBackground = true;
+        private bool _alignThumbnailToRight = true;
 
         public MediaPanel()
         {
@@ -57,6 +61,45 @@ namespace ModernFlyouts.WinUI.Controls
         {
             get => _showSeekbar;
             set { _showSeekbar = value; UpdateTimeline(); }
+        }
+
+        public bool ShowShuffle
+        {
+            get => _showShuffle;
+            set { _showShuffle = value; UpdateAll(); }
+        }
+
+        public bool ShowRepeat
+        {
+            get => _showRepeat;
+            set { _showRepeat = value; UpdateAll(); }
+        }
+
+        public bool UseThumbnailAsBackground
+        {
+            get => _useThumbnailAsBackground;
+            set { _useThumbnailAsBackground = value; UpdateAll(); }
+        }
+
+        /// <summary>Artwork on the right (default) or on the left of the title.</summary>
+        public bool AlignThumbnailToRight
+        {
+            get => _alignThumbnailToRight;
+            set
+            {
+                _alignThumbnailToRight = value;
+                InfoColumn.Width = value ? new GridLength(1, GridUnitType.Star) : GridLength.Auto;
+                ArtworkColumn.Width = value ? GridLength.Auto : new GridLength(1, GridUnitType.Star);
+                Grid.SetColumn(InfoGrid, value ? 0 : 1);
+                Grid.SetColumn(ArtworkBorder, value ? 1 : 0);
+                UpdateAll();
+            }
+        }
+
+        private void ContentPanel_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            BackgroundArtwork.Width = e.NewSize.Width;
+            BackgroundArtwork.Height = e.NewSize.Height;
         }
 
         public MediaSession? Session
@@ -122,6 +165,8 @@ namespace ModernFlyouts.WinUI.Controls
             ArtistText.Visibility = string.IsNullOrEmpty(ArtistText.Text) ? Visibility.Collapsed : Visibility.Visible;
             Artwork.Source = ArtworkImages.ToImageSource(s.Thumbnail);
             ArtworkPlaceholder.Visibility = Artwork.Source == null ? Visibility.Visible : Visibility.Collapsed;
+            BackgroundArtwork.Source = _useThumbnailAsBackground
+                ? ArtworkImages.ToFadedBackground(s.Thumbnail, _alignThumbnailToRight) : null;
 
             PreviousButton.Command = s.PreviousTrackCommand;
             PlayPauseButton.Command = s.PlayOrPauseCommand;
@@ -134,15 +179,16 @@ namespace ModernFlyouts.WinUI.Controls
             ToolTipService.SetToolTip(PlayPauseButton, s.IsPlaying ? Strings.SessionControl_Pause : Strings.SessionControl_Play);
 
             // "More" holds shuffle / repeat / stop.
-            MoreButton.Visibility = s.IsMoreControlsButtonVisible ? Visibility.Visible : Visibility.Collapsed;
-            if (!s.IsMoreControlsButtonVisible)
+            bool hasMore = (_showShuffle && s.IsShuffleEnabled) || (_showRepeat && s.IsRepeatEnabled) || s.IsStopEnabled;
+            MoreButton.Visibility = hasMore ? Visibility.Visible : Visibility.Collapsed;
+            if (!hasMore)
             {
                 MoreButton.IsChecked = false;
             }
 
-            ShuffleButton.Visibility = s.IsShuffleEnabled ? Visibility.Visible : Visibility.Collapsed;
+            ShuffleButton.Visibility = _showShuffle && s.IsShuffleEnabled ? Visibility.Visible : Visibility.Collapsed;
             ShuffleButton.IsChecked = s.IsShuffleActive == true;
-            RepeatButton.Visibility = s.IsRepeatEnabled ? Visibility.Visible : Visibility.Collapsed;
+            RepeatButton.Visibility = _showRepeat && s.IsRepeatEnabled ? Visibility.Visible : Visibility.Collapsed;
             RepeatButton.IsChecked = s.AutoRepeatMode != MediaPlaybackAutoRepeatMode.None;
             RepeatGlyph.Glyph = s.AutoRepeatMode switch
             {

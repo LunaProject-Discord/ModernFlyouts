@@ -35,6 +35,8 @@ namespace ModernFlyouts.Core.Media.Control
 
         public string StableSessionId => currentSnapshot?.StableSessionId ?? string.Empty;
 
+        public string SourceAppUserModelId => currentSnapshot?.SourceAppUserModelId ?? string.Empty;
+
         public void RefreshTimelineActivity()
         {
             UpdateTimelineTimer();

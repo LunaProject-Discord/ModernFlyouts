@@ -28,6 +28,64 @@
                     <ToggleSwitch IsOn="{x:Bind S.ShowMediaSeekbar, Mode=TwoWay}" />
                 </controls:SettingsCard>
 
+                <controls:SettingsCard Glyph="&#xE767;" Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowVolumeControlInGSMTCFlyout}">
+                    <ToggleSwitch IsOn="{x:Bind S.ShowVolumeControlInMediaFlyout, Mode=TwoWay}" />
+                </controls:SettingsCard>
+
+                <controls:SettingsCard Glyph="&#xE8B1;" Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowShuffle}">
+                    <ToggleSwitch IsOn="{x:Bind S.ShowMediaShuffle, Mode=TwoWay}" />
+                </controls:SettingsCard>
+
+                <controls:SettingsCard Glyph="&#xE8EE;" Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowRepeat}">
+                    <ToggleSwitch IsOn="{x:Bind S.ShowMediaRepeat, Mode=TwoWay}" />
+                </controls:SettingsCard>
+
+                <controls:SettingsCard Glyph="&#xE91B;" Header="{x:Bind res:Strings.AudioFlyoutHelper_UseThumbnailAsBackground}">
+                    <ToggleSwitch IsOn="{x:Bind S.UseThumbnailAsBackground, Mode=TwoWay}" />
+                </controls:SettingsCard>
+
+                <controls:SettingsCard Glyph="&#xE8E4;" Header="{x:Bind res:Strings.AudioFlyoutHelper_ThumbnailAlignment}">
+                    <ToggleSwitch IsOn="{x:Bind S.AlignThumbnailToRight, Mode=TwoWay}"
+                                  OnContent="{x:Bind res:Strings.Settings_Right}" OffContent="{x:Bind res:Strings.Settings_Left}" />
+                </controls:SettingsCard>
+
+                <controls:SettingsCard Glyph="&#xE8A9;" Header="{x:Bind res:Strings.AudioFlyoutHelper_SessionsPanelOrientation}">
+                    <ComboBox x:Name="OrientationCombo" MinWidth="200" />
+                </controls:SettingsCard>
+
+                <controls:SettingsCard x:Name="MaxSessionsCard" Glyph="&#xE8FD;" Header="{x:Bind res:Strings.AudioFlyoutHelper_MaxVerticalSessionControlsCount}">
+                    <NumberBox Minimum="1" Maximum="5" SmallChange="1" SpinButtonPlacementMode="Inline" MinWidth="120"
+                               Value="{x:Bind S.MaxVerticalSessionControlsCount, Mode=TwoWay}" />
+                </controls:SettingsCard>
+
+                <!-- Which player is shown (enhanced backend) -->
+                <controls:SettingsCard Glyph="&#xE718;" Header="{x:Bind res:Strings.AudioFlyoutHelper_PinnedAppUserModelId}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBox Text="{x:Bind S.PinnedMediaAppUserModelId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="220" />
+                        <Button x:Name="PinnedAppPicker" Click="AppPicker_Click" Tag="pinned">
+                            <FontIcon Glyph="&#xE70D;" FontSize="12" />
+                        </Button>
+                    </StackPanel>
+                </controls:SettingsCard>
+
+                <controls:SettingsCard Glyph="&#xE8CB;" Header="{x:Bind res:Strings.AudioFlyoutHelper_PinnedAppPriority}">
+                    <ComboBox x:Name="PinnedPriorityCombo" MinWidth="200" MaxWidth="280" />
+                </controls:SettingsCard>
+
+                <controls:SettingsCard Glyph="&#xE71C;" Header="{x:Bind res:Strings.AudioFlyoutHelper_AppFilteringMode}">
+                    <ComboBox x:Name="FilteringModeCombo" MinWidth="200" />
+                </controls:SettingsCard>
+
+                <controls:SettingsCard Glyph="&#xE8FD;" Header="{x:Bind res:Strings.AudioFlyoutHelper_AppFilterList}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <TextBox Text="{x:Bind S.MediaAppFilterList, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Width="220" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="64" />
+                        <Button x:Name="FilterAppPicker" Click="AppPicker_Click" Tag="filter" VerticalAlignment="Top">
+                            <FontIcon Glyph="&#xE710;" FontSize="12" />
+                        </Button>
+                    </StackPanel>
+                </controls:SettingsCard>
+
                 <controls:SettingsCard x:Name="BackendCard" Glyph="&#xE9D9;" Header="{x:Bind res:Strings.AudioFlyoutHelper_EnhancedMediaBackend}">
                     <ComboBox x:Name="BackendCombo" MinWidth="200" />
                 </controls:SettingsCard>

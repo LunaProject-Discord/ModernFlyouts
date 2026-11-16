@@ -7,7 +7,7 @@
     Title="ModernFlyouts">
 
     <Window.SystemBackdrop>
-        <DesktopAcrylicBackdrop />
+        <controls:FlyoutBackdrop x:Name="Backdrop" />
     </Window.SystemBackdrop>
 
     <!--
@@ -40,10 +40,16 @@
                 <Border Width="32" Height="4" CornerRadius="2" VerticalAlignment="Center"
                         Background="{ThemeResource TextFillColorTertiaryBrush}" />
             </Border>
-            <Button Grid.Column="2" Style="{StaticResource FlyoutTopBarButtonStyle}" Click="CloseButton_Click"
-                    ToolTipService.ToolTip="{x:Bind CloseText}">
-                <FontIcon Glyph="&#xE8BB;" FontSize="12" />
-            </Button>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="2">
+                <!-- Pin: top bar always visible / only while the pointer is over the flyout -->
+                <Button x:Name="PinButton" Style="{StaticResource FlyoutTopBarButtonStyle}" Click="PinButton_Click">
+                    <FontIcon x:Name="PinGlyph" Glyph="&#xE77A;" FontSize="14" />
+                </Button>
+                <Button Style="{StaticResource FlyoutTopBarButtonStyle}" Click="CloseButton_Click"
+                        ToolTipService.ToolTip="{x:Bind CloseText}">
+                    <FontIcon Glyph="&#xE8BB;" FontSize="12" />
+                </Button>
+            </StackPanel>
         </Grid>
 
         <!-- Volume -->
@@ -70,22 +76,8 @@
                        Style="{StaticResource FlyoutValueTextStyle}" />
         </Grid>
 
-        <!-- Brightness -->
-        <Grid x:Name="BrightnessRow" Height="48" Visibility="Collapsed">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="48" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="48" />
-            </Grid.ColumnDefinitions>
-            <FontIcon x:Name="BrightnessGlyph" Glyph="&#xE706;" FontSize="16"
-                      HorizontalAlignment="Center" VerticalAlignment="Center" />
-            <Slider x:Name="BrightnessSlider" Grid.Column="1" Minimum="0" Maximum="100" StepFrequency="1"
-                    VerticalAlignment="Center" Margin="8,0" IsThumbToolTipEnabled="False"
-                    ValueChanged="BrightnessSlider_ValueChanged" />
-            <TextBlock x:Name="BrightnessText" Grid.Column="2" Text="0"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                       Style="{StaticResource FlyoutValueTextStyle}" />
-        </Grid>
+        <!-- Brightness: one row per display (rows are created in code) -->
+        <StackPanel x:Name="BrightnessRow" Visibility="Collapsed" />
 
         <!-- Icon + message (airplane mode, lock keys) -->
         <Grid x:Name="InfoRow" Height="48" Visibility="Collapsed">
@@ -114,10 +106,19 @@
             </StackPanel>
         </Grid>
 
-        <!-- Media (below the volume row) -->
+        <!-- Media sessions (below the volume row, or above it when stacking is reversed).
+             Several sessions scroll sideways (one page each) or are stacked vertically. -->
         <StackPanel x:Name="MediaSection" Visibility="Collapsed">
-            <Border Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
-            <controls:MediaPanel x:Name="MediaPanel" />
+            <Border x:Name="MediaDivider" Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+            <ScrollViewer x:Name="SessionsScroller"
+                          HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"
+                          HorizontalSnapPointsType="MandatorySingle" VerticalSnapPointsType="MandatorySingle"
+                          ViewChanged="SessionsScroller_ViewChanged">
+                <StackPanel x:Name="SessionsPanel" />
+            </ScrollViewer>
+            <!-- Page dots for several sessions side by side -->
+            <StackPanel x:Name="SessionDots" Orientation="Horizontal" HorizontalAlignment="Center"
+                        Spacing="6" Margin="0,0,0,8" Visibility="Collapsed" />
         </StackPanel>
     </StackPanel>
 </Window>

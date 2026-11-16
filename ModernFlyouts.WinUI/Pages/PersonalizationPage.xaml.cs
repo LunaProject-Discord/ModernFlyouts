@@ -26,5 +26,7 @@ namespace ModernFlyouts.WinUI.Pages
         }
 
         public AppSettings S => AppSettings.Instance;
+
+        public string PercentText(double value) => $"{value:0}%";
     }
 }

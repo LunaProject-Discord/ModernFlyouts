@@ -42,6 +42,15 @@
                 </controls:SettingsCard>
             </StackPanel>
 
+            <controls:SettingsCard x:Name="ExpandCard" Glyph="&#xE74A;" Header="{x:Bind res:Strings.Settings_FlyoutExpandDirection}"
+                                   Description="{x:Bind res:Strings.Settings_ExpandDirectionDescription}">
+                <ComboBox x:Name="ExpandCombo" MinWidth="200" />
+            </controls:SettingsCard>
+
+            <controls:SettingsCard Glyph="&#xE8CB;" Header="{x:Bind res:Strings.Settings_FlyoutContentStackingDirection}">
+                <ComboBox x:Name="StackingCombo" MinWidth="200" />
+            </controls:SettingsCard>
+
             <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_Display}" />
 
             <controls:SettingsCard Glyph="&#xE7F4;" Header="{x:Bind res:Strings.Settings_DisplayDescription}">

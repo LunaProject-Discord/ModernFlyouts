@@ -1,6 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using ModernFlyouts.Core.Media.Control;
+using ModernFlyouts.WinUI.Settings;
 
 namespace ModernFlyouts.WinUI.Media
 {
@@ -17,6 +21,78 @@ namespace ModernFlyouts.WinUI.Media
         public MediaController(Func<bool> isTimelineDisplayed)
         {
             _isTimelineDisplayed = isTimelineDisplayed;
+            AppSettings.Instance.PropertyChanged += Settings_PropertyChanged;
+        }
+
+        /// <summary>
+        /// Every session to show: the selected one first, then the others. The enhanced backend
+        /// selects a single session (pinned app / filter rules); GSMTC and NowPlaying list all.
+        /// </summary>
+        public IReadOnlyList<MediaSession> Sessions
+        {
+            get
+            {
+                if (DemoSession != null)
+                {
+                    return new[] { DemoSession };
+                }
+
+                if (_manager == null)
+                {
+                    return Array.Empty<MediaSession>();
+                }
+
+                var current = CurrentSession;
+                var list = new List<MediaSession>();
+                if (current != null)
+                {
+                    list.Add(current);
+                }
+                list.AddRange(_manager.MediaSessions.Where(m => !ReferenceEquals(m, current)));
+                return list;
+            }
+        }
+
+        /// <summary>Media apps seen so far (app id → name), offered as choices for pinning/filtering.</summary>
+        public IReadOnlyDictionary<string, string> KnownSources
+        {
+            get
+            {
+                if (_manager is EnhancedGSMTCMediaSessionManager enhanced)
+                {
+                    foreach (var snapshot in enhanced.GetAllSessions())
+                    {
+                        if (!string.IsNullOrEmpty(snapshot.SourceAppUserModelId))
+                        {
+                            _knownSources[snapshot.SourceAppUserModelId] = string.IsNullOrEmpty(snapshot.DisplayAppName)
+                                ? snapshot.SourceAppUserModelId : snapshot.DisplayAppName;
+                        }
+                    }
+                }
+                return _knownSources;
+            }
+        }
+
+        private readonly Dictionary<string, string> _knownSources = new(StringComparer.OrdinalIgnoreCase);
+
+        private static MediaSessionSelectionOptions CreateSelectionOptions()
+        {
+            var s = AppSettings.Instance;
+            return MediaSessionSelectionOptions.FromDelimitedList(
+                s.PinnedMediaAppUserModelId, s.PinnedAppPriorityMode, s.MediaAppFilteringMode, s.MediaAppFilterList);
+        }
+
+        private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(AppSettings.PinnedMediaAppUserModelId):
+                case nameof(AppSettings.PinnedAppPriorityMode):
+                case nameof(AppSettings.MediaAppFilteringMode):
+                case nameof(AppSettings.MediaAppFilterList):
+                    (_manager as EnhancedGSMTCMediaSessionManager)?.RefreshSelectionOptions();
+                    break;
+            }
         }
 
         /// <summary>Session to display, or null when nothing is playing.</summary>
@@ -45,7 +121,7 @@ namespace ModernFlyouts.WinUI.Media
             if (preflight.IsAvailable)
             {
                 manager = new EnhancedGSMTCMediaSessionManager(
-                    () => new MediaSessionSelectionOptions(),
+                    CreateSelectionOptions,
                     _isTimelineDisplayed);
                 BackendName = "enhanced GSMTC";
             }
@@ -61,10 +137,24 @@ namespace ModernFlyouts.WinUI.Media
         private void Attach(MediaSessionManager manager)
         {
             _manager = manager;
-            manager.CurrentMediaSessionChanged += (_, _) => CurrentSessionChanged?.Invoke(this, EventArgs.Empty);
-            manager.MediaSessionsChanged += (_, _) => CurrentSessionChanged?.Invoke(this, EventArgs.Empty);
-            manager.MediaSessions.CollectionChanged += (_, _) => CurrentSessionChanged?.Invoke(this, EventArgs.Empty);
+            manager.CurrentMediaSessionChanged += (_, _) => RaiseChanged();
+            manager.MediaSessionsChanged += (_, _) => RaiseChanged();
+            manager.MediaSessions.CollectionChanged += (_, _) => RaiseChanged();
             manager.OnEnabled();
+            RaiseChanged();
+        }
+
+        private void RaiseChanged()
+        {
+            foreach (var session in Sessions)
+            {
+                string id = (session as EnhancedGSMTCMediaSession)?.SourceAppUserModelId ?? session.MediaSourceName;
+                if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(session.MediaSourceName))
+                {
+                    _knownSources[id] = session.MediaSourceName;
+                }
+            }
+
             CurrentSessionChanged?.Invoke(this, EventArgs.Empty);
         }
 

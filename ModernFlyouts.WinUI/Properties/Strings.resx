@@ -569,4 +569,13 @@
   <data name="Settings.ManualPlacementDescription" xml:space="preserve">
     <value>Drag the handle at the top of the flyout to move it. The position is remembered.</value>
   </data>
+  <data name="Settings.ChooseFromMediaApps" xml:space="preserve">
+    <value>Choose from media apps</value>
+  </data>
+  <data name="Settings.NoMediaAppsYet" xml:space="preserve">
+    <value>No media apps detected yet. Play something and try again.</value>
+  </data>
+  <data name="Settings.ExpandDirectionDescription" xml:space="preserve">
+    <value>Used when the flyout has been moved by dragging</value>
+  </data>
 </root>

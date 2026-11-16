@@ -464,4 +464,13 @@
   <data name="Settings.ManualPlacementDescription" xml:space="preserve">
     <value>フライアウト上部のつまみをドラッグすると移動できます。移動した位置は記憶されます。</value>
   </data>
+  <data name="Settings.ChooseFromMediaApps" xml:space="preserve">
+    <value>メディアアプリから選ぶ</value>
+  </data>
+  <data name="Settings.NoMediaAppsYet" xml:space="preserve">
+    <value>メディアアプリがまだ検出されていません。何か再生してから再度お試しください。</value>
+  </data>
+  <data name="Settings.ExpandDirectionDescription" xml:space="preserve">
+    <value>フライアウトをドラッグで移動したときに使われます</value>
+  </data>
 </root>

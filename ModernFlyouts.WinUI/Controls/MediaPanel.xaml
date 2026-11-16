@@ -10,14 +10,20 @@
         timeline toggle on the right; a thin progress bar until the seek bar is opened.
         Fluent spacing: 20 px side padding, 4 px control radius.
     -->
-    <StackPanel>
+    <Grid>
+    <!-- Artwork as a faded background (optional, as in the WPF version) -->
+    <!-- Sized to the content in code, so the image never makes the panel taller -->
+    <Image x:Name="BackgroundArtwork" Stretch="UniformToFill" Opacity="0.5" IsHitTestVisible="False"
+           Width="0" Height="0" HorizontalAlignment="Left" VerticalAlignment="Top" />
+
+    <StackPanel x:Name="ContentPanel" SizeChanged="ContentPanel_SizeChanged">
         <Grid Padding="20,16,20,0" ColumnSpacing="16">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition x:Name="InfoColumn" Width="*" />
+                <ColumnDefinition x:Name="ArtworkColumn" Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <Grid RowSpacing="2">
+            <Grid x:Name="InfoGrid" RowSpacing="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
@@ -38,7 +44,7 @@
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis" />
             </Grid>
 
-            <Border Grid.Column="1" Width="64" Height="64" CornerRadius="4" BorderThickness="1"
+            <Border x:Name="ArtworkBorder" Grid.Column="1" Width="64" Height="64" CornerRadius="4" BorderThickness="1"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                     Background="{ThemeResource ControlFillColorSecondaryBrush}">
                 <Grid>
@@ -111,4 +117,5 @@
             </ToggleButton>
         </Grid>
     </StackPanel>
+    </Grid>
 </UserControl>

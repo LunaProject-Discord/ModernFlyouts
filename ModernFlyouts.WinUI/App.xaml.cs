@@ -37,9 +37,13 @@ namespace ModernFlyouts.WinUI
         private SettingsWindow? _settingsWindow;
         private KeyboardHook? _keyboardHook;
         private MediaController? _media;
+
+        /// <summary>The running media backend (settings pages list its apps).</summary>
+        public static MediaController? Media => (Current as App)?._media;
         private WindowMessageHook? _messageHook;
         private ShellHook? _shellHook;
         private TrayIcon? _trayIcon;
+        private readonly Windows.UI.ViewManagement.UISettings _uiSettings = new();
         private AirplaneModeWatcher? _airplaneModeWatcher;
         private int? _pressedLockKey;
         private long _lastShellTriggerTick;
@@ -99,7 +103,7 @@ namespace ModernFlyouts.WinUI
             _messageHook.MessageReceived += (msg, w, l) => DisplayManager.Instance?.OnWndProc(_flyout.Handle, msg, w, l);
             _shellHook = new ShellHook(_messageHook);
             _shellHook.VolumeKey += () => ShowFromShell(S.AudioModuleEnabled, _flyout.ShowVolume);
-            _shellHook.MediaKey += () => ShowFromShell(S.AudioModuleEnabled, _flyout.ShowVolume);
+            _shellHook.MediaKey += () => ShowFromShell(S.AudioModuleEnabled, _flyout.ShowMedia);
             _shellHook.BrightnessKey += () => ShowFromShell(S.BrightnessModuleEnabled, _flyout.ShowBrightness);
 
             // Notification area icon (uses the same message hook).
@@ -110,6 +114,7 @@ namespace ModernFlyouts.WinUI
             };
             _trayIcon.OpenSettingsRequested += ShowSettings;
             _trayIcon.ExitRequested += ExitApp;
+            UpdateTrayIconFile();
             _trayIcon.IsVisible = S.TrayIconEnabled;
             S.PropertyChanged += (_, e) =>
             {
@@ -117,7 +122,13 @@ namespace ModernFlyouts.WinUI
                 {
                     UiDispatcher.Post(() => _trayIcon.IsVisible = S.TrayIconEnabled);
                 }
+                else if (e.PropertyName == nameof(AppSettings.UseColoredTrayIcon))
+                {
+                    UiDispatcher.Post(UpdateTrayIconFile);
+                }
             };
+            // The monochrome icon follows the taskbar (light/dark) theme.
+            _uiSettings.ColorValuesChanged += (_, _) => UiDispatcher.Post(UpdateTrayIconFile);
 
             // Lock keys (the shell doesn't report them).
             _keyboardHook = new KeyboardHook();
@@ -159,6 +170,33 @@ namespace ModernFlyouts.WinUI
         private static bool CanShowOurFlyouts => S.DefaultFlyout == DefaultFlyout.ModernFlyouts;
 
         /// <summary>Shows the volume flyout so placement changes can be checked from the settings.</summary>
+        private void UpdateTrayIconFile()
+        {
+            if (_trayIcon == null)
+            {
+                return;
+            }
+
+            if (S.UseColoredTrayIcon)
+            {
+                _trayIcon.IconFile = "Logo.ico";
+                return;
+            }
+
+            bool lightTaskbar = false;
+            try
+            {
+                using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+                    @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
+                lightTaskbar = key?.GetValue("SystemUsesLightTheme") is int value && value != 0;
+            }
+            catch
+            {
+            }
+
+            _trayIcon.IconFile = lightTaskbar ? "Logo_Tray_Black.ico" : "Logo_Tray_White.ico";
+        }
+
         public void PreviewFlyout() => _flyout?.ShowVolume();
 
         public void ShowSettings()

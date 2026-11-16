@@ -129,12 +129,7 @@ namespace ModernFlyouts.WinUI.Interop
                 return;
             }
 
-            if (_icon == IntPtr.Zero)
-            {
-                int size = GetSystemMetricsForDpi(SM_CXSMICON, GetDpiForSystem());
-                _icon = LoadImage(IntPtr.Zero, Path.Combine(AppContext.BaseDirectory, "Assets", "Logo.ico"),
-                    IMAGE_ICON, size, size, LR_LOADFROMFILE);
-            }
+            EnsureIcon();
 
             var data = CreateData();
             data.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP | NIF_SHOWTIP;
@@ -148,6 +143,47 @@ namespace ModernFlyouts.WinUI.Interop
             {
                 data.uVersion = NOTIFYICON_VERSION_4;
                 Shell_NotifyIcon(NIM_SETVERSION, ref data);
+            }
+        }
+
+        private string _iconFile = "Logo.ico";
+
+        /// <summary>File name in Assets\ (Logo.ico, or the monochrome Logo_Tray_Black/White.ico).</summary>
+        public string IconFile
+        {
+            get => _iconFile;
+            set
+            {
+                if (_iconFile == value)
+                {
+                    return;
+                }
+
+                _iconFile = value;
+                if (_icon != IntPtr.Zero)
+                {
+                    DestroyIcon(_icon);
+                    _icon = IntPtr.Zero;
+                }
+
+                if (_added)
+                {
+                    EnsureIcon();
+                    var data = CreateData();
+                    data.uFlags = NIF_ICON;
+                    data.hIcon = _icon;
+                    Shell_NotifyIcon(NIM_MODIFY, ref data);
+                }
+            }
+        }
+
+        private void EnsureIcon()
+        {
+            if (_icon == IntPtr.Zero)
+            {
+                int size = GetSystemMetricsForDpi(SM_CXSMICON, GetDpiForSystem());
+                _icon = LoadImage(IntPtr.Zero, Path.Combine(AppContext.BaseDirectory, "Assets", _iconFile),
+                    IMAGE_ICON, size, size, LR_LOADFROMFILE);
             }
         }
 

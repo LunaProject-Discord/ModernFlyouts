@@ -36,6 +36,11 @@ namespace ModernFlyouts.WinUI.Pages
             InitializeComponent();
 
             EnumChoices.Bind(ModeCombo, () => S.PlacementMode, v => S.PlacementMode = v);
+            // The flyout has a fixed width, so only up/down growth applies.
+            EnumChoices.Bind(ExpandCombo,
+                new[] { FlyoutWindowExpandDirection.Auto, FlyoutWindowExpandDirection.Up, FlyoutWindowExpandDirection.Down },
+                () => S.ExpandDirection, v => S.ExpandDirection = v);
+            EnumChoices.Bind(StackingCombo, () => S.ContentStackingDirection, v => S.ContentStackingDirection = v);
 
             for (int i = 0; i < Cells.Length; i++)
             {
