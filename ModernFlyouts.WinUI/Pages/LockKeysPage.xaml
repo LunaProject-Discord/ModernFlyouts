@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="ModernFlyouts.WinUI.Pages.LockKeysPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:ModernFlyouts.WinUI.Controls"
+    xmlns:res="using:ModernFlyouts.Properties">
+
+    <ScrollViewer>
+        <StackPanel Style="{StaticResource SettingsPagePanelStyle}">
+            <controls:SettingsCard Glyph="&#xE72E;" Header="{x:Bind res:Strings.Settings_EnableModule_LockKeys}" Margin="0,8,0,4">
+                <ToggleSwitch IsOn="{x:Bind S.LockKeysModuleEnabled, Mode=TwoWay}" />
+            </controls:SettingsCard>
+
+            <StackPanel IsHitTestVisible="{x:Bind S.LockKeysModuleEnabled, Mode=OneWay}"
+                        Opacity="{x:Bind OpacityFor(S.LockKeysModuleEnabled), Mode=OneWay}">
+                <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.LockKeysFlyoutHelper_SelectKeyDescription}" />
+
+                <controls:SettingsCard Glyph="&#xE765;" Header="{x:Bind res:Strings.LockKeysFlyoutHelper_CapsLock}">
+                    <ToggleSwitch IsOn="{x:Bind S.CapsLockEnabled, Mode=TwoWay}" />
+                </controls:SettingsCard>
+                <controls:SettingsCard Glyph="&#xE765;" Header="{x:Bind res:Strings.LockKeysFlyoutHelper_NumLock}">
+                    <ToggleSwitch IsOn="{x:Bind S.NumLockEnabled, Mode=TwoWay}" />
+                </controls:SettingsCard>
+                <controls:SettingsCard Glyph="&#xE765;" Header="{x:Bind res:Strings.LockKeysFlyoutHelper_ScrollLock}">
+                    <ToggleSwitch IsOn="{x:Bind S.ScrollLockEnabled, Mode=TwoWay}" />
+                </controls:SettingsCard>
+                <controls:SettingsCard Glyph="&#xE765;" Header="{x:Bind res:Strings.LockKeysFlyoutHelper_Insert}">
+                    <ToggleSwitch IsOn="{x:Bind S.InsertEnabled, Mode=TwoWay}" />
+                </controls:SettingsCard>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

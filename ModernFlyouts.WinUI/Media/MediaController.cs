@@ -27,9 +27,17 @@ namespace ModernFlyouts.WinUI.Media
 
         public event EventHandler? CurrentSessionChanged;
 
-        public async Task StartAsync()
+        public async Task StartAsync(EnhancedMediaBackendMode mode)
         {
             MediaSessionManager manager;
+            if (mode == EnhancedMediaBackendMode.Disabled)
+            {
+                manager = new GSMTCMediaSessionManager();
+                BackendName = "GSMTC (enhanced backend disabled)";
+                Attach(manager);
+                return;
+            }
+
             var preflight = await MediaControlPreflight.RunAsync();
             if (preflight.IsAvailable)
             {
@@ -44,6 +52,11 @@ namespace ModernFlyouts.WinUI.Media
                 BackendName = $"NowPlaying ({preflight.DiagnosticMessage})";
             }
 
+            Attach(manager);
+        }
+
+        private void Attach(MediaSessionManager manager)
+        {
             _manager = manager;
             manager.CurrentMediaSessionChanged += (_, _) => CurrentSessionChanged?.Invoke(this, EventArgs.Empty);
             manager.MediaSessionsChanged += (_, _) => CurrentSessionChanged?.Invoke(this, EventArgs.Empty);

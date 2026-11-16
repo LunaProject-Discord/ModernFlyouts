@@ -28,6 +28,21 @@ namespace ModernFlyouts.WinUI.Controls
             TimelineSlider.AddHandler(PointerCaptureLostEvent, new PointerEventHandler((_, _) => EndScrub()), true);
         }
 
+        private bool _showPlayerInfo = true;
+        private bool _showSeekbar = true;
+
+        public bool ShowPlayerInfo
+        {
+            get => _showPlayerInfo;
+            set { _showPlayerInfo = value; UpdateAll(); }
+        }
+
+        public bool ShowSeekbar
+        {
+            get => _showSeekbar;
+            set { _showSeekbar = value; UpdateTimeline(); }
+        }
+
         /// <summary>Raised whenever the user interacts, so the flyout can postpone hiding.</summary>
         public event EventHandler? Interacted;
 
@@ -84,7 +99,7 @@ namespace ModernFlyouts.WinUI.Controls
 
             SourceName.Text = s.MediaSourceName ?? string.Empty;
             SourceIcon.Source = ArtworkImages.ToImageSource(s.MediaSourceIcon);
-            SourcePanel.Visibility = string.IsNullOrEmpty(SourceName.Text) ? Visibility.Collapsed : Visibility.Visible;
+            SourcePanel.Visibility = _showPlayerInfo && !string.IsNullOrEmpty(SourceName.Text) ? Visibility.Visible : Visibility.Collapsed;
 
             TitleText.Text = s.Title ?? string.Empty;
             ArtistText.Text = s.Artist ?? string.Empty;
@@ -113,7 +128,7 @@ namespace ModernFlyouts.WinUI.Controls
 
             double start = s.TimelineStartTime.TotalSeconds;
             double end = s.TimelineEndTime.TotalSeconds;
-            bool visible = s.IsTimelinePropertiesEnabled && end > start;
+            bool visible = _showSeekbar && s.IsTimelinePropertiesEnabled && end > start;
             TimelinePanel.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
             if (!visible)
             {

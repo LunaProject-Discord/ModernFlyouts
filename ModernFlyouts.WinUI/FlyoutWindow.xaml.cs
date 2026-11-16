@@ -11,6 +11,7 @@ using ModernFlyouts.Core.Display;
 using ModernFlyouts.WinUI.Audio;
 using ModernFlyouts.WinUI.Interop;
 using ModernFlyouts.WinUI.Media;
+using ModernFlyouts.WinUI.Settings;
 using Windows.Foundation;
 using Windows.Graphics;
 using WinRT.Interop;
@@ -62,6 +63,19 @@ namespace ModernFlyouts.WinUI
             UpdateVolume(_volume.Volume, _volume.IsMuted);
 
             MediaPanel.Interacted += (_, _) => RestartHideTimer();
+
+            ApplySettings();
+            AppSettings.Instance.PropertyChanged += (_, _) => DispatcherQueue.TryEnqueue(ApplySettings);
+        }
+
+        private void ApplySettings()
+        {
+            var s = AppSettings.Instance;
+            _hideTimer.Interval = TimeSpan.FromMilliseconds(s.FlyoutTimeout);
+            RootPanel.RequestedTheme = s.FlyoutTheme;
+            MediaPanel.ShowPlayerInfo = s.ShowMediaPlayerInfo;
+            MediaPanel.ShowSeekbar = s.ShowMediaSeekbar;
+            UpdateMediaVisibility();
         }
 
         public IntPtr Handle => _hwnd;
@@ -176,7 +190,8 @@ namespace ModernFlyouts.WinUI
 
         private void UpdateMediaVisibility()
         {
-            bool show = _kind == FlyoutKind.Volume && MediaPanel.Session != null;
+            bool show = _kind == FlyoutKind.Volume && MediaPanel.Session != null
+                && AppSettings.Instance.ShowMediaInVolumeFlyout;
             MediaSection.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
         }
 

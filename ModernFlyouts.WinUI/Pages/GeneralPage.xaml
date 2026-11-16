@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="ModernFlyouts.WinUI.Pages.GeneralPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:ModernFlyouts.WinUI.Controls"
+    xmlns:res="using:ModernFlyouts.Properties">
+
+    <ScrollViewer>
+        <StackPanel Style="{StaticResource SettingsPagePanelStyle}">
+            <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_Behavior}" />
+
+            <controls:SettingsCard Glyph="&#xE7E8;" Header="{x:Bind res:Strings.Settings_RunAtStartup}">
+                <ToggleSwitch IsOn="{x:Bind S.RunAtStartup, Mode=TwoWay}" />
+            </controls:SettingsCard>
+
+            <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_DefaultFlyout}" />
+
+            <controls:SettingsCard Glyph="&#xE737;" Header="{x:Bind res:Strings.Settings_DefaultFlyoutDescription}">
+                <ComboBox x:Name="DefaultFlyoutCombo" MinWidth="200" />
+            </controls:SettingsCard>
+
+            <InfoBar x:Name="DefaultFlyoutWarning" Severity="Warning" IsOpen="True" IsClosable="False"
+                     Message="{x:Bind res:Strings.Settings_DefaultFlyoutWarningMessage}" Margin="0,0,0,4" />
+
+            <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_Additional}" />
+
+            <controls:SettingsCard Glyph="&#xE777;" Header="{x:Bind res:Strings.Settings_ResetToDefaults}">
+                <Button Content="{x:Bind res:Strings.Settings_ResetToDefaults}" Click="ResetButton_Click" />
+            </controls:SettingsCard>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

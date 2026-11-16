@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="ModernFlyouts.WinUI.Pages.AboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:res="using:ModernFlyouts.Properties">
+
+    <ScrollViewer>
+        <StackPanel Style="{StaticResource SettingsPagePanelStyle}" Spacing="4">
+            <Border Margin="0,8,0,0" Padding="16" CornerRadius="6" BorderThickness="1"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <StackPanel Spacing="4">
+                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="ModernFlyouts" />
+                    <TextBlock x:Name="VersionText" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Margin="0,8,0,0" TextWrapping="Wrap" Text="{x:Bind res:Strings.About_AppDescription}" />
+                    <TextBlock TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               Text="Personal combined build (WinUI 3): based on the usoppii fork (ModernFlyouts 0.10 line) with the enhanced media backend from GlobalFlyouts (Astear17, Kinfani)." />
+                </StackPanel>
+            </Border>
+
+            <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="Credits" />
+
+            <Border Padding="8" CornerRadius="6" BorderThickness="1"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <StackPanel>
+                    <HyperlinkButton Content="ModernFlyouts (original project)" NavigateUri="https://github.com/ModernFlyouts-Community/ModernFlyouts" />
+                    <HyperlinkButton Content="usoppii/ModernFlyouts" NavigateUri="https://github.com/usoppii/ModernFlyouts" />
+                    <HyperlinkButton Content="Astear17/GlobalFlyouts" NavigateUri="https://github.com/Astear17/GlobalFlyouts" />
+                    <HyperlinkButton Content="Kinfani/GlobalFlyouts" NavigateUri="https://github.com/Kinfani/GlobalFlyouts" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
