@@ -9,14 +9,38 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x86;x64;ARM64</Platforms>
     <RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+    <!-- One RID per platform, so each bundle architecture builds for itself. -->
+    <RuntimeIdentifier Condition="'$(Platform)' == 'x86'">win-x86</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(Platform)' == 'x64'">win-x64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition="'$(Platform)' == 'ARM64'">win-arm64</RuntimeIdentifier>
     <UseWinUI>true</UseWinUI>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <!-- Prototype: run straight from the build output without installing a package or runtime. -->
-    <WindowsPackageType>None</WindowsPackageType>
+    <!-- The Windows App SDK runtime ships inside the app (no separate runtime install). -->
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <SelfContained>true</SelfContained>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <!-- Build the localized satellite assemblies with csc; the legacy AL.exe has no ARM64 support. -->
+    <GenerateSatelliteAssembliesForCore>true</GenerateSatelliteAssembliesForCore>
+  </PropertyGroup>
+
+  <!-- Day-to-day builds run unpackaged straight from bin\. Build with -p:PackageMsix=true to
+       produce the signed MSIX (see Package.appxmanifest). -->
+  <PropertyGroup Condition="'$(PackageMsix)' != 'true'">
+    <WindowsPackageType>None</WindowsPackageType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PackageMsix)' == 'true'">
+    <WindowsPackageType>MSIX</WindowsPackageType>
+    <GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
+    <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
+    <PackageCertificateThumbprint>10D4E956A5007A79300325C6689AA80447CE9CDE</PackageCertificateThumbprint>
+    <AppxPackageSigningTimestampServerUrl>http://timestamp.digicert.com</AppxPackageSigningTimestampServerUrl>
+    <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+    <UapAppxPackageBuildMode>SideloadOnly</UapAppxPackageBuildMode>
+    <AppxSymbolPackageEnabled>false</AppxSymbolPackageEnabled>
+    <AppxAutoIncrementPackageRevision>false</AppxAutoIncrementPackageRevision>
+    <GenerateTestArtifacts>true</GenerateTestArtifacts>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,6 +56,7 @@
 
   <ItemGroup>
     <Content Include="Assets\*.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Images\*.png" Exclude="Images\*.backup.png" />
   </ItemGroup>
 
   <PropertyGroup>

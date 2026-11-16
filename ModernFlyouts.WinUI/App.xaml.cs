@@ -137,6 +137,8 @@ namespace ModernFlyouts.WinUI
             NativeFlyoutHandler.Instance.NativeFlyoutShown += (_, _) => OnNativeFlyoutShown();
             _lastVirtualDesktopId = VirtualDesktopManager.Instance.TryGetCurrentDesktop()?.Id;
 
+            SyncRunAtStartupAsync();
+
             if (Environment.GetCommandLineArgs() is { Length: > 1 } cmd && cmd[1] == "--settings")
             {
                 ShowSettings();
@@ -315,6 +317,51 @@ namespace ModernFlyouts.WinUI
         }
 
         #endregion
+
+        /// <summary>
+        /// The real state lives in Windows (Task Manager / Settings can change it), so read it
+        /// at startup, then push user changes from the settings page back to Windows.
+        /// </summary>
+        private async void SyncRunAtStartupAsync()
+        {
+            bool applying = false;
+            try
+            {
+                applying = true;
+                S.RunAtStartup = await StartupRegistration.IsEnabledAsync();
+            }
+            catch (Exception ex)
+            {
+                Log($"startup state read failed: {ex.Message}");
+            }
+            finally
+            {
+                applying = false;
+            }
+
+            S.PropertyChanged += async (_, e) =>
+            {
+                if (e.PropertyName != nameof(AppSettings.RunAtStartup) || applying)
+                {
+                    return;
+                }
+
+                try
+                {
+                    applying = true;
+                    bool actual = await StartupRegistration.SetEnabledAsync(S.RunAtStartup);
+                    UiDispatcher.Post(() => S.RunAtStartup = actual);
+                }
+                catch (Exception ex)
+                {
+                    Log($"startup registration failed: {ex.Message}");
+                }
+                finally
+                {
+                    applying = false;
+                }
+            };
+        }
 
         private async void StartMediaAsync()
         {
