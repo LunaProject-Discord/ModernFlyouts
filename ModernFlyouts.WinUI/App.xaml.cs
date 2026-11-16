@@ -39,6 +39,7 @@ namespace ModernFlyouts.WinUI
         private MediaController? _media;
         private WindowMessageHook? _messageHook;
         private ShellHook? _shellHook;
+        private TrayIcon? _trayIcon;
         private AirplaneModeWatcher? _airplaneModeWatcher;
         private int? _pressedLockKey;
         private long _lastShellTriggerTick;
@@ -92,6 +93,23 @@ namespace ModernFlyouts.WinUI
             _shellHook.MediaKey += () => ShowFromShell(S.AudioModuleEnabled, _flyout.ShowVolume);
             _shellHook.BrightnessKey += () => ShowFromShell(S.BrightnessModuleEnabled, _flyout.ShowBrightness);
 
+            // Notification area icon (uses the same message hook).
+            _trayIcon = new TrayIcon(_messageHook, "ModernFlyouts")
+            {
+                SettingsText = Strings.SettingsItem,
+                ExitText = Strings.ExitItem,
+            };
+            _trayIcon.OpenSettingsRequested += ShowSettings;
+            _trayIcon.ExitRequested += ExitApp;
+            _trayIcon.IsVisible = S.TrayIconEnabled;
+            S.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(AppSettings.TrayIconEnabled))
+                {
+                    UiDispatcher.Post(() => _trayIcon.IsVisible = S.TrayIconEnabled);
+                }
+            };
+
             // Lock keys (the shell doesn't report them).
             _keyboardHook = new KeyboardHook();
             _keyboardHook.KeyDown += OnKeyDown;
@@ -133,6 +151,18 @@ namespace ModernFlyouts.WinUI
         {
             _settingsWindow ??= new SettingsWindow();
             _settingsWindow.ShowAndActivate();
+        }
+
+        /// <summary>Removes the tray icon and hooks, gives the OSD back to Windows, then exits.</summary>
+        private void ExitApp()
+        {
+            Log("exit");
+            _trayIcon?.Dispose();
+            _shellHook?.Dispose();
+            _keyboardHook = null;
+            _airplaneModeWatcher?.Stop();
+            _flyout?.HideFlyout();
+            Exit();
         }
 
         private void ShowFromShell(bool moduleEnabled, Action show)
