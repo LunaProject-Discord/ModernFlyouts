@@ -54,6 +54,14 @@
                 <Setter Property="BorderThickness" Value="0" />
                 <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
             </Style>
+            <!-- Row icons: the full glyph in a faint tone behind the glyph of the current level -->
+            <Style x:Key="FlyoutLevelGlyphStyle" TargetType="FontIcon">
+                <Setter Property="FontSize" Value="16" />
+            </Style>
+            <Style x:Key="FlyoutLevelShadowGlyphStyle" TargetType="FontIcon" BasedOn="{StaticResource FlyoutLevelGlyphStyle}">
+                <Setter Property="Foreground" Value="{ThemeResource TextFillColorDisabledBrush}" />
+            </Style>
+
             <Style x:Key="FlyoutValueTextStyle" TargetType="TextBlock" BasedOn="{StaticResource SubtitleTextBlockStyle}">
                 <Setter Property="FontSize" Value="20" />
                 <!-- Trim the line box to the glyphs so the digits sit exactly at the row's center -->

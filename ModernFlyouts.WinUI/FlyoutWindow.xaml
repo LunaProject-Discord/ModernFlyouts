@@ -65,9 +65,8 @@
                     Click="MuteButton_Click">
                 <!-- Full speaker in a faint tone behind the current level (as in the WPF flyout) -->
                 <Grid>
-                    <FontIcon x:Name="VolumeShadowGlyph" Glyph="&#xE995;" FontSize="16"
-                              Foreground="{ThemeResource TextFillColorDisabledBrush}" />
-                    <FontIcon x:Name="VolumeGlyph" Glyph="&#xE995;" FontSize="16" />
+                    <FontIcon x:Name="VolumeShadowGlyph" Glyph="&#xE995;" Style="{StaticResource FlyoutLevelShadowGlyphStyle}" />
+                    <FontIcon x:Name="VolumeGlyph" Glyph="&#xE995;" Style="{StaticResource FlyoutLevelGlyphStyle}" />
                 </Grid>
             </Button>
             <Slider x:Name="VolumeSlider" Grid.Column="1" Minimum="0" Maximum="100" StepFrequency="1"

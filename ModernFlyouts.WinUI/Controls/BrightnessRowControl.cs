@@ -14,7 +14,8 @@ namespace ModernFlyouts.WinUI.Controls
     /// </summary>
     internal sealed class BrightnessRowControl : Grid
     {
-        private readonly BrightnessIcon _glyph;
+        private readonly FontIcon _shadowGlyph;
+        private readonly FontIcon _glyph;
         private readonly TextBlock _index;
         private readonly Slider _slider;
         private readonly TextBlock _value;
@@ -29,7 +30,10 @@ namespace ModernFlyouts.WinUI.Controls
             ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(48) });
 
             var icon = new Grid { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-            _glyph = new BrightnessIcon();
+            // Same composition as the volume icon: the full sun in a faint tone behind the
+            // glyph of the current level.
+            _shadowGlyph = new FontIcon { Glyph = BrightGlyph, Style = (Style)Application.Current.Resources["FlyoutLevelShadowGlyphStyle"] };
+            _glyph = new FontIcon { Glyph = BrightGlyph, Style = (Style)Application.Current.Resources["FlyoutLevelGlyphStyle"] };
             _index = new TextBlock
             {
                 FontSize = 9,
@@ -39,6 +43,7 @@ namespace ModernFlyouts.WinUI.Controls
                 VerticalAlignment = VerticalAlignment.Bottom,
                 Visibility = showIndex ? Visibility.Visible : Visibility.Collapsed,
             };
+            icon.Children.Add(_shadowGlyph);
             icon.Children.Add(_glyph);
             icon.Children.Add(_index);
             if (controller.AssociatedDisplayMonitor is { } monitor)
@@ -78,7 +83,8 @@ namespace ModernFlyouts.WinUI.Controls
 
 #if DEBUG
         /// <summary>Shows the icon at another level without touching the display (--demo-brightness).</summary>
-        internal void PreviewIconLevel(double level) => _glyph.Level = level;
+        internal void PreviewIconLevel(double level) =>
+            UpdateGlyph(Controller.Minimum + (Controller.Maximum - Controller.Minimum) * level);
 #endif
 
         /// <summary>Raised when the user changes the value (keeps the flyout open).</summary>
@@ -98,9 +104,18 @@ namespace ModernFlyouts.WinUI.Controls
             _updating = false;
 
             _value.Text = Controller.Brightness.ToString("0");
-            // The sun's rays follow the level.
-            double range = Controller.Maximum - Controller.Minimum;
-            _glyph.Level = range > 0 ? (Controller.Brightness - Controller.Minimum) / range : 1;
+            UpdateGlyph(Controller.Brightness);
+        }
+
+        // Segoe Fluent Icons has two brightness glyphs: Brightness and LowerBrightness.
+        private const string BrightGlyph = "\uE706";
+        private const string LowerGlyph = "\uEC8A";
+
+        /// <summary>Lower brightness glyph up to the middle of the range, as in the WPF version.</summary>
+        private void UpdateGlyph(double brightness)
+        {
+            double middle = (Controller.Minimum + Controller.Maximum) / 2;
+            _glyph.Glyph = brightness > middle ? BrightGlyph : LowerGlyph;
         }
 
         private void Slider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
