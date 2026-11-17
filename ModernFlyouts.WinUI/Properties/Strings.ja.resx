@@ -200,6 +200,9 @@
   <data name="Settings.SystemDefault" xml:space="preserve">
     <value>システムの既定値</value>
   </data>
+  <data name="Settings.FollowWindowsMode" xml:space="preserve">
+    <value>Windows モードに合わせる</value>
+  </data>
   <data name="About.Dependencies" xml:space="preserve">
     <value>依存関係</value>
   </data>

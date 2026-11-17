@@ -131,8 +131,12 @@ namespace ModernFlyouts.WinUI
                     UiDispatcher.Post(UpdateTrayIconFile);
                 }
             };
-            // The monochrome icon follows the taskbar (light/dark) theme.
-            _uiSettings.ColorValuesChanged += (_, _) => UiDispatcher.Post(UpdateTrayIconFile);
+            // The monochrome icon and the flyout (by default) follow the Windows mode.
+            _uiSettings.ColorValuesChanged += (_, _) => UiDispatcher.Post(() =>
+            {
+                UpdateTrayIconFile();
+                _flyout.ApplyTheme();
+            });
 
             // Lock keys (the shell doesn't report them).
             _keyboardHook = new KeyboardHook();
@@ -187,18 +191,7 @@ namespace ModernFlyouts.WinUI
                 return;
             }
 
-            bool lightTaskbar = false;
-            try
-            {
-                using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
-                    @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
-                lightTaskbar = key?.GetValue("SystemUsesLightTheme") is int value && value != 0;
-            }
-            catch
-            {
-            }
-
-            _trayIcon.IconFile = lightTaskbar ? "Logo_Tray_Black.ico" : "Logo_Tray_White.ico";
+            _trayIcon.IconFile = WindowsTheme.IsLight ? "Logo_Tray_Black.ico" : "Logo_Tray_White.ico";
         }
 
         public void PreviewFlyout() => _flyout?.ShowVolume();

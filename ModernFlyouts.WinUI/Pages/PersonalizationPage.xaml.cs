@@ -1,4 +1,7 @@
+using System;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using ModernFlyouts.Properties;
 using ModernFlyouts.WinUI.Settings;
 
 namespace ModernFlyouts.WinUI.Pages
@@ -9,7 +12,9 @@ namespace ModernFlyouts.WinUI.Pages
         {
             InitializeComponent();
 
-            EnumChoices.Bind(FlyoutThemeCombo, () => S.FlyoutTheme, v => S.FlyoutTheme = v);
+            // The flyout's default follows the Windows mode (taskbar), not the app mode.
+            EnumChoices.Bind(FlyoutThemeCombo, Enum.GetValues<ElementTheme>(), () => S.FlyoutTheme, v => S.FlyoutTheme = v,
+                v => v == ElementTheme.Default ? Strings.Settings_FollowWindowsMode : EnumChoices.GetDisplayName(v));
             EnumChoices.Bind(AppThemeCombo, () => S.AppTheme, v => S.AppTheme = v);
             EnumChoices.Bind(TopBarCombo, () => S.TopBarVisibility, v => S.TopBarVisibility = v);
 

@@ -1222,6 +1222,15 @@ namespace ModernFlyouts.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Windows mode.
+        /// </summary>
+        public static string Settings_FollowWindowsMode {
+            get {
+                return ResourceManager.GetString("Settings.FollowWindowsMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to System default.
         /// </summary>
         public static string Settings_SystemDefault {

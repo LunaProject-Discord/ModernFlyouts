@@ -30,8 +30,12 @@ namespace ModernFlyouts.WinUI.Settings
 
         /// <summary>Only the given <paramref name="values"/> are offered.</summary>
         public static void Bind<T>(ComboBox comboBox, T[] values, Func<T> get, Action<T> set) where T : struct, Enum
+            => Bind(comboBox, values, get, set, v => GetDisplayName(v));
+
+        /// <summary>With custom texts (e.g. what "default" means for this setting).</summary>
+        public static void Bind<T>(ComboBox comboBox, T[] values, Func<T> get, Action<T> set, Func<T, string> displayName) where T : struct, Enum
         {
-            comboBox.ItemsSource = values.Select(v => GetDisplayName(v)).ToList();
+            comboBox.ItemsSource = values.Select(displayName).ToList();
             comboBox.SelectedIndex = Array.IndexOf(values, get());
             comboBox.SelectionChanged += (_, _) =>
             {

@@ -142,7 +142,7 @@ namespace ModernFlyouts.WinUI
         {
             var s = AppSettings.Instance;
             _hideTimer.Interval = TimeSpan.FromMilliseconds(s.FlyoutTimeout);
-            RootPanel.RequestedTheme = s.FlyoutTheme;
+            ApplyTheme();
             Backdrop.BackgroundOpacity = s.FlyoutBackgroundOpacity / 100.0;
             foreach (var panel in _mediaPanels)
             {
@@ -157,6 +157,16 @@ namespace ModernFlyouts.WinUI
             {
                 PlaceWindow(animate: false);
             }
+        }
+
+        /// <summary>
+        /// Light/dark as chosen; the default follows the Windows mode (like the shell's own
+        /// flyouts), not the app mode. Set on the window's root so the acrylic matches too.
+        /// </summary>
+        public void ApplyTheme()
+        {
+            var theme = AppSettings.Instance.FlyoutTheme;
+            RootGrid.RequestedTheme = theme == ElementTheme.Default ? WindowsTheme.Current : theme;
         }
 
         #region Showing

@@ -395,6 +395,9 @@
   <data name="Settings.SystemDefault" xml:space="preserve">
     <value>System default</value>
   </data>
+  <data name="Settings.FollowWindowsMode" xml:space="preserve">
+    <value>Windows mode</value>
+  </data>
   <data name="Settings.TopBarVisibility" xml:space="preserve">
     <value>TopBar visibility</value>
   </data>
