@@ -574,7 +574,7 @@ namespace ModernFlyouts.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Caps lock.
+        ///   Looks up a localized string similar to Caps Lock.
         /// </summary>
         public static string LockKeysFlyoutHelper_CapsLock {
             get {
@@ -619,7 +619,7 @@ namespace ModernFlyouts.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Num lock.
+        ///   Looks up a localized string similar to Num Lock.
         /// </summary>
         public static string LockKeysFlyoutHelper_NumLock {
             get {
@@ -637,7 +637,7 @@ namespace ModernFlyouts.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Scroll lock.
+        ///   Looks up a localized string similar to Scroll Lock.
         /// </summary>
         public static string LockKeysFlyoutHelper_ScrollLock {
             get {
