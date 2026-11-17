@@ -18,7 +18,13 @@
         <!-- WinUI title bar (48 px as before): pane toggle, icon, title -->
         <TitleBar x:Name="AppTitleBar" Title="{x:Bind res:Strings.SettingsItem}" Height="48"
                   IsBackButtonVisible="False" IsPaneToggleButtonVisible="True"
-                  PaneToggleRequested="AppTitleBar_PaneToggleRequested">
+                  PaneToggleRequested="AppTitleBar_PaneToggleRequested" Loaded="AppTitleBar_Loaded">
+            <TitleBar.Resources>
+                <!-- Pane toggle as large as the (tall) caption buttons -->
+                <x:Double x:Key="TitleBarPaneToggleButtonWidth">48</x:Double>
+                <!-- Keep the title bar at 48 px (its compact layout is 32 px) -->
+                <x:Double x:Key="TitleBarCompactHeight">48</x:Double>
+            </TitleBar.Resources>
             <TitleBar.IconSource>
                 <ImageIconSource ImageSource="ms-appx:///Assets/Logo.ico" />
             </TitleBar.IconSource>
