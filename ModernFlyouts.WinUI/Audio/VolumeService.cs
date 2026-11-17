@@ -1,15 +1,18 @@
 using System;
 using NAudio.CoreAudioApi;
+using NAudio.CoreAudioApi.Interfaces;
 
 namespace ModernFlyouts.WinUI.Audio
 {
     /// <summary>
-    /// Default render endpoint volume. Notifications arrive on a COM thread;
-    /// subscribers must marshal to the UI thread themselves.
+    /// Volume of the default output device. Follows the default device when it changes
+    /// (e.g. Bluetooth earbuds connect), like the WPF version did.
+    /// Notifications arrive on a COM thread; subscribers must marshal to the UI thread themselves.
     /// </summary>
-    public sealed class VolumeService : IDisposable
+    public sealed class VolumeService : IDisposable, IMMNotificationClient
     {
         private readonly MMDeviceEnumerator _enumerator = new();
+        private readonly object _gate = new();
         private MMDevice? _device;
 
         /// <summary>(volume 0-100, isMuted)</summary>
@@ -17,14 +20,14 @@ namespace ModernFlyouts.WinUI.Audio
 
         public VolumeService()
         {
+            AttachDefaultDevice();
             try
             {
-                _device = _enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-                _device.AudioEndpointVolume.OnVolumeNotification += OnVolumeNotification;
+                _enumerator.RegisterEndpointNotificationCallback(this);
             }
-            catch
+            catch (Exception ex)
             {
-                _device = null;
+                App.Log($"audio device notifications unavailable: {ex.Message}");
             }
         }
 
@@ -32,21 +35,78 @@ namespace ModernFlyouts.WinUI.Audio
 
         public double Volume
         {
-            get => _device == null ? 0 : Math.Round(_device.AudioEndpointVolume.MasterVolumeLevelScalar * 100);
+            get
+            {
+                var device = _device;
+                try { return device == null ? 0 : Math.Round(device.AudioEndpointVolume.MasterVolumeLevelScalar * 100); }
+                catch { return 0; }
+            }
             set
             {
-                if (_device == null) return;
-                _device.AudioEndpointVolume.MasterVolumeLevelScalar = (float)Math.Clamp(value / 100.0, 0, 1);
+                var device = _device;
+                try
+                {
+                    if (device != null) device.AudioEndpointVolume.MasterVolumeLevelScalar = (float)Math.Clamp(value / 100.0, 0, 1);
+                }
+                catch { }
             }
         }
 
         public bool IsMuted
         {
-            get => _device?.AudioEndpointVolume.Mute ?? false;
+            get
+            {
+                var device = _device;
+                try { return device?.AudioEndpointVolume.Mute ?? false; }
+                catch { return false; }
+            }
             set
             {
-                if (_device != null) _device.AudioEndpointVolume.Mute = value;
+                var device = _device;
+                try
+                {
+                    if (device != null) device.AudioEndpointVolume.Mute = value;
+                }
+                catch { }
             }
+        }
+
+        private void AttachDefaultDevice()
+        {
+            lock (_gate)
+            {
+                DetachDevice();
+                try
+                {
+                    _device = _enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+                    _device.AudioEndpointVolume.OnVolumeNotification += OnVolumeNotification;
+                    App.Log($"audio device: {_device.FriendlyName}");
+                }
+                catch (Exception ex)
+                {
+                    _device = null;
+                    App.Log($"no audio device: {ex.Message}");
+                }
+            }
+
+            // The new device has its own level: update the flyout right away.
+            VolumeChanged?.Invoke(Volume, IsMuted);
+        }
+
+        private void DetachDevice()
+        {
+            if (_device == null)
+            {
+                return;
+            }
+
+            try
+            {
+                _device.AudioEndpointVolume.OnVolumeNotification -= OnVolumeNotification;
+                _device.Dispose();
+            }
+            catch { }
+            _device = null;
         }
 
         private long _lastChangeTick;
@@ -64,12 +124,35 @@ namespace ModernFlyouts.WinUI.Audio
             return last != 0 && Environment.TickCount64 - last <= within.TotalMilliseconds;
         }
 
+        #region IMMNotificationClient
+
+        void IMMNotificationClient.OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId)
+        {
+            if (flow != DataFlow.Render || role != Role.Multimedia)
+            {
+                return;
+            }
+
+            // Called on a COM thread that must not re-enter the device enumerator: switch later.
+            System.Threading.ThreadPool.QueueUserWorkItem(_ => AttachDefaultDevice());
+        }
+
+        void IMMNotificationClient.OnDeviceStateChanged(string deviceId, DeviceState newState) { }
+
+        void IMMNotificationClient.OnDeviceAdded(string pwstrDeviceId) { }
+
+        void IMMNotificationClient.OnDeviceRemoved(string deviceId) { }
+
+        void IMMNotificationClient.OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key) { }
+
+        #endregion
+
         public void Dispose()
         {
-            if (_device != null)
+            try { _enumerator.UnregisterEndpointNotificationCallback(this); } catch { }
+            lock (_gate)
             {
-                _device.AudioEndpointVolume.OnVolumeNotification -= OnVolumeNotification;
-                _device.Dispose();
+                DetachDevice();
             }
             _enumerator.Dispose();
         }
