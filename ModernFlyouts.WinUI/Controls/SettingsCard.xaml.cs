@@ -11,9 +11,29 @@ namespace ModernFlyouts.WinUI.Controls
     [ContentProperty(Name = nameof(Action))]
     public sealed partial class SettingsCard : UserControl
     {
+        // CommunityToolkit SettingsCardWrapThreshold: narrower cards put the action under the header.
+        private const double WrapThreshold = 476;
+
         public SettingsCard()
         {
             InitializeComponent();
+            SizeChanged += (_, e) => UpdateWrap(e.NewSize.Width < WrapThreshold);
+        }
+
+        private bool _wrapped;
+
+        private void UpdateWrap(bool wrap)
+        {
+            if (wrap == _wrapped)
+            {
+                return;
+            }
+
+            _wrapped = wrap;
+            Grid.SetRow(ActionPresenter, wrap ? 1 : 0);
+            Grid.SetColumn(ActionPresenter, wrap ? 1 : 2);
+            ActionPresenter.HorizontalAlignment = wrap ? HorizontalAlignment.Left : HorizontalAlignment.Stretch;
+            ActionPresenter.Margin = wrap ? new Thickness(0, 8, 0, 0) : new Thickness(16, 0, 0, 0);
         }
 
         public string Glyph
@@ -72,6 +92,7 @@ namespace ModernFlyouts.WinUI.Controls
             toggle.MinWidth = 0;
             toggle.Width = 40; // the track; WinUI's own state text (to its right) is clipped away
             toggle.VerticalAlignment = VerticalAlignment.Center;
+            toggle.Margin = new Thickness(0, -4, 0, -4); // 40 px tall template; rows stay 68 px like other cards
             toggle.Toggled += (_, _) => Update();
             toggle.RegisterPropertyChangedCallback(ToggleSwitch.OnContentProperty, (_, _) => Update());
             toggle.RegisterPropertyChangedCallback(ToggleSwitch.OffContentProperty, (_, _) => Update());

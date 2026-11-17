@@ -173,6 +173,12 @@ namespace ModernFlyouts.WinUI
             }
 
             Log("ready");
+#if DEBUG
+            if (Array.IndexOf(Environment.GetCommandLineArgs(), "--demo-desktop") > 0)
+            {
+                _flyout.ShowVirtualDesktop("Desktop 2", 1, 4);
+            }
+#endif
         }
 
         private static bool CanShowOurFlyouts => S.DefaultFlyout == DefaultFlyout.ModernFlyouts;

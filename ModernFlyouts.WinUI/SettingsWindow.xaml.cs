@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Navigation;
 using ModernFlyouts.WinUI.Pages;
 using ModernFlyouts.WinUI.Settings;
 using Windows.Graphics;
@@ -22,8 +25,16 @@ namespace ModernFlyouts.WinUI
 
             Title = Properties.Strings.SettingsItem;
             ExtendsContentIntoTitleBar = true;
-            SetTitleBar(TitleBar);
+            SetTitleBar(AppTitleBar);
+            // Caption buttons as tall as the 48 px title bar (as in Windows Settings).
+            AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
+            AppWindow.SetIcon(System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Logo.ico"));
             AppWindow.Resize(new SizeInt32(1100, 760));
+            if (AppWindow.Presenter is OverlappedPresenter presenter)
+            {
+                presenter.PreferredMinimumWidth = 500;
+                presenter.PreferredMinimumHeight = 500;
+            }
 
             // Keep the window around: hide on close instead of destroying it.
             AppWindow.Closing += (_, e) =>
@@ -73,29 +84,76 @@ namespace ModernFlyouts.WinUI
             titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
         }
 
+        private bool _syncingSelection;
+
+        private static (Type Page, object? Parameter) GetPage(string? tag) => tag switch
+        {
+            "personalization" => (typeof(PersonalizationPage), null),
+            "layout" => (typeof(LayoutPage), null),
+            "audio" => (typeof(AudioPage), null),
+            "brightness" => (typeof(ModuleTogglePage), ToggleModule.Brightness),
+            "airplane" => (typeof(ModuleTogglePage), ToggleModule.AirplaneMode),
+            "lockkeys" => (typeof(LockKeysPage), null),
+            "virtualdesktop" => (typeof(ModuleTogglePage), ToggleModule.VirtualDesktop),
+            "about" => (typeof(AboutPage), null),
+            _ => (typeof(GeneralPage), null),
+        };
+
+        private IEnumerable<NavigationViewItem> AllItems =>
+            NavView.MenuItems.Concat(NavView.FooterMenuItems).OfType<NavigationViewItem>();
+
         private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            if (args.SelectedItem is not NavigationViewItem item)
+            if (_syncingSelection || args.SelectedItem is not NavigationViewItem item)
             {
                 return;
             }
 
-            HeaderText.Text = item.Content?.ToString();
-
-            (Type page, object? parameter) = (item.Tag as string) switch
+            var (page, parameter) = GetPage(item.Tag as string);
+            if (ContentFrame.CurrentSourcePageType == page && Equals(ContentFrame.Content is Page { Tag: var current } ? current : null, parameter))
             {
-                "personalization" => (typeof(PersonalizationPage), null),
-                "layout" => (typeof(LayoutPage), null),
-                "audio" => (typeof(AudioPage), null),
-                "brightness" => (typeof(ModuleTogglePage), ToggleModule.Brightness),
-                "airplane" => (typeof(ModuleTogglePage), ToggleModule.AirplaneMode),
-                "lockkeys" => (typeof(LockKeysPage), null),
-                "virtualdesktop" => (typeof(ModuleTogglePage), ToggleModule.VirtualDesktop),
-                "about" => (typeof(AboutPage), null),
-                _ => (typeof(GeneralPage), (object?)null),
-            };
+                return;
+            }
 
-            ContentFrame.Navigate(page, parameter);
+            ContentFrame.Navigate(page, parameter, new EntranceNavigationTransitionInfo());
+        }
+
+        /// <summary>After any navigation (including back): header, selection and back button.</summary>
+        private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
+        {
+            if (e.Content is Page page)
+            {
+                page.Tag = e.Parameter; // remembers which module a shared page shows
+            }
+
+            var item = AllItems.FirstOrDefault(i =>
+            {
+                var (type, parameter) = GetPage(i.Tag as string);
+                return type == e.SourcePageType && Equals(parameter, e.Parameter);
+            });
+
+            if (item != null)
+            {
+                HeaderText.Text = item.Content?.ToString();
+                _syncingSelection = true;
+                NavView.SelectedItem = item;
+                _syncingSelection = false;
+            }
+
+            AppTitleBar.IsBackButtonEnabled = ContentFrame.CanGoBack;
+        }
+
+        private void AppTitleBar_BackRequested(TitleBar sender, object args)
+        {
+            if (ContentFrame.CanGoBack)
+            {
+                ContentFrame.GoBack();
+            }
+        }
+
+        private void AppTitleBar_PaneToggleRequested(TitleBar sender, object args)
+        {
+            NavView.IsPaneOpen = !NavView.IsPaneOpen;
         }
     }
 }

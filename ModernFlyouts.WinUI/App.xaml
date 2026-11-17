@@ -15,7 +15,8 @@
                 <Setter Property="MaxWidth" Value="1000" />
             </Style>
             <Style x:Key="SettingsSectionHeaderStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
-                <Setter Property="Margin" Value="1,24,0,8" />
+                <!-- WinUI Gallery / Windows Settings section header spacing -->
+                <Setter Property="Margin" Value="1,30,0,6" />
             </Style>
 
             <!-- Flyout controls: WPF sizes (40x40 media buttons, 32 px top bar) with Fluent 4 px corners -->

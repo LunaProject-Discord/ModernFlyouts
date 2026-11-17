@@ -169,6 +169,7 @@ namespace ModernFlyouts.WinUI
             var resolved = theme == ElementTheme.Default ? WindowsTheme.Current : theme;
             RootGrid.RequestedTheme = resolved;
             Backdrop.Theme = resolved;
+            RefreshDotColors();
         }
 
         #region Showing
@@ -215,8 +216,9 @@ namespace ModernFlyouts.WinUI
                     Width = current ? 16 : 6,
                     Height = 6,
                     CornerRadius = new CornerRadius(3),
-                    Background = (Brush)Application.Current.Resources[current ? "AccentFillColorDefaultBrush" : "TextFillColorPrimaryBrush"],
+                    Background = GetDotBrush(current),
                     Opacity = current ? 1 : 0.35,
+                    Tag = current,
                 });
             }
 
@@ -710,7 +712,7 @@ namespace ModernFlyouts.WinUI
                     {
                         Height = 6,
                         CornerRadius = new CornerRadius(3),
-                        Background = (Brush)Application.Current.Resources["TextFillColorPrimaryBrush"],
+                        Background = GetDotBrush(false),
                     });
                 }
             }
@@ -737,8 +739,38 @@ namespace ModernFlyouts.WinUI
                 bool current = i == page;
                 dot.Width = current ? 16 : 6;
                 dot.Opacity = current ? 1 : 0.35;
-                dot.Background = (Brush)Application.Current.Resources[current ? "AccentFillColorDefaultBrush" : "TextFillColorPrimaryBrush"];
+                dot.Background = GetDotBrush(current);
             }
+        }
+
+        private static readonly Windows.UI.ViewManagement.UISettings s_uiSettings = new();
+
+        /// <summary>
+        /// Page/desktop indicator colors for the flyout's own theme. (Brushes looked up in the
+        /// application resources follow the app mode, which can differ from the flyout theme.)
+        /// Same values as AccentFillColorDefaultBrush / TextFillColorPrimaryBrush.
+        /// </summary>
+        private Brush GetDotBrush(bool current)
+        {
+            bool dark = RootGrid.ActualTheme == ElementTheme.Dark;
+            if (current)
+            {
+                return new SolidColorBrush(s_uiSettings.GetColorValue(dark
+                    ? Windows.UI.ViewManagement.UIColorType.AccentLight2
+                    : Windows.UI.ViewManagement.UIColorType.AccentDark1));
+            }
+
+            return new SolidColorBrush(dark ? Windows.UI.Color.FromArgb(0xFF, 0xFF, 0xFF, 0xFF) : Windows.UI.Color.FromArgb(0xE4, 0, 0, 0));
+        }
+
+        /// <summary>Recolors the indicators after a theme change.</summary>
+        private void RefreshDotColors()
+        {
+            foreach (var dot in DesktopDots.Children.OfType<Border>())
+            {
+                dot.Background = GetDotBrush(dot.Tag is true);
+            }
+            UpdateSessionDots();
         }
 
         #endregion
