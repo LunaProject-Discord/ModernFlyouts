@@ -15,16 +15,14 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- WinUI title bar (48 px as before): pane toggle, icon, title -->
-        <TitleBar x:Name="AppTitleBar" Title="{x:Bind res:Strings.SettingsItem}" Height="48"
+        <!-- WinUI title bar, laid out like WinUI Gallery's: pane toggle, icon, title -->
+        <TitleBar x:Name="AppTitleBar" Title="{x:Bind res:Strings.SettingsItem}"
                   IsBackButtonVisible="False" IsPaneToggleButtonVisible="True"
-                  PaneToggleRequested="AppTitleBar_PaneToggleRequested" Loaded="AppTitleBar_Loaded">
-            <TitleBar.Resources>
-                <!-- Pane toggle as large as the (tall) caption buttons -->
-                <x:Double x:Key="TitleBarPaneToggleButtonWidth">48</x:Double>
-                <!-- Keep the title bar at 48 px (its compact layout is 32 px) -->
-                <x:Double x:Key="TitleBarCompactHeight">48</x:Double>
-            </TitleBar.Resources>
+                  PaneToggleRequested="AppTitleBar_PaneToggleRequested">
+            <!-- With content the title bar uses its 48 px (expanded) layout, as in WinUI Gallery -->
+            <TitleBar.Content>
+                <Grid />
+            </TitleBar.Content>
             <TitleBar.IconSource>
                 <ImageIconSource ImageSource="ms-appx:///Assets/Logo.ico" />
             </TitleBar.IconSource>

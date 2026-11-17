@@ -141,44 +141,6 @@ namespace ModernFlyouts.WinUI
             }
         }
 
-        /// <summary>
-        /// The title bar's pane toggle is a small rounded button; make it fill the 48 px bar like
-        /// the caption buttons on the other side.
-        /// </summary>
-        private void AppTitleBar_Loaded(object sender, RoutedEventArgs e)
-        {
-            var toggle = FindDescendants<Button>(AppTitleBar).FirstOrDefault(b => b.Name == "PART_PaneToggleButton");
-            if (toggle == null)
-            {
-                App.Log("title bar pane toggle not found");
-                return;
-            }
-
-            toggle.Width = 48;
-            toggle.Height = 48;
-            toggle.Margin = new Thickness(0);
-            toggle.CornerRadius = new CornerRadius(0);
-            toggle.VerticalAlignment = VerticalAlignment.Stretch;
-        }
-
-        private static IEnumerable<T> FindDescendants<T>(DependencyObject root) where T : DependencyObject
-        {
-            int count = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChildrenCount(root);
-            for (int i = 0; i < count; i++)
-            {
-                var child = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChild(root, i);
-                if (child is T match)
-                {
-                    yield return match;
-                }
-
-                foreach (var descendant in FindDescendants<T>(child))
-                {
-                    yield return descendant;
-                }
-            }
-        }
-
         private void AppTitleBar_PaneToggleRequested(TitleBar sender, object args)
         {
             NavView.IsPaneOpen = !NavView.IsPaneOpen;

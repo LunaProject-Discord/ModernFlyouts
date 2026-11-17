@@ -11,7 +11,7 @@
   <Identity
     Name="LunaProject.ModernFlyouts"
     Publisher="CN=Luna Project"
-    Version="0.12.14.0" />
+    Version="0.12.15.0" />
 
   <Properties>
     <DisplayName>ModernFlyouts</DisplayName>
