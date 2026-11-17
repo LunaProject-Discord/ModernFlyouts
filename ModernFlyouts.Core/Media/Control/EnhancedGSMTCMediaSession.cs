@@ -39,6 +39,14 @@ namespace ModernFlyouts.Core.Media.Control
 
         public void RefreshTimelineActivity()
         {
+            // The ticker is stopped while nothing shows the timeline, so the position is stale
+            // (e.g. 0 from when playback started). Catch up now, before the first frame, instead of
+            // jumping on the first tick half a second later.
+            if (!timelineTimer.IsEnabled && ShouldRunTimelineTimer())
+            {
+                TimelineTimer_Tick(this, EventArgs.Empty);
+            }
+
             UpdateTimelineTimer();
         }
 
