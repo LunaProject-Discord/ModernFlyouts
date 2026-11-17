@@ -48,8 +48,7 @@
                 </controls:SettingsCard>
 
                 <controls:SettingsCard Glyph="&#xE8E4;" Header="{x:Bind res:Strings.AudioFlyoutHelper_ThumbnailAlignment}">
-                    <ToggleSwitch IsOn="{x:Bind S.AlignThumbnailToRight, Mode=TwoWay}"
-                                  OnContent="{x:Bind res:Strings.Settings_Right}" OffContent="{x:Bind res:Strings.Settings_Left}" />
+                    <ComboBox x:Name="ThumbnailAlignmentCombo" MinWidth="200" />
                 </controls:SettingsCard>
 
                 <controls:SettingsCard Glyph="&#xE8A9;" Header="{x:Bind res:Strings.AudioFlyoutHelper_SessionsPanelOrientation}">

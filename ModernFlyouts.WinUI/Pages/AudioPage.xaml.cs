@@ -18,6 +18,11 @@ namespace ModernFlyouts.WinUI.Pages
             BackendCard.Description = Strings.Settings_RestartRequired;
 
             EnumChoices.Bind(OrientationCombo, () => S.SessionsPanelOrientation, v => S.SessionsPanelOrientation = v);
+
+            // Left / right is a choice of position, not on/off.
+            ThumbnailAlignmentCombo.ItemsSource = new[] { Strings.Settings_Left, Strings.Settings_Right };
+            ThumbnailAlignmentCombo.SelectedIndex = S.AlignThumbnailToRight ? 1 : 0;
+            ThumbnailAlignmentCombo.SelectionChanged += (_, _) => S.AlignThumbnailToRight = ThumbnailAlignmentCombo.SelectedIndex == 1;
             EnumChoices.Bind(PinnedPriorityCombo, () => S.PinnedAppPriorityMode, v => S.PinnedAppPriorityMode = v);
             EnumChoices.Bind(FilteringModeCombo, () => S.MediaAppFilteringMode, v => S.MediaAppFilteringMode = v);
 
