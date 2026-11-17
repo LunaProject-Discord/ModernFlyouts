@@ -368,4 +368,151 @@
   <data name="Settings.VerticalAlignment" xml:space="preserve">
     <value>יישור אנכי</value>
   </data>
+  <data name="Settings.FollowWindowsMode" xml:space="preserve">
+    <value>התאמה למצב Windows</value>
+  </data>
+  <data name="Settings.Restart" xml:space="preserve">
+    <value>הפעלה מחדש</value>
+  </data>
+  <data name="Settings.FollowAppMode" xml:space="preserve">
+    <value>התאמה למצב האפליקציות</value>
+  </data>
+  <data name="AudioFlyoutHelper.EnhancedMediaBackend" xml:space="preserve">
+    <value>מנוע מדיה משופר</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowPlayerInfo" xml:space="preserve">
+    <value>הצגת שם הנגן</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowSeekbar" xml:space="preserve">
+    <value>הצגת סרגל ההתקדמות</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowShuffle" xml:space="preserve">
+    <value>הצגת לחצן ערבוב</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowRepeat" xml:space="preserve">
+    <value>הצגת לחצן חזרה</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppUserModelId" xml:space="preserve">
+    <value>מזהה האפליקציה של הנגן המוצמד</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppPriority" xml:space="preserve">
+    <value>עדיפות הנגן המוצמד</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilteringMode" xml:space="preserve">
+    <value>סינון אפליקציות</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilterList" xml:space="preserve">
+    <value>רשימת סינון אפליקציות (מופרדות בפסיק, נקודה-פסיק או שורה חדשה)</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Auto" xml:space="preserve">
+    <value>אוטומטי</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Enabled" xml:space="preserve">
+    <value>מופעל</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Disabled" xml:space="preserve">
+    <value>מושבת</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Disabled" xml:space="preserve">
+    <value>מושבת</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Allowlist" xml:space="preserve">
+    <value>רשימת היתרים</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Blocklist" xml:space="preserve">
+    <value>רשימת חסימה</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.PreferPinnedOnlyWhenPlaying" xml:space="preserve">
+    <value>העדפת האפליקציה המוצמדת רק בזמן ניגון</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.AlwaysPreferPinnedIfEligible" xml:space="preserve">
+    <value>תמיד להעדיף את האפליקציה המוצמדת אם אפשר</value>
+  </data>
+  <data name="Settings.Modules.VirtualDesktop" xml:space="preserve">
+    <value>שולחנות עבודה וירטואליים</value>
+  </data>
+  <data name="Settings.EnableModule.VirtualDesktop" xml:space="preserve">
+    <value>הפעלת החלונית הנפתחת של שולחנות עבודה וירטואליים</value>
+  </data>
+  <data name="VirtualDesktopFlyoutHelper.DefaultName" xml:space="preserve">
+    <value>שולחן עבודה {0}</value>
+  </data>
+  <data name="Settings.FlyoutMargin" xml:space="preserve">
+    <value>מרחק מקצה המסך</value>
+  </data>
+  <data name="Settings.PrimaryDisplay" xml:space="preserve">
+    <value>תצוגה ראשית</value>
+  </data>
+  <data name="Settings.FlyoutPosition" xml:space="preserve">
+    <value>מיקום</value>
+  </data>
+  <data name="Settings.ManualPlacementDescription" xml:space="preserve">
+    <value>גרור את הידית בחלק העליון של החלונית כדי להזיז אותה. המיקום נשמר.</value>
+  </data>
+  <data name="Settings.ChooseFromMediaApps" xml:space="preserve">
+    <value>בחירה מתוך אפליקציות מדיה</value>
+  </data>
+  <data name="Settings.NoMediaAppsYet" xml:space="preserve">
+    <value>עדיין לא זוהו אפליקציות מדיה. נגן משהו ונסה שוב.</value>
+  </data>
+  <data name="Settings.ExpandDirectionDescription" xml:space="preserve">
+    <value>בשימוש כאשר החלונית הוזזה בגרירה</value>
+  </data>
+  <data name="Settings.MediaControlsGroup" xml:space="preserve">
+    <value>פקדי מדיה</value>
+  </data>
+  <data name="Settings.MediaControlsGroupDescription" xml:space="preserve">
+    <value>מה פקדי המדיה מציגים</value>
+  </data>
+  <data name="Settings.ThumbnailGroup" xml:space="preserve">
+    <value>תמונה ממוזערת</value>
+  </data>
+  <data name="Settings.ThumbnailGroupDescription" xml:space="preserve">
+    <value>רקע ומיקום של עטיפת האלבום</value>
+  </data>
+  <data name="Settings.MediaSessionsGroup" xml:space="preserve">
+    <value>הפעלות מדיה מרובות</value>
+  </data>
+  <data name="Settings.MediaSessionsGroupDescription" xml:space="preserve">
+    <value>אופן הצגת הפעלות של כמה נגנים</value>
+  </data>
+  <data name="Settings.MediaAppsSection" xml:space="preserve">
+    <value>אפליקציות מדיה</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroup" xml:space="preserve">
+    <value>נגן מוצמד</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroupDescription" xml:space="preserve">
+    <value>העדפת ההפעלה של נגן אחד</value>
+  </data>
+  <data name="Settings.AppFilterDescription" xml:space="preserve">
+    <value>הצגה או הסתרה של הפעלות של אפליקציות מסוימות</value>
+  </data>
+  <data name="Settings.Credits" xml:space="preserve">
+    <value>תודות</value>
+  </data>
+  <data name="Settings.FlyoutAnimationEnabled" xml:space="preserve">
+    <value>הנפשת דהייה</value>
+  </data>
+  <data name="Settings.DisplayDescription" xml:space="preserve">
+    <value>בחר את התצוגה שבה תוצג החלונית</value>
+  </data>
+  <data name="Settings.FlyoutAlignment" xml:space="preserve">
+    <value>יישור החלונית</value>
+  </data>
+  <data name="Settings.FlyoutContentStackingDirection" xml:space="preserve">
+    <value>כיוון ערימת התוכן</value>
+  </data>
+  <data name="Settings.FlyoutExpandDirection" xml:space="preserve">
+    <value>כיוון הרחבת החלונית</value>
+  </data>
+  <data name="Settings.FlyoutPlacement" xml:space="preserve">
+    <value>מיקום החלונית</value>
+  </data>
+  <data name="Settings.FlyoutPlacementMode" xml:space="preserve">
+    <value>מצב מיקום</value>
+  </data>
+  <data name="AudioFlyoutHelper.UseThumbnailAsBackground" xml:space="preserve">
+    <value>שימוש בתמונה הממוזערת של המדיה כרקע של פקדי המדיה</value>
+  </data>
 </root>

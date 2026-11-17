@@ -363,4 +363,157 @@
   <data name="Settings.VerticalAlignment" xml:space="preserve">
     <value>Выравнивание по вертикали</value>
   </data>
+  <data name="Settings.FollowWindowsMode" xml:space="preserve">
+    <value>Как в режиме Windows</value>
+  </data>
+  <data name="Settings.Restart" xml:space="preserve">
+    <value>Перезапустить</value>
+  </data>
+  <data name="Settings.FollowAppMode" xml:space="preserve">
+    <value>Как в режиме приложений</value>
+  </data>
+  <data name="AudioFlyoutHelper.EnhancedMediaBackend" xml:space="preserve">
+    <value>Расширенный медиамодуль</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowPlayerInfo" xml:space="preserve">
+    <value>Показывать название проигрывателя</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowSeekbar" xml:space="preserve">
+    <value>Показывать полосу перемотки</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowShuffle" xml:space="preserve">
+    <value>Показывать кнопку перемешивания</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowRepeat" xml:space="preserve">
+    <value>Показывать кнопку повтора</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppUserModelId" xml:space="preserve">
+    <value>ID приложения закреплённого проигрывателя</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppPriority" xml:space="preserve">
+    <value>Приоритет закреплённого проигрывателя</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilteringMode" xml:space="preserve">
+    <value>Фильтрация приложений</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilterList" xml:space="preserve">
+    <value>Список фильтра приложений (через запятую, точку с запятой или с новой строки)</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Auto" xml:space="preserve">
+    <value>Автоматически</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Enabled" xml:space="preserve">
+    <value>Включено</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Disabled" xml:space="preserve">
+    <value>Отключено</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Disabled" xml:space="preserve">
+    <value>Отключено</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Allowlist" xml:space="preserve">
+    <value>Список разрешённых</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Blocklist" xml:space="preserve">
+    <value>Список заблокированных</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.PreferPinnedOnlyWhenPlaying" xml:space="preserve">
+    <value>Предпочитать закреплённое приложение только во время воспроизведения</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.AlwaysPreferPinnedIfEligible" xml:space="preserve">
+    <value>Всегда предпочитать закреплённое приложение, если возможно</value>
+  </data>
+  <data name="Settings.Modules.VirtualDesktop" xml:space="preserve">
+    <value>Виртуальные рабочие столы</value>
+  </data>
+  <data name="Settings.EnableModule.VirtualDesktop" xml:space="preserve">
+    <value>Включить всплывающее окно виртуальных рабочих столов</value>
+  </data>
+  <data name="VirtualDesktopFlyoutHelper.DefaultName" xml:space="preserve">
+    <value>Рабочий стол {0}</value>
+  </data>
+  <data name="Settings.FlyoutMargin" xml:space="preserve">
+    <value>Расстояние от края экрана</value>
+  </data>
+  <data name="Settings.PrimaryDisplay" xml:space="preserve">
+    <value>Основной дисплей</value>
+  </data>
+  <data name="Settings.FlyoutPosition" xml:space="preserve">
+    <value>Положение</value>
+  </data>
+  <data name="Settings.ManualPlacementDescription" xml:space="preserve">
+    <value>Перетащите маркер в верхней части окна, чтобы переместить его. Положение запоминается.</value>
+  </data>
+  <data name="Settings.ChooseFromMediaApps" xml:space="preserve">
+    <value>Выбрать из медиаприложений</value>
+  </data>
+  <data name="Settings.NoMediaAppsYet" xml:space="preserve">
+    <value>Медиаприложения пока не обнаружены. Включите воспроизведение и повторите попытку.</value>
+  </data>
+  <data name="Settings.ExpandDirectionDescription" xml:space="preserve">
+    <value>Используется, если окно было перемещено перетаскиванием</value>
+  </data>
+  <data name="Settings.MediaControlsGroup" xml:space="preserve">
+    <value>Элементы управления медиа</value>
+  </data>
+  <data name="Settings.MediaControlsGroupDescription" xml:space="preserve">
+    <value>Что показывают элементы управления медиа</value>
+  </data>
+  <data name="Settings.ThumbnailGroup" xml:space="preserve">
+    <value>Миниатюра</value>
+  </data>
+  <data name="Settings.ThumbnailGroupDescription" xml:space="preserve">
+    <value>Фон и положение обложки альбома</value>
+  </data>
+  <data name="Settings.MediaSessionsGroup" xml:space="preserve">
+    <value>Несколько медиасеансов</value>
+  </data>
+  <data name="Settings.MediaSessionsGroupDescription" xml:space="preserve">
+    <value>Как показываются сеансы нескольких проигрывателей</value>
+  </data>
+  <data name="Settings.MediaAppsSection" xml:space="preserve">
+    <value>Медиаприложения</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroup" xml:space="preserve">
+    <value>Закреплённый проигрыватель</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroupDescription" xml:space="preserve">
+    <value>Предпочитать сеанс одного проигрывателя</value>
+  </data>
+  <data name="Settings.AppFilterDescription" xml:space="preserve">
+    <value>Показывать или скрывать сеансы определённых приложений</value>
+  </data>
+  <data name="Settings.Credits" xml:space="preserve">
+    <value>Благодарности</value>
+  </data>
+  <data name="Settings.FlyoutAnimationEnabled" xml:space="preserve">
+    <value>Анимация затухания</value>
+  </data>
+  <data name="Settings.DisplayDescription" xml:space="preserve">
+    <value>Выберите дисплей, на котором будет показываться всплывающее окно</value>
+  </data>
+  <data name="Settings.FlyoutAlignment" xml:space="preserve">
+    <value>Выравнивание всплывающего окна</value>
+  </data>
+  <data name="Settings.FlyoutContentStackingDirection" xml:space="preserve">
+    <value>Направление расположения содержимого</value>
+  </data>
+  <data name="Settings.FlyoutExpandDirection" xml:space="preserve">
+    <value>Направление раскрытия всплывающего окна</value>
+  </data>
+  <data name="Settings.FlyoutPlacement" xml:space="preserve">
+    <value>Расположение всплывающего окна</value>
+  </data>
+  <data name="Settings.FlyoutPlacementMode" xml:space="preserve">
+    <value>Режим расположения</value>
+  </data>
+  <data name="AudioFlyoutHelper.UseThumbnailAsBackground" xml:space="preserve">
+    <value>Использовать обложку как фон элементов управления медиа</value>
+  </data>
+  <data name="Enums.StackingDirection.Ascending" xml:space="preserve">
+    <value>По возрастанию</value>
+  </data>
+  <data name="Enums.StackingDirection.Descending" xml:space="preserve">
+    <value>По убыванию</value>
+  </data>
 </root>

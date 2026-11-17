@@ -368,4 +368,151 @@
   <data name="Settings.VerticalAlignment" xml:space="preserve">
     <value>Lodret justering</value>
   </data>
+  <data name="Settings.FollowWindowsMode" xml:space="preserve">
+    <value>Følg Windows-tilstand</value>
+  </data>
+  <data name="Settings.Restart" xml:space="preserve">
+    <value>Genstart</value>
+  </data>
+  <data name="Settings.FollowAppMode" xml:space="preserve">
+    <value>Følg apptilstand</value>
+  </data>
+  <data name="AudioFlyoutHelper.EnhancedMediaBackend" xml:space="preserve">
+    <value>Udvidet mediebackend</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowPlayerInfo" xml:space="preserve">
+    <value>Vis afspillernavn</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowSeekbar" xml:space="preserve">
+    <value>Vis søgelinje</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowShuffle" xml:space="preserve">
+    <value>Vis knap til blanding</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowRepeat" xml:space="preserve">
+    <value>Vis knap til gentagelse</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppUserModelId" xml:space="preserve">
+    <value>App-id for fastgjort afspiller</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppPriority" xml:space="preserve">
+    <value>Prioritet for fastgjort afspiller</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilteringMode" xml:space="preserve">
+    <value>Appfiltrering</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilterList" xml:space="preserve">
+    <value>Liste over appfiltre (adskilt med komma, semikolon eller linjeskift)</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Auto" xml:space="preserve">
+    <value>Automatisk</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Enabled" xml:space="preserve">
+    <value>Aktiveret</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Disabled" xml:space="preserve">
+    <value>Deaktiveret</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Disabled" xml:space="preserve">
+    <value>Deaktiveret</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Allowlist" xml:space="preserve">
+    <value>Tilladelsesliste</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Blocklist" xml:space="preserve">
+    <value>Blokeringsliste</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.PreferPinnedOnlyWhenPlaying" xml:space="preserve">
+    <value>Foretræk fastgjort app kun under afspilning</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.AlwaysPreferPinnedIfEligible" xml:space="preserve">
+    <value>Foretræk altid fastgjort app, hvis muligt</value>
+  </data>
+  <data name="Settings.Modules.VirtualDesktop" xml:space="preserve">
+    <value>Virtuelle skriveborde</value>
+  </data>
+  <data name="Settings.EnableModule.VirtualDesktop" xml:space="preserve">
+    <value>Aktivér flyout for virtuelle skriveborde</value>
+  </data>
+  <data name="VirtualDesktopFlyoutHelper.DefaultName" xml:space="preserve">
+    <value>Skrivebord {0}</value>
+  </data>
+  <data name="Settings.FlyoutMargin" xml:space="preserve">
+    <value>Afstand fra skærmkanten</value>
+  </data>
+  <data name="Settings.PrimaryDisplay" xml:space="preserve">
+    <value>Primær skærm</value>
+  </data>
+  <data name="Settings.FlyoutPosition" xml:space="preserve">
+    <value>Placering</value>
+  </data>
+  <data name="Settings.ManualPlacementDescription" xml:space="preserve">
+    <value>Træk i håndtaget øverst på flyoutet for at flytte det. Placeringen huskes.</value>
+  </data>
+  <data name="Settings.ChooseFromMediaApps" xml:space="preserve">
+    <value>Vælg blandt medieapps</value>
+  </data>
+  <data name="Settings.NoMediaAppsYet" xml:space="preserve">
+    <value>Der er endnu ikke fundet nogen medieapps. Afspil noget, og prøv igen.</value>
+  </data>
+  <data name="Settings.ExpandDirectionDescription" xml:space="preserve">
+    <value>Bruges, når flyoutet er blevet flyttet ved at trække</value>
+  </data>
+  <data name="Settings.MediaControlsGroup" xml:space="preserve">
+    <value>Mediekontroller</value>
+  </data>
+  <data name="Settings.MediaControlsGroupDescription" xml:space="preserve">
+    <value>Hvad mediekontrollerne viser</value>
+  </data>
+  <data name="Settings.ThumbnailGroup" xml:space="preserve">
+    <value>Miniature</value>
+  </data>
+  <data name="Settings.ThumbnailGroupDescription" xml:space="preserve">
+    <value>Baggrund og placering af albumcover</value>
+  </data>
+  <data name="Settings.MediaSessionsGroup" xml:space="preserve">
+    <value>Flere mediesessioner</value>
+  </data>
+  <data name="Settings.MediaSessionsGroupDescription" xml:space="preserve">
+    <value>Sådan vises sessioner fra flere afspillere</value>
+  </data>
+  <data name="Settings.MediaAppsSection" xml:space="preserve">
+    <value>Medieapps</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroup" xml:space="preserve">
+    <value>Fastgjort afspiller</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroupDescription" xml:space="preserve">
+    <value>Foretræk én afspillers session</value>
+  </data>
+  <data name="Settings.AppFilterDescription" xml:space="preserve">
+    <value>Vis eller skjul sessioner fra bestemte apps</value>
+  </data>
+  <data name="Settings.Credits" xml:space="preserve">
+    <value>Tak til</value>
+  </data>
+  <data name="Settings.FlyoutAnimationEnabled" xml:space="preserve">
+    <value>Toningsanimation</value>
+  </data>
+  <data name="Settings.DisplayDescription" xml:space="preserve">
+    <value>Vælg den skærm, flyoutet skal vises på</value>
+  </data>
+  <data name="Settings.FlyoutAlignment" xml:space="preserve">
+    <value>Justering af flyout</value>
+  </data>
+  <data name="Settings.FlyoutContentStackingDirection" xml:space="preserve">
+    <value>Stablingsretning for flyoutindhold</value>
+  </data>
+  <data name="Settings.FlyoutExpandDirection" xml:space="preserve">
+    <value>Udvidelsesretning for flyout</value>
+  </data>
+  <data name="Settings.FlyoutPlacement" xml:space="preserve">
+    <value>Placering af flyout</value>
+  </data>
+  <data name="Settings.FlyoutPlacementMode" xml:space="preserve">
+    <value>Placeringstilstand</value>
+  </data>
+  <data name="AudioFlyoutHelper.UseThumbnailAsBackground" xml:space="preserve">
+    <value>Brug mediets miniature som baggrund for mediekontrollerne</value>
+  </data>
 </root>

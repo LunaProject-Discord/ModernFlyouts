@@ -368,4 +368,151 @@
   <data name="Settings.VerticalAlignment" xml:space="preserve">
     <value>&amp;Vertikale belyning</value>
   </data>
+  <data name="Settings.FollowWindowsMode" xml:space="preserve">
+    <value>Volg Windows-modus</value>
+  </data>
+  <data name="Settings.Restart" xml:space="preserve">
+    <value>Herbegin</value>
+  </data>
+  <data name="Settings.FollowAppMode" xml:space="preserve">
+    <value>Volg toepmodus</value>
+  </data>
+  <data name="AudioFlyoutHelper.EnhancedMediaBackend" xml:space="preserve">
+    <value>Verbeterde media-agterkant</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowPlayerInfo" xml:space="preserve">
+    <value>Wys spelernaam</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowSeekbar" xml:space="preserve">
+    <value>Wys soekbalk</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowShuffle" xml:space="preserve">
+    <value>Wys skommelknoppie</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowRepeat" xml:space="preserve">
+    <value>Wys herhaalknoppie</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppUserModelId" xml:space="preserve">
+    <value>Toep-ID van vasgespelde speler</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppPriority" xml:space="preserve">
+    <value>Prioriteit van vasgespelde speler</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilteringMode" xml:space="preserve">
+    <value>Toepfiltrering</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilterList" xml:space="preserve">
+    <value>Toepfilterlys (geskei deur komma, kommapunt of nuwe reël)</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Auto" xml:space="preserve">
+    <value>Outomaties</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Enabled" xml:space="preserve">
+    <value>Geaktiveer</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Disabled" xml:space="preserve">
+    <value>Gedeaktiveer</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Disabled" xml:space="preserve">
+    <value>Gedeaktiveer</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Allowlist" xml:space="preserve">
+    <value>Toelaatlys</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Blocklist" xml:space="preserve">
+    <value>Bloklys</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.PreferPinnedOnlyWhenPlaying" xml:space="preserve">
+    <value>Verkies vasgespelde toep slegs tydens speel</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.AlwaysPreferPinnedIfEligible" xml:space="preserve">
+    <value>Verkies altyd vasgespelde toep indien moontlik</value>
+  </data>
+  <data name="Settings.Modules.VirtualDesktop" xml:space="preserve">
+    <value>Virtuele werkskerms</value>
+  </data>
+  <data name="Settings.EnableModule.VirtualDesktop" xml:space="preserve">
+    <value>Aktiveer uitvouvenster vir virtuele werkskerms</value>
+  </data>
+  <data name="VirtualDesktopFlyoutHelper.DefaultName" xml:space="preserve">
+    <value>Werkskerm {0}</value>
+  </data>
+  <data name="Settings.FlyoutMargin" xml:space="preserve">
+    <value>Afstand van die skermrand</value>
+  </data>
+  <data name="Settings.PrimaryDisplay" xml:space="preserve">
+    <value>Hoofskerm</value>
+  </data>
+  <data name="Settings.FlyoutPosition" xml:space="preserve">
+    <value>Posisie</value>
+  </data>
+  <data name="Settings.ManualPlacementDescription" xml:space="preserve">
+    <value>Sleep die handvatsel bo-aan die uitvouvenster om dit te skuif. Die posisie word onthou.</value>
+  </data>
+  <data name="Settings.ChooseFromMediaApps" xml:space="preserve">
+    <value>Kies uit mediatoepe</value>
+  </data>
+  <data name="Settings.NoMediaAppsYet" xml:space="preserve">
+    <value>Nog geen mediatoepe bespeur nie. Speel iets en probeer weer.</value>
+  </data>
+  <data name="Settings.ExpandDirectionDescription" xml:space="preserve">
+    <value>Word gebruik wanneer die uitvouvenster deur sleep geskuif is</value>
+  </data>
+  <data name="Settings.MediaControlsGroup" xml:space="preserve">
+    <value>Mediakontroles</value>
+  </data>
+  <data name="Settings.MediaControlsGroupDescription" xml:space="preserve">
+    <value>Wat die mediakontroles wys</value>
+  </data>
+  <data name="Settings.ThumbnailGroup" xml:space="preserve">
+    <value>Duimnael</value>
+  </data>
+  <data name="Settings.ThumbnailGroupDescription" xml:space="preserve">
+    <value>Agtergrond en posisie van albumkuns</value>
+  </data>
+  <data name="Settings.MediaSessionsGroup" xml:space="preserve">
+    <value>Veelvuldige mediasessies</value>
+  </data>
+  <data name="Settings.MediaSessionsGroupDescription" xml:space="preserve">
+    <value>Hoe sessies van verskeie spelers gewys word</value>
+  </data>
+  <data name="Settings.MediaAppsSection" xml:space="preserve">
+    <value>Mediatoepe</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroup" xml:space="preserve">
+    <value>Vasgespelde speler</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroupDescription" xml:space="preserve">
+    <value>Verkies die sessie van een speler</value>
+  </data>
+  <data name="Settings.AppFilterDescription" xml:space="preserve">
+    <value>Wys of versteek die sessies van spesifieke toepe</value>
+  </data>
+  <data name="Settings.Credits" xml:space="preserve">
+    <value>Erkennings</value>
+  </data>
+  <data name="Settings.FlyoutAnimationEnabled" xml:space="preserve">
+    <value>Vervaag-animasie</value>
+  </data>
+  <data name="Settings.DisplayDescription" xml:space="preserve">
+    <value>Kies die skerm waarop die uitvouvenster gewys word</value>
+  </data>
+  <data name="Settings.FlyoutAlignment" xml:space="preserve">
+    <value>Belyning van uitvouvenster</value>
+  </data>
+  <data name="Settings.FlyoutContentStackingDirection" xml:space="preserve">
+    <value>Stapelrigting van uitvouvensterinhoud</value>
+  </data>
+  <data name="Settings.FlyoutExpandDirection" xml:space="preserve">
+    <value>Uitbreirigting van uitvouvenster</value>
+  </data>
+  <data name="Settings.FlyoutPlacement" xml:space="preserve">
+    <value>Plasing van uitvouvenster</value>
+  </data>
+  <data name="Settings.FlyoutPlacementMode" xml:space="preserve">
+    <value>Plasingsmodus</value>
+  </data>
+  <data name="AudioFlyoutHelper.UseThumbnailAsBackground" xml:space="preserve">
+    <value>Gebruik die media se duimnael as agtergrond van die mediakontroles</value>
+  </data>
 </root>

@@ -39,7 +39,7 @@
 
             <toolkit:SettingsCard Header="{x:Bind res:Strings.Settings_FlyoutAnimationEnabled}">
                 <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE945;" /></toolkit:SettingsCard.HeaderIcon>
-                <ToggleSwitch IsOn="{x:Bind S.FlyoutAnimationEnabled, Mode=TwoWay}" />
+                <ToggleSwitch OnContent="{x:Bind res:Strings.Settings_On}" OffContent="{x:Bind res:Strings.Settings_Off}" IsOn="{x:Bind S.FlyoutAnimationEnabled, Mode=TwoWay}" />
             </toolkit:SettingsCard>
 
             <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_Behavior}" />

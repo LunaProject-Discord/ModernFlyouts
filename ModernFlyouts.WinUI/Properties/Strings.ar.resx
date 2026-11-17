@@ -389,4 +389,130 @@
   <data name="Settings.VerticalAlignment" xml:space="preserve">
     <value>انحياز عمودي</value>
   </data>
+  <data name="Settings.FollowWindowsMode" xml:space="preserve">
+    <value>مطابقة وضع Windows</value>
+  </data>
+  <data name="Settings.Restart" xml:space="preserve">
+    <value>إعادة التشغيل</value>
+  </data>
+  <data name="Settings.FollowAppMode" xml:space="preserve">
+    <value>مطابقة وضع التطبيقات</value>
+  </data>
+  <data name="AudioFlyoutHelper.EnhancedMediaBackend" xml:space="preserve">
+    <value>واجهة الوسائط الخلفية المحسّنة</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowPlayerInfo" xml:space="preserve">
+    <value>إظهار اسم المشغّل</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowSeekbar" xml:space="preserve">
+    <value>إظهار شريط التقديم</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowShuffle" xml:space="preserve">
+    <value>إظهار زر التشغيل العشوائي</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowRepeat" xml:space="preserve">
+    <value>إظهار زر التكرار</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppUserModelId" xml:space="preserve">
+    <value>معرّف تطبيق المشغّل المثبّت</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppPriority" xml:space="preserve">
+    <value>أولوية المشغّل المثبّت</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilteringMode" xml:space="preserve">
+    <value>تصفية التطبيقات</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilterList" xml:space="preserve">
+    <value>قائمة تصفية التطبيقات (مفصولة بفاصلة أو فاصلة منقوطة أو سطر جديد)</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Auto" xml:space="preserve">
+    <value>تلقائي</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Enabled" xml:space="preserve">
+    <value>ممكّن</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Disabled" xml:space="preserve">
+    <value>معطّل</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Disabled" xml:space="preserve">
+    <value>معطّل</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Allowlist" xml:space="preserve">
+    <value>قائمة السماح</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Blocklist" xml:space="preserve">
+    <value>قائمة الحظر</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.PreferPinnedOnlyWhenPlaying" xml:space="preserve">
+    <value>تفضيل التطبيق المثبّت أثناء التشغيل فقط</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.AlwaysPreferPinnedIfEligible" xml:space="preserve">
+    <value>تفضيل التطبيق المثبّت دائمًا إن أمكن</value>
+  </data>
+  <data name="Settings.Modules.VirtualDesktop" xml:space="preserve">
+    <value>أسطح المكتب الافتراضية</value>
+  </data>
+  <data name="Settings.EnableModule.VirtualDesktop" xml:space="preserve">
+    <value>تمكين النافذة المنبثقة لأسطح المكتب الافتراضية</value>
+  </data>
+  <data name="VirtualDesktopFlyoutHelper.DefaultName" xml:space="preserve">
+    <value>سطح المكتب {0}</value>
+  </data>
+  <data name="Settings.FlyoutMargin" xml:space="preserve">
+    <value>المسافة من حافة الشاشة</value>
+  </data>
+  <data name="Settings.PrimaryDisplay" xml:space="preserve">
+    <value>الشاشة الرئيسية</value>
+  </data>
+  <data name="Settings.FlyoutPosition" xml:space="preserve">
+    <value>الموضع</value>
+  </data>
+  <data name="Settings.ManualPlacementDescription" xml:space="preserve">
+    <value>اسحب المقبض أعلى النافذة المنبثقة لنقلها. سيتم تذكّر الموضع.</value>
+  </data>
+  <data name="Settings.ChooseFromMediaApps" xml:space="preserve">
+    <value>الاختيار من تطبيقات الوسائط</value>
+  </data>
+  <data name="Settings.NoMediaAppsYet" xml:space="preserve">
+    <value>لم يتم اكتشاف أي تطبيقات وسائط بعد. شغّل شيئًا ثم حاول مرة أخرى.</value>
+  </data>
+  <data name="Settings.ExpandDirectionDescription" xml:space="preserve">
+    <value>يُستخدم عند نقل النافذة المنبثقة بالسحب</value>
+  </data>
+  <data name="Settings.MediaControlsGroup" xml:space="preserve">
+    <value>عناصر التحكم في الوسائط</value>
+  </data>
+  <data name="Settings.MediaControlsGroupDescription" xml:space="preserve">
+    <value>ما تعرضه عناصر التحكم في الوسائط</value>
+  </data>
+  <data name="Settings.ThumbnailGroup" xml:space="preserve">
+    <value>الصورة المصغّرة</value>
+  </data>
+  <data name="Settings.ThumbnailGroupDescription" xml:space="preserve">
+    <value>خلفية صورة الألبوم وموضعها</value>
+  </data>
+  <data name="Settings.MediaSessionsGroup" xml:space="preserve">
+    <value>جلسات وسائط متعددة</value>
+  </data>
+  <data name="Settings.MediaSessionsGroupDescription" xml:space="preserve">
+    <value>كيفية عرض جلسات عدة مشغّلات</value>
+  </data>
+  <data name="Settings.MediaAppsSection" xml:space="preserve">
+    <value>تطبيقات الوسائط</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroup" xml:space="preserve">
+    <value>المشغّل المثبّت</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroupDescription" xml:space="preserve">
+    <value>تفضيل جلسة مشغّل واحد</value>
+  </data>
+  <data name="Settings.AppFilterDescription" xml:space="preserve">
+    <value>إظهار جلسات تطبيقات معيّنة أو إخفاؤها</value>
+  </data>
+  <data name="Settings.Credits" xml:space="preserve">
+    <value>شكر وتقدير</value>
+  </data>
+  <data name="Settings.FlyoutAnimationEnabled" xml:space="preserve">
+    <value>حركة التلاشي</value>
+  </data>
 </root>

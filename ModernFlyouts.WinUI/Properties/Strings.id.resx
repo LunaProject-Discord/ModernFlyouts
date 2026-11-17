@@ -392,4 +392,127 @@
   <data name="Settings.FlyoutAnimationEnabled" xml:space="preserve">
     <value>Animasi pudar</value>
   </data>
+  <data name="Settings.FollowWindowsMode" xml:space="preserve">
+    <value>Ikuti mode Windows</value>
+  </data>
+  <data name="Settings.Restart" xml:space="preserve">
+    <value>Mulai ulang</value>
+  </data>
+  <data name="Settings.FollowAppMode" xml:space="preserve">
+    <value>Ikuti mode aplikasi</value>
+  </data>
+  <data name="AudioFlyoutHelper.EnhancedMediaBackend" xml:space="preserve">
+    <value>Backend media yang ditingkatkan</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowPlayerInfo" xml:space="preserve">
+    <value>Tampilkan nama pemutar</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowSeekbar" xml:space="preserve">
+    <value>Tampilkan bilah pencarian</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowShuffle" xml:space="preserve">
+    <value>Tampilkan tombol acak</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowRepeat" xml:space="preserve">
+    <value>Tampilkan tombol ulangi</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppUserModelId" xml:space="preserve">
+    <value>ID aplikasi pemutar yang disematkan</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppPriority" xml:space="preserve">
+    <value>Prioritas pemutar yang disematkan</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilteringMode" xml:space="preserve">
+    <value>Pemfilteran aplikasi</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilterList" xml:space="preserve">
+    <value>Daftar filter aplikasi (dipisahkan koma, titik koma, atau baris baru)</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Auto" xml:space="preserve">
+    <value>Otomatis</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Enabled" xml:space="preserve">
+    <value>Diaktifkan</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Disabled" xml:space="preserve">
+    <value>Dinonaktifkan</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Disabled" xml:space="preserve">
+    <value>Dinonaktifkan</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Allowlist" xml:space="preserve">
+    <value>Daftar yang diizinkan</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Blocklist" xml:space="preserve">
+    <value>Daftar yang diblokir</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.PreferPinnedOnlyWhenPlaying" xml:space="preserve">
+    <value>Utamakan aplikasi yang disematkan hanya saat memutar</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.AlwaysPreferPinnedIfEligible" xml:space="preserve">
+    <value>Selalu utamakan aplikasi yang disematkan jika memungkinkan</value>
+  </data>
+  <data name="Settings.Modules.VirtualDesktop" xml:space="preserve">
+    <value>Desktop virtual</value>
+  </data>
+  <data name="Settings.EnableModule.VirtualDesktop" xml:space="preserve">
+    <value>Aktifkan flyout desktop virtual</value>
+  </data>
+  <data name="VirtualDesktopFlyoutHelper.DefaultName" xml:space="preserve">
+    <value>Desktop {0}</value>
+  </data>
+  <data name="Settings.FlyoutMargin" xml:space="preserve">
+    <value>Jarak dari tepi layar</value>
+  </data>
+  <data name="Settings.PrimaryDisplay" xml:space="preserve">
+    <value>Layar utama</value>
+  </data>
+  <data name="Settings.FlyoutPosition" xml:space="preserve">
+    <value>Posisi</value>
+  </data>
+  <data name="Settings.ManualPlacementDescription" xml:space="preserve">
+    <value>Seret pegangan di bagian atas flyout untuk memindahkannya. Posisinya akan diingat.</value>
+  </data>
+  <data name="Settings.ChooseFromMediaApps" xml:space="preserve">
+    <value>Pilih dari aplikasi media</value>
+  </data>
+  <data name="Settings.NoMediaAppsYet" xml:space="preserve">
+    <value>Belum ada aplikasi media yang terdeteksi. Putar sesuatu, lalu coba lagi.</value>
+  </data>
+  <data name="Settings.ExpandDirectionDescription" xml:space="preserve">
+    <value>Digunakan saat flyout dipindahkan dengan diseret</value>
+  </data>
+  <data name="Settings.MediaControlsGroup" xml:space="preserve">
+    <value>Kontrol media</value>
+  </data>
+  <data name="Settings.MediaControlsGroupDescription" xml:space="preserve">
+    <value>Yang ditampilkan kontrol media</value>
+  </data>
+  <data name="Settings.ThumbnailGroup" xml:space="preserve">
+    <value>Gambar mini</value>
+  </data>
+  <data name="Settings.ThumbnailGroupDescription" xml:space="preserve">
+    <value>Latar belakang dan posisi sampul album</value>
+  </data>
+  <data name="Settings.MediaSessionsGroup" xml:space="preserve">
+    <value>Beberapa sesi media</value>
+  </data>
+  <data name="Settings.MediaSessionsGroupDescription" xml:space="preserve">
+    <value>Cara sesi dari beberapa pemutar ditampilkan</value>
+  </data>
+  <data name="Settings.MediaAppsSection" xml:space="preserve">
+    <value>Aplikasi media</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroup" xml:space="preserve">
+    <value>Pemutar yang disematkan</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroupDescription" xml:space="preserve">
+    <value>Utamakan sesi satu pemutar</value>
+  </data>
+  <data name="Settings.AppFilterDescription" xml:space="preserve">
+    <value>Tampilkan atau sembunyikan sesi aplikasi tertentu</value>
+  </data>
+  <data name="Settings.Credits" xml:space="preserve">
+    <value>Kredit</value>
+  </data>
 </root>

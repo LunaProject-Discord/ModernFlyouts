@@ -368,4 +368,151 @@
   <data name="Settings.VerticalAlignment" xml:space="preserve">
     <value>垂直對齊</value>
   </data>
+  <data name="Settings.FollowWindowsMode" xml:space="preserve">
+    <value>跟隨 Windows 模式</value>
+  </data>
+  <data name="Settings.Restart" xml:space="preserve">
+    <value>重新啟動</value>
+  </data>
+  <data name="Settings.FollowAppMode" xml:space="preserve">
+    <value>跟隨應用程式模式</value>
+  </data>
+  <data name="AudioFlyoutHelper.EnhancedMediaBackend" xml:space="preserve">
+    <value>增強的媒體後端</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowPlayerInfo" xml:space="preserve">
+    <value>顯示播放器名稱</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowSeekbar" xml:space="preserve">
+    <value>顯示進度列</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowShuffle" xml:space="preserve">
+    <value>顯示隨機播放按鈕</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowRepeat" xml:space="preserve">
+    <value>顯示重複播放按鈕</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppUserModelId" xml:space="preserve">
+    <value>釘選播放器的應用程式 ID</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppPriority" xml:space="preserve">
+    <value>釘選播放器的優先順序</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilteringMode" xml:space="preserve">
+    <value>應用程式篩選</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilterList" xml:space="preserve">
+    <value>應用程式篩選清單（以逗號、分號或換行分隔）</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Auto" xml:space="preserve">
+    <value>自動</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Enabled" xml:space="preserve">
+    <value>已啟用</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Disabled" xml:space="preserve">
+    <value>已停用</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Disabled" xml:space="preserve">
+    <value>已停用</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Allowlist" xml:space="preserve">
+    <value>允許清單</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Blocklist" xml:space="preserve">
+    <value>封鎖清單</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.PreferPinnedOnlyWhenPlaying" xml:space="preserve">
+    <value>僅在播放時優先使用釘選的應用程式</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.AlwaysPreferPinnedIfEligible" xml:space="preserve">
+    <value>若可行，一律優先使用釘選的應用程式</value>
+  </data>
+  <data name="Settings.Modules.VirtualDesktop" xml:space="preserve">
+    <value>虛擬桌面</value>
+  </data>
+  <data name="Settings.EnableModule.VirtualDesktop" xml:space="preserve">
+    <value>啟用虛擬桌面飛出視窗</value>
+  </data>
+  <data name="VirtualDesktopFlyoutHelper.DefaultName" xml:space="preserve">
+    <value>桌面 {0}</value>
+  </data>
+  <data name="Settings.FlyoutMargin" xml:space="preserve">
+    <value>與螢幕邊緣的距離</value>
+  </data>
+  <data name="Settings.PrimaryDisplay" xml:space="preserve">
+    <value>主要顯示器</value>
+  </data>
+  <data name="Settings.FlyoutPosition" xml:space="preserve">
+    <value>位置</value>
+  </data>
+  <data name="Settings.ManualPlacementDescription" xml:space="preserve">
+    <value>拖曳飛出視窗頂端的控點即可移動。位置會被記住。</value>
+  </data>
+  <data name="Settings.ChooseFromMediaApps" xml:space="preserve">
+    <value>從媒體應用程式中選擇</value>
+  </data>
+  <data name="Settings.NoMediaAppsYet" xml:space="preserve">
+    <value>尚未偵測到媒體應用程式。請播放內容後再試一次。</value>
+  </data>
+  <data name="Settings.ExpandDirectionDescription" xml:space="preserve">
+    <value>在以拖曳方式移動飛出視窗後使用</value>
+  </data>
+  <data name="Settings.MediaControlsGroup" xml:space="preserve">
+    <value>媒體控制項</value>
+  </data>
+  <data name="Settings.MediaControlsGroupDescription" xml:space="preserve">
+    <value>媒體控制項顯示的內容</value>
+  </data>
+  <data name="Settings.ThumbnailGroup" xml:space="preserve">
+    <value>縮圖</value>
+  </data>
+  <data name="Settings.ThumbnailGroupDescription" xml:space="preserve">
+    <value>專輯封面的背景與位置</value>
+  </data>
+  <data name="Settings.MediaSessionsGroup" xml:space="preserve">
+    <value>多個媒體工作階段</value>
+  </data>
+  <data name="Settings.MediaSessionsGroupDescription" xml:space="preserve">
+    <value>多個播放器工作階段的顯示方式</value>
+  </data>
+  <data name="Settings.MediaAppsSection" xml:space="preserve">
+    <value>媒體應用程式</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroup" xml:space="preserve">
+    <value>釘選的播放器</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroupDescription" xml:space="preserve">
+    <value>優先顯示特定播放器的工作階段</value>
+  </data>
+  <data name="Settings.AppFilterDescription" xml:space="preserve">
+    <value>顯示或隱藏特定應用程式的工作階段</value>
+  </data>
+  <data name="Settings.Credits" xml:space="preserve">
+    <value>致謝</value>
+  </data>
+  <data name="Settings.FlyoutAnimationEnabled" xml:space="preserve">
+    <value>淡入淡出動畫</value>
+  </data>
+  <data name="Settings.DisplayDescription" xml:space="preserve">
+    <value>選擇要顯示飛出視窗的顯示器</value>
+  </data>
+  <data name="Settings.FlyoutAlignment" xml:space="preserve">
+    <value>飛出視窗對齊方式</value>
+  </data>
+  <data name="Settings.FlyoutContentStackingDirection" xml:space="preserve">
+    <value>飛出視窗內容堆疊方向</value>
+  </data>
+  <data name="Settings.FlyoutExpandDirection" xml:space="preserve">
+    <value>飛出視窗展開方向</value>
+  </data>
+  <data name="Settings.FlyoutPlacement" xml:space="preserve">
+    <value>飛出視窗位置</value>
+  </data>
+  <data name="Settings.FlyoutPlacementMode" xml:space="preserve">
+    <value>放置模式</value>
+  </data>
+  <data name="AudioFlyoutHelper.UseThumbnailAsBackground" xml:space="preserve">
+    <value>使用媒體縮圖作為媒體控制項背景</value>
+  </data>
 </root>

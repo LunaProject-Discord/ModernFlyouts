@@ -16,23 +16,23 @@
                                       Description="{x:Bind res:Strings.LockKeysFlyoutHelper_SelectKeyDescription}"
                                       IsExpanded="True" Margin="0,8,0,0">
                 <toolkit:SettingsExpander.HeaderIcon><FontIcon Glyph="&#xE72E;" /></toolkit:SettingsExpander.HeaderIcon>
-                <ToggleSwitch IsOn="{x:Bind S.LockKeysModuleEnabled, Mode=TwoWay}" />
+                <ToggleSwitch OnContent="{x:Bind res:Strings.Settings_On}" OffContent="{x:Bind res:Strings.Settings_Off}" IsOn="{x:Bind S.LockKeysModuleEnabled, Mode=TwoWay}" />
                 <toolkit:SettingsExpander.Items>
                     <toolkit:SettingsCard Header="{x:Bind res:Strings.LockKeysFlyoutHelper_CapsLock}"
                                           IsEnabled="{x:Bind S.LockKeysModuleEnabled, Mode=OneWay}">
-                        <ToggleSwitch IsOn="{x:Bind S.CapsLockEnabled, Mode=TwoWay}" />
+                        <ToggleSwitch OnContent="{x:Bind res:Strings.Settings_On}" OffContent="{x:Bind res:Strings.Settings_Off}" IsOn="{x:Bind S.CapsLockEnabled, Mode=TwoWay}" />
                     </toolkit:SettingsCard>
                     <toolkit:SettingsCard Header="{x:Bind res:Strings.LockKeysFlyoutHelper_NumLock}"
                                           IsEnabled="{x:Bind S.LockKeysModuleEnabled, Mode=OneWay}">
-                        <ToggleSwitch IsOn="{x:Bind S.NumLockEnabled, Mode=TwoWay}" />
+                        <ToggleSwitch OnContent="{x:Bind res:Strings.Settings_On}" OffContent="{x:Bind res:Strings.Settings_Off}" IsOn="{x:Bind S.NumLockEnabled, Mode=TwoWay}" />
                     </toolkit:SettingsCard>
                     <toolkit:SettingsCard Header="{x:Bind res:Strings.LockKeysFlyoutHelper_ScrollLock}"
                                           IsEnabled="{x:Bind S.LockKeysModuleEnabled, Mode=OneWay}">
-                        <ToggleSwitch IsOn="{x:Bind S.ScrollLockEnabled, Mode=TwoWay}" />
+                        <ToggleSwitch OnContent="{x:Bind res:Strings.Settings_On}" OffContent="{x:Bind res:Strings.Settings_Off}" IsOn="{x:Bind S.ScrollLockEnabled, Mode=TwoWay}" />
                     </toolkit:SettingsCard>
                     <toolkit:SettingsCard Header="{x:Bind res:Strings.LockKeysFlyoutHelper_Insert}"
                                           IsEnabled="{x:Bind S.LockKeysModuleEnabled, Mode=OneWay}">
-                        <ToggleSwitch IsOn="{x:Bind S.InsertEnabled, Mode=TwoWay}" />
+                        <ToggleSwitch OnContent="{x:Bind res:Strings.Settings_On}" OffContent="{x:Bind res:Strings.Settings_Off}" IsOn="{x:Bind S.InsertEnabled, Mode=TwoWay}" />
                     </toolkit:SettingsCard>
                 </toolkit:SettingsExpander.Items>
             </toolkit:SettingsExpander>

@@ -389,4 +389,130 @@
   <data name="Settings.VerticalAlignment" xml:space="preserve">
     <value>수직 정렬</value>
   </data>
+  <data name="Settings.FollowWindowsMode" xml:space="preserve">
+    <value>Windows 모드에 맞춤</value>
+  </data>
+  <data name="Settings.Restart" xml:space="preserve">
+    <value>다시 시작</value>
+  </data>
+  <data name="Settings.FollowAppMode" xml:space="preserve">
+    <value>앱 모드에 맞춤</value>
+  </data>
+  <data name="AudioFlyoutHelper.EnhancedMediaBackend" xml:space="preserve">
+    <value>향상된 미디어 백엔드</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowPlayerInfo" xml:space="preserve">
+    <value>플레이어 이름 표시</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowSeekbar" xml:space="preserve">
+    <value>탐색 막대 표시</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowShuffle" xml:space="preserve">
+    <value>셔플 버튼 표시</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowRepeat" xml:space="preserve">
+    <value>반복 버튼 표시</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppUserModelId" xml:space="preserve">
+    <value>고정된 플레이어의 앱 ID</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppPriority" xml:space="preserve">
+    <value>고정된 플레이어 우선순위</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilteringMode" xml:space="preserve">
+    <value>앱 필터링</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilterList" xml:space="preserve">
+    <value>앱 필터 목록(쉼표, 세미콜론 또는 줄 바꿈으로 구분)</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Auto" xml:space="preserve">
+    <value>자동</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Enabled" xml:space="preserve">
+    <value>사용</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Disabled" xml:space="preserve">
+    <value>사용 안 함</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Disabled" xml:space="preserve">
+    <value>사용 안 함</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Allowlist" xml:space="preserve">
+    <value>허용 목록</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Blocklist" xml:space="preserve">
+    <value>차단 목록</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.PreferPinnedOnlyWhenPlaying" xml:space="preserve">
+    <value>재생 중일 때만 고정된 앱 우선</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.AlwaysPreferPinnedIfEligible" xml:space="preserve">
+    <value>가능하면 항상 고정된 앱 우선</value>
+  </data>
+  <data name="Settings.Modules.VirtualDesktop" xml:space="preserve">
+    <value>가상 데스크톱</value>
+  </data>
+  <data name="Settings.EnableModule.VirtualDesktop" xml:space="preserve">
+    <value>가상 데스크톱 플라이아웃 사용</value>
+  </data>
+  <data name="VirtualDesktopFlyoutHelper.DefaultName" xml:space="preserve">
+    <value>데스크톱 {0}</value>
+  </data>
+  <data name="Settings.FlyoutMargin" xml:space="preserve">
+    <value>화면 가장자리로부터의 거리</value>
+  </data>
+  <data name="Settings.PrimaryDisplay" xml:space="preserve">
+    <value>주 디스플레이</value>
+  </data>
+  <data name="Settings.FlyoutPosition" xml:space="preserve">
+    <value>위치</value>
+  </data>
+  <data name="Settings.ManualPlacementDescription" xml:space="preserve">
+    <value>플라이아웃 위쪽의 손잡이를 끌어 이동합니다. 위치는 기억됩니다.</value>
+  </data>
+  <data name="Settings.ChooseFromMediaApps" xml:space="preserve">
+    <value>미디어 앱에서 선택</value>
+  </data>
+  <data name="Settings.NoMediaAppsYet" xml:space="preserve">
+    <value>아직 감지된 미디어 앱이 없습니다. 무언가를 재생한 후 다시 시도하세요.</value>
+  </data>
+  <data name="Settings.ExpandDirectionDescription" xml:space="preserve">
+    <value>플라이아웃을 끌어서 이동했을 때 사용됩니다</value>
+  </data>
+  <data name="Settings.MediaControlsGroup" xml:space="preserve">
+    <value>미디어 컨트롤</value>
+  </data>
+  <data name="Settings.MediaControlsGroupDescription" xml:space="preserve">
+    <value>미디어 컨트롤에 표시할 항목</value>
+  </data>
+  <data name="Settings.ThumbnailGroup" xml:space="preserve">
+    <value>썸네일</value>
+  </data>
+  <data name="Settings.ThumbnailGroupDescription" xml:space="preserve">
+    <value>앨범 아트의 배경과 위치</value>
+  </data>
+  <data name="Settings.MediaSessionsGroup" xml:space="preserve">
+    <value>여러 미디어 세션</value>
+  </data>
+  <data name="Settings.MediaSessionsGroupDescription" xml:space="preserve">
+    <value>여러 플레이어의 세션을 표시하는 방법</value>
+  </data>
+  <data name="Settings.MediaAppsSection" xml:space="preserve">
+    <value>미디어 앱</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroup" xml:space="preserve">
+    <value>고정된 플레이어</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroupDescription" xml:space="preserve">
+    <value>특정 플레이어의 세션을 우선</value>
+  </data>
+  <data name="Settings.AppFilterDescription" xml:space="preserve">
+    <value>특정 앱의 세션 표시 또는 숨기기</value>
+  </data>
+  <data name="Settings.Credits" xml:space="preserve">
+    <value>크레딧</value>
+  </data>
+  <data name="Settings.FlyoutAnimationEnabled" xml:space="preserve">
+    <value>페이드 애니메이션</value>
+  </data>
 </root>

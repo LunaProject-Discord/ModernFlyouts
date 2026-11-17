@@ -174,6 +174,13 @@ namespace ModernFlyouts.WinUI
 
             Log("ready");
 #if DEBUG
+            int pageArg = Array.IndexOf(Environment.GetCommandLineArgs(), "--settings-page");
+            if (pageArg > 0 && pageArg + 1 < Environment.GetCommandLineArgs().Length)
+            {
+                ShowSettings();
+                _settingsWindow!.SelectPage(Environment.GetCommandLineArgs()[pageArg + 1]);
+            }
+
             if (Array.IndexOf(Environment.GetCommandLineArgs(), "--demo-desktop") > 0)
             {
                 _flyout.ShowVirtualDesktop("Desktop 2", 1, 4);
