@@ -5,7 +5,7 @@
 # the bundle is (re)signed here with the 64-bit SignTool afterwards.
 param(
     [string]$Configuration = "Release",
-    [string]$Thumbprint = "10D4E956A5007A79300325C6689AA80447CE9CDE",
+    [string]$Thumbprint = "DCEC7DEBC5ACA1AE8AE579538FCE2BE0FB253215",
     [string]$TimestampUrl = "http://timestamp.digicert.com"
 )
 
