@@ -32,7 +32,10 @@ namespace ModernFlyouts.WinUI.Interop
             _window = new Window { Content = _root, Title = "ModernFlyouts tray menu" };
             _hwnd = WindowNative.GetWindowHandle(_window);
 
-            _window.AppWindow.SetPresenter(OverlappedPresenter.CreateForContextMenu());
+            // Above everything (the taskbar is the foreground window when the icon is clicked).
+            var presenter = OverlappedPresenter.CreateForContextMenu();
+            presenter.IsAlwaysOnTop = true;
+            _window.AppWindow.SetPresenter(presenter);
             _window.AppWindow.IsShownInSwitchers = false;
 
             // Invisible host: tool window (no taskbar button) drawn fully transparent.
@@ -50,6 +53,7 @@ namespace ModernFlyouts.WinUI.Interop
             _menu.Items.Add(new MenuFlyoutSeparator());
             _menu.Items.Add(exit);
             _menu.Closed += (_, _) => _window.AppWindow.Hide();
+            _menu.Opened += (_, _) => MakePopupsTopmost();
 
             _root.Loaded += (_, _) =>
             {
@@ -74,6 +78,7 @@ namespace ModernFlyouts.WinUI.Interop
 
             _window.AppWindow.MoveAndResize(new RectInt32(x, y, 1, 1));
             _window.AppWindow.Show();
+            Native.SetWindowPos(_hwnd, Native.HWND_TOPMOST, 0, 0, 0, 0, Native.SWP_NOMOVE | Native.SWP_NOSIZE);
             _window.Activate();
             // Foreground so that clicking anywhere else dismisses the menu.
             Native.SetForegroundWindow(_hwnd);
@@ -87,6 +92,37 @@ namespace ModernFlyouts.WinUI.Interop
                 _showWhenLoaded = true;
             }
         }
+
+        /// <summary>
+        /// The menu is a separate popup window owned by the host; put it above other topmost
+        /// windows too (it is created after the host was made topmost).
+        /// </summary>
+        private void MakePopupsTopmost()
+        {
+            uint thread = GetWindowThreadProcessId(_hwnd, out _);
+            EnumThreadWindows(thread, (hwnd, _) =>
+            {
+                if (hwnd != _hwnd && GetWindow(hwnd, GW_OWNER) == _hwnd)
+                {
+                    Native.SetWindowPos(hwnd, Native.HWND_TOPMOST, 0, 0, 0, 0,
+                        Native.SWP_NOMOVE | Native.SWP_NOSIZE | Native.SWP_NOACTIVATE);
+                }
+                return true;
+            }, IntPtr.Zero);
+        }
+
+        private const uint GW_OWNER = 4;
+
+        private delegate bool EnumThreadWindowsProc(IntPtr hwnd, IntPtr lParam);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool EnumThreadWindows(uint threadId, EnumThreadWindowsProc callback, IntPtr lParam);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern IntPtr GetWindow(IntPtr hwnd, uint cmd);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern uint GetWindowThreadProcessId(IntPtr hwnd, out uint processId);
 
         private void OpenMenu()
         {
