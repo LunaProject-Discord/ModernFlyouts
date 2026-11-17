@@ -55,9 +55,11 @@
             </Border>
         </Grid>
 
-        <!-- Timeline: position | seek slider | duration. When the player doesn't allow changing
-             the position, a progress bar takes the slider's place. -->
-        <Grid x:Name="SeekPanel" Padding="20,8,20,0" ColumnSpacing="8">
+        <!-- Timeline: position | progress | duration. When the player allows seeking, pointing at
+             the timeline turns the progress bar into a seek slider. Both stay in the layout (only
+             their opacity changes) so the flyout keeps its size. -->
+        <Grid x:Name="SeekPanel" Padding="20,8,20,0" ColumnSpacing="8" MinHeight="40" Background="Transparent"
+              PointerEntered="SeekPanel_PointerEntered" PointerExited="SeekPanel_PointerExited">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
@@ -65,14 +67,14 @@
             </Grid.ColumnDefinitions>
             <TextBlock x:Name="PositionText" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            <ProgressBar x:Name="TimelineProgress" Grid.Column="1" VerticalAlignment="Center" />
             <Slider x:Name="TimelineSlider" Grid.Column="1" IsThumbToolTipEnabled="False" VerticalAlignment="Center"
-                    ValueChanged="TimelineSlider_ValueChanged" />
-            <ProgressBar x:Name="TimelineProgress" Grid.Column="1" VerticalAlignment="Center" Visibility="Collapsed" />
+                    Opacity="0" ValueChanged="TimelineSlider_ValueChanged" />
             <TextBlock x:Name="DurationText" Grid.Column="2" Style="{StaticResource CaptionTextBlockStyle}" VerticalAlignment="Center"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
         </Grid>
 
-        <!-- Transport controls -->
+        <!-- Transport controls: shuffle | (stop) previous, play/pause, next | repeat -->
         <Grid Height="56" Padding="8,4,8,8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="48" />
@@ -80,12 +82,14 @@
                 <ColumnDefinition Width="48" />
             </Grid.ColumnDefinitions>
 
-            <ToggleButton x:Name="MoreButton" Style="{StaticResource MediaToggleButtonStyle}"
-                          HorizontalAlignment="Center" Checked="MoreButton_Toggled" Unchecked="MoreButton_Toggled">
-                <FontIcon Glyph="&#xE712;" FontSize="16" />
+            <ToggleButton x:Name="ShuffleButton" Style="{StaticResource MediaToggleButtonStyle}" HorizontalAlignment="Center">
+                <FontIcon Glyph="&#xE8B1;" FontSize="16" />
             </ToggleButton>
 
             <StackPanel x:Name="MainControls" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
+                <Button x:Name="StopButton" Style="{StaticResource MediaButtonStyle}">
+                    <FontIcon Glyph="&#xE71A;" FontSize="16" />
+                </Button>
                 <Button x:Name="PreviousButton" Style="{StaticResource MediaButtonStyle}">
                     <FontIcon Glyph="&#xE892;" FontSize="16" />
                 </Button>
@@ -97,18 +101,9 @@
                 </Button>
             </StackPanel>
 
-            <StackPanel x:Name="MoreControls" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center"
-                        Spacing="16" Visibility="Collapsed">
-                <ToggleButton x:Name="ShuffleButton" Style="{StaticResource MediaToggleButtonStyle}">
-                    <FontIcon Glyph="&#xE8B1;" FontSize="16" />
-                </ToggleButton>
-                <ToggleButton x:Name="RepeatButton" Style="{StaticResource MediaToggleButtonStyle}">
-                    <FontIcon x:Name="RepeatGlyph" Glyph="&#xE8EE;" FontSize="16" />
-                </ToggleButton>
-                <Button x:Name="StopButton" Style="{StaticResource MediaButtonStyle}">
-                    <FontIcon Glyph="&#xE71A;" FontSize="16" />
-                </Button>
-            </StackPanel>
+            <ToggleButton x:Name="RepeatButton" Grid.Column="2" Style="{StaticResource MediaToggleButtonStyle}" HorizontalAlignment="Center">
+                <FontIcon x:Name="RepeatGlyph" Glyph="&#xE8EE;" FontSize="16" />
+            </ToggleButton>
         </Grid>
     </StackPanel>
     </Grid>

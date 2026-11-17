@@ -7,7 +7,7 @@ namespace ModernFlyouts.WinUI.Interop
     /// <summary>
     /// Notification area icon using Shell_NotifyIcon directly (no extra dependency).
     /// Messages arrive through the flyout window's <see cref="WindowMessageHook"/>.
-    /// Left click opens the settings; right click shows a native context menu.
+    /// Left click opens the settings; right click asks for the (WinUI) context menu.
     /// The icon is re-added when explorer restarts (TaskbarCreated).
     /// </summary>
     internal sealed class TrayIcon : IDisposable
@@ -20,13 +20,9 @@ namespace ModernFlyouts.WinUI.Interop
         private const uint WM_LBUTTONUP = 0x0202;
         private const uint NIN_SELECT = 0x0400;
         private const uint NIN_KEYSELECT = 0x0401;
-        private const uint WM_NULL = 0x0000;
-        private const uint MF_STRING = 0x0, MF_SEPARATOR = 0x800;
-        private const uint TPM_RETURNCMD = 0x0100, TPM_RIGHTBUTTON = 0x0002, TPM_BOTTOMALIGN = 0x0020;
         private const uint IMAGE_ICON = 1, LR_LOADFROMFILE = 0x10;
         private const int SM_CXSMICON = 49;
         private const uint IconId = 1;
-        private const int CmdSettings = 1, CmdExit = 2;
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private struct NOTIFYICONDATAW
@@ -67,24 +63,6 @@ namespace ModernFlyouts.WinUI.Interop
         private static extern uint GetDpiForSystem();
 
         [DllImport("user32.dll")]
-        private static extern IntPtr CreatePopupMenu();
-
-        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        private static extern bool AppendMenu(IntPtr menu, uint flags, UIntPtr id, string? text);
-
-        [DllImport("user32.dll")]
-        private static extern int TrackPopupMenuEx(IntPtr menu, uint flags, int x, int y, IntPtr hWnd, IntPtr tpm);
-
-        [DllImport("user32.dll")]
-        private static extern bool DestroyMenu(IntPtr menu);
-
-        [DllImport("user32.dll")]
-        private static extern bool SetForegroundWindow(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        private static extern bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
-
-        [DllImport("user32.dll")]
         private static extern bool GetCursorPos(out POINT point);
 
         [StructLayout(LayoutKind.Sequential)]
@@ -106,11 +84,8 @@ namespace ModernFlyouts.WinUI.Interop
 
         public event Action? OpenSettingsRequested;
 
-        public event Action? ExitRequested;
-
-        public string SettingsText { get; set; } = "Settings";
-
-        public string ExitText { get; set; } = "Exit";
+        /// <summary>Right click (or Shift+F10 / menu key): screen position in physical pixels.</summary>
+        public event Action<int, int>? ContextMenuRequested;
 
         public bool IsVisible
         {
@@ -235,32 +210,9 @@ namespace ModernFlyouts.WinUI.Interop
                     OpenSettingsRequested?.Invoke();
                     break;
                 case WM_CONTEXTMENU:
-                    ShowContextMenu();
+                    GetCursorPos(out var pt);
+                    ContextMenuRequested?.Invoke(pt.X, pt.Y);
                     break;
-            }
-        }
-
-        private void ShowContextMenu()
-        {
-            IntPtr menu = CreatePopupMenu();
-            try
-            {
-                AppendMenu(menu, MF_STRING, (UIntPtr)CmdSettings, SettingsText);
-                AppendMenu(menu, MF_SEPARATOR, UIntPtr.Zero, null);
-                AppendMenu(menu, MF_STRING, (UIntPtr)CmdExit, ExitText);
-
-                GetCursorPos(out var pt);
-                // Required so the menu closes when clicking elsewhere (KB135788).
-                SetForegroundWindow(_hook.Handle);
-                int command = TrackPopupMenuEx(menu, TPM_RETURNCMD | TPM_RIGHTBUTTON | TPM_BOTTOMALIGN, pt.X, pt.Y, _hook.Handle, IntPtr.Zero);
-                PostMessage(_hook.Handle, WM_NULL, IntPtr.Zero, IntPtr.Zero);
-
-                if (command == CmdSettings) OpenSettingsRequested?.Invoke();
-                else if (command == CmdExit) ExitRequested?.Invoke();
-            }
-            finally
-            {
-                DestroyMenu(menu);
             }
         }
 

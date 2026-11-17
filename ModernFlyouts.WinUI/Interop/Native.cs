@@ -137,6 +137,9 @@ namespace ModernFlyouts.WinUI.Interop
         [DllImport("user32.dll")]
         public static extern bool GetCursorPos(out POINT point);
 
+        [DllImport("user32.dll")]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
+
         public static string GetClassName(IntPtr hWnd)
         {
             var sb = new StringBuilder(256);

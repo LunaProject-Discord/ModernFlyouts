@@ -43,6 +43,7 @@ namespace ModernFlyouts.WinUI
         private WindowMessageHook? _messageHook;
         private ShellHook? _shellHook;
         private TrayIcon? _trayIcon;
+        private TrayMenu? _trayMenu;
         private readonly Windows.UI.ViewManagement.UISettings _uiSettings = new();
         private AirplaneModeWatcher? _airplaneModeWatcher;
         private int? _pressedLockKey;
@@ -111,13 +112,12 @@ namespace ModernFlyouts.WinUI
             _shellHook.BrightnessKey += () => ShowFromShell(S.BrightnessModuleEnabled, _flyout.ShowBrightness);
 
             // Notification area icon (uses the same message hook).
-            _trayIcon = new TrayIcon(_messageHook, "ModernFlyouts")
-            {
-                SettingsText = Strings.SettingsItem,
-                ExitText = Strings.ExitItem,
-            };
+            _trayIcon = new TrayIcon(_messageHook, "ModernFlyouts");
             _trayIcon.OpenSettingsRequested += ShowSettings;
-            _trayIcon.ExitRequested += ExitApp;
+            _trayMenu = new TrayMenu(Strings.SettingsItem, Strings.ExitItem);
+            _trayMenu.SettingsRequested += ShowSettings;
+            _trayMenu.ExitRequested += ExitApp;
+            _trayIcon.ContextMenuRequested += _trayMenu.Show;
             UpdateTrayIconFile();
             _trayIcon.IsVisible = S.TrayIconEnabled;
             S.PropertyChanged += (_, e) =>
@@ -177,6 +177,12 @@ namespace ModernFlyouts.WinUI
             if (Array.IndexOf(Environment.GetCommandLineArgs(), "--demo-desktop") > 0)
             {
                 _flyout.ShowVirtualDesktop("Desktop 2", 1, 4);
+            }
+            else if (Array.IndexOf(Environment.GetCommandLineArgs(), "--demo-traymenu") > 0)
+            {
+                // Where the notification area is: bottom right corner of the primary screen.
+                var bounds = Microsoft.UI.Windowing.DisplayArea.Primary.OuterBounds;
+                _trayMenu.Show(bounds.X + bounds.Width - 40, bounds.Y + bounds.Height - 20);
             }
 #endif
         }

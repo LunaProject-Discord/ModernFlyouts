@@ -20,6 +20,7 @@ namespace ModernFlyouts.WinUI.Controls
         private MediaSession? _session;
         private bool _updatingTimeline;
         private bool _scrubbing;
+        private bool _pointerOverTimeline;
         private bool _showPlayerInfo = true;
         private bool _showSeekbar = true;
         private bool _showShuffle = true;
@@ -38,7 +39,6 @@ namespace ModernFlyouts.WinUI.Controls
             ToolTipService.SetToolTip(PreviousButton, Strings.SessionControl_Previous);
             ToolTipService.SetToolTip(NextButton, Strings.SessionControl_Next);
             ToolTipService.SetToolTip(StopButton, Strings.SessionControl_Stop);
-            ToolTipService.SetToolTip(MoreButton, Strings.SessionControl_MoreControls);
 
             ShuffleButton.Click += (_, _) => { Execute(_session?.ChangeShuffleActiveCommand); UpdateAll(); };
             RepeatButton.Click += (_, _) => { Execute(_session?.ChangeAutoRepeatModeCommand); UpdateAll(); };
@@ -123,8 +123,6 @@ namespace ModernFlyouts.WinUI.Controls
                     _session.PropertyChanged += Session_PropertyChanged;
                 }
 
-                // A different player starts with the default controls.
-                MoreButton.IsChecked = false;
                 UpdateAll();
             }
         }
@@ -177,18 +175,19 @@ namespace ModernFlyouts.WinUI.Controls
             PlayPauseGlyph.Glyph = s.IsPlaying ? "" : "";
             ToolTipService.SetToolTip(PlayPauseButton, s.IsPlaying ? Strings.SessionControl_Pause : Strings.SessionControl_Play);
 
-            // "More" holds shuffle / repeat / stop.
-            bool hasMore = (_showShuffle && s.IsShuffleEnabled) || (_showRepeat && s.IsRepeatEnabled) || s.IsStopEnabled;
-            MoreButton.Visibility = hasMore ? Visibility.Visible : Visibility.Collapsed;
-            if (!hasMore)
-            {
-                MoreButton.IsChecked = false;
-            }
-
+            // Shuffle on the left and repeat on the right of the main controls, when the player
+            // supports them (their columns stay so the main controls remain centered).
             ShuffleButton.Visibility = _showShuffle && s.IsShuffleEnabled ? Visibility.Visible : Visibility.Collapsed;
             ShuffleButton.IsChecked = s.IsShuffleActive == true;
             RepeatButton.Visibility = _showRepeat && s.IsRepeatEnabled ? Visibility.Visible : Visibility.Collapsed;
             RepeatButton.IsChecked = s.AutoRepeatMode != MediaPlaybackAutoRepeatMode.None;
+            ToolTipService.SetToolTip(ShuffleButton, s.IsShuffleActive == true ? Strings.SessionControl_ShuffleOn : Strings.SessionControl_ShuffleOff);
+            ToolTipService.SetToolTip(RepeatButton, s.AutoRepeatMode switch
+            {
+                MediaPlaybackAutoRepeatMode.Track => Strings.SessionControl_RepeatOne,
+                MediaPlaybackAutoRepeatMode.List => Strings.SessionControl_RepeatAll,
+                _ => Strings.SessionControl_RepeatOff,
+            });
             RepeatGlyph.Glyph = s.AutoRepeatMode switch
             {
                 MediaPlaybackAutoRepeatMode.Track => "", // repeat one
@@ -196,16 +195,8 @@ namespace ModernFlyouts.WinUI.Controls
                 _ => "",                                 // repeat off
             };
             StopButton.Visibility = s.IsStopEnabled ? Visibility.Visible : Visibility.Collapsed;
-            UpdateControlsMode();
 
             UpdateTimeline();
-        }
-
-        private void UpdateControlsMode()
-        {
-            bool more = MoreButton.IsChecked == true;
-            MainControls.Visibility = more ? Visibility.Collapsed : Visibility.Visible;
-            MoreControls.Visibility = more ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void UpdateTimeline()
@@ -228,9 +219,7 @@ namespace ModernFlyouts.WinUI.Controls
                 LayoutChanged?.Invoke(this, EventArgs.Empty);
             }
 
-            // Seek slider normally; a read-only progress bar when the position can't be changed.
-            TimelineSlider.Visibility = canSeek ? Visibility.Visible : Visibility.Collapsed;
-            TimelineProgress.Visibility = canSeek ? Visibility.Collapsed : Visibility.Visible;
+            UpdateTimelineMode(canSeek);
 
             if (!hasTimeline)
             {
@@ -257,13 +246,30 @@ namespace ModernFlyouts.WinUI.Controls
             PositionText.Text = Format(s.PlaybackPosition);
         }
 
-        // Checked/Unchecked (not Click) so keyboard and UI Automation toggles work too.
-        private void MoreButton_Toggled(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Progress bar normally; the seek slider while the pointer is on the timeline (or the
+        /// thumb is being dragged), and only when the player allows seeking.
+        /// </summary>
+        private void UpdateTimelineMode(bool canSeek)
         {
-            UpdateControlsMode();
-            Interacted?.Invoke(this, EventArgs.Empty);
+            bool slider = canSeek && (_pointerOverTimeline || _scrubbing);
+            TimelineSlider.Opacity = slider ? 1 : 0;
+            TimelineSlider.IsHitTestVisible = canSeek;
+            TimelineSlider.IsTabStop = canSeek;
+            TimelineProgress.Opacity = slider ? 0 : 1;
         }
 
+        private void SeekPanel_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            _pointerOverTimeline = true;
+            UpdateTimelineMode(_session?.IsPlaybackPositionEnabled == true);
+        }
+
+        private void SeekPanel_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            _pointerOverTimeline = false;
+            UpdateTimelineMode(_session?.IsPlaybackPositionEnabled == true);
+        }
 
         private void TimelineSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
@@ -294,6 +300,7 @@ namespace ModernFlyouts.WinUI.Controls
 
             _scrubbing = false;
             (_session as EnhancedGSMTCMediaSession)?.EndTimelineScrub();
+            UpdateTimelineMode(_session?.IsPlaybackPositionEnabled == true);
         }
 
         private void Execute(System.Windows.Input.ICommand? command)
