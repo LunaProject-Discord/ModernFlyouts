@@ -34,7 +34,7 @@
     <WindowsPackageType>MSIX</WindowsPackageType>
     <GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
     <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
-    <PackageCertificateThumbprint>10D4E956A5007A79300325C6689AA80447CE9CDE</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>DCEC7DEBC5ACA1AE8AE579538FCE2BE0FB253215</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampServerUrl>http://timestamp.digicert.com</AppxPackageSigningTimestampServerUrl>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <UapAppxPackageBuildMode>SideloadOnly</UapAppxPackageBuildMode>
