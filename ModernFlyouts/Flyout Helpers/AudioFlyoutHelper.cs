@@ -7,6 +7,8 @@ using NAudio.CoreAudioApi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -25,6 +27,11 @@ namespace ModernFlyouts
         private SessionsPanel sessionsPanel;
         private TextBlock noDeviceMessageBlock;
         private List<MediaSessionManager> mediaSessionManagers = new();
+        private CancellationTokenSource mediaBackendCancellationTokenSource;
+        private bool mediaBackendRefreshInProgress;
+        private bool mediaBackendStarted;
+        private bool isFlyoutVisible;
+        private bool isInitializing;
         private bool isVolumeFlyout = true;
 
         #region Properties
@@ -59,6 +66,157 @@ namespace ModernFlyouts
             }
         }
 
+        private EnhancedMediaBackendMode enhancedMediaBackendMode = DefaultValuesStore.EnhancedMediaBackendMode;
+
+        public EnhancedMediaBackendMode EnhancedMediaBackendMode
+        {
+            get => enhancedMediaBackendMode;
+            set
+            {
+                if (SetProperty(ref enhancedMediaBackendMode, value))
+                {
+                    AppDataHelper.EnhancedMediaBackendMode = value;
+                    if (!isInitializing && mediaBackendStarted)
+                    {
+                        _ = RefreshMediaSessionBackendAsync();
+                    }
+                }
+            }
+        }
+
+        private bool showPlayerInfo = DefaultValuesStore.ShowMediaPlayerInfo;
+
+        public bool ShowPlayerInfo
+        {
+            get => showPlayerInfo;
+            set
+            {
+                if (SetProperty(ref showPlayerInfo, value))
+                {
+                    AppDataHelper.ShowMediaPlayerInfo = value;
+                }
+            }
+        }
+
+        private bool showSeekbar = DefaultValuesStore.ShowMediaSeekbar;
+
+        public bool ShowSeekbar
+        {
+            get => showSeekbar;
+            set
+            {
+                if (SetProperty(ref showSeekbar, value))
+                {
+                    AppDataHelper.ShowMediaSeekbar = value;
+                    RefreshMediaTimelineActivity();
+                }
+            }
+        }
+
+        private bool showShuffle = DefaultValuesStore.ShowMediaShuffle;
+
+        public bool ShowShuffle
+        {
+            get => showShuffle;
+            set
+            {
+                if (SetProperty(ref showShuffle, value))
+                {
+                    AppDataHelper.ShowMediaShuffle = value;
+                }
+            }
+        }
+
+        private bool showRepeat = DefaultValuesStore.ShowMediaRepeat;
+
+        public bool ShowRepeat
+        {
+            get => showRepeat;
+            set
+            {
+                if (SetProperty(ref showRepeat, value))
+                {
+                    AppDataHelper.ShowMediaRepeat = value;
+                }
+            }
+        }
+
+        private string pinnedMediaAppUserModelId = string.Empty;
+
+        public string PinnedMediaAppUserModelId
+        {
+            get => pinnedMediaAppUserModelId;
+            set
+            {
+                if (SetProperty(ref pinnedMediaAppUserModelId, value ?? string.Empty))
+                {
+                    AppDataHelper.PinnedMediaAppUserModelId = pinnedMediaAppUserModelId;
+                    RefreshEnhancedSelectionOptions();
+                }
+            }
+        }
+
+        private PinnedAppPriorityMode pinnedAppPriorityMode = DefaultValuesStore.PinnedAppPriorityMode;
+
+        public PinnedAppPriorityMode PinnedAppPriorityMode
+        {
+            get => pinnedAppPriorityMode;
+            set
+            {
+                if (SetProperty(ref pinnedAppPriorityMode, value))
+                {
+                    AppDataHelper.PinnedAppPriorityMode = value;
+                    RefreshEnhancedSelectionOptions();
+                }
+            }
+        }
+
+        private MediaAppFilteringMode mediaAppFilteringMode = DefaultValuesStore.MediaAppFilteringMode;
+
+        public MediaAppFilteringMode MediaAppFilteringMode
+        {
+            get => mediaAppFilteringMode;
+            set
+            {
+                if (SetProperty(ref mediaAppFilteringMode, value))
+                {
+                    AppDataHelper.MediaAppFilteringMode = value;
+                    RefreshEnhancedSelectionOptions();
+                }
+            }
+        }
+
+        private string mediaAppFilterList = string.Empty;
+
+        public string MediaAppFilterList
+        {
+            get => mediaAppFilterList;
+            set
+            {
+                if (SetProperty(ref mediaAppFilterList, value ?? string.Empty))
+                {
+                    AppDataHelper.MediaAppFilterList = mediaAppFilterList;
+                    RefreshEnhancedSelectionOptions();
+                }
+            }
+        }
+
+        private string enhancedBackendDiagnosticsMessage = string.Empty;
+
+        public string EnhancedBackendDiagnosticsMessage
+        {
+            get => enhancedBackendDiagnosticsMessage;
+            private set
+            {
+                if (SetProperty(ref enhancedBackendDiagnosticsMessage, value ?? string.Empty))
+                {
+                    OnPropertyChanged(nameof(EnhancedBackendDiagnosticsVisible));
+                }
+            }
+        }
+
+        public bool EnhancedBackendDiagnosticsVisible => !string.IsNullOrWhiteSpace(EnhancedBackendDiagnosticsMessage);
+
         #endregion
 
         public AudioFlyoutHelper()
@@ -70,8 +228,19 @@ namespace ModernFlyouts
         {
             AlwaysHandleDefaultFlyout = true;
 
+            isInitializing = true;
             ShowGSMTCInVolumeFlyout = AppDataHelper.ShowGSMTCInVolumeFlyout;
             ShowVolumeControlInGSMTCFlyout = AppDataHelper.ShowVolumeControlInGSMTCFlyout;
+            EnhancedMediaBackendMode = AppDataHelper.EnhancedMediaBackendMode;
+            ShowPlayerInfo = AppDataHelper.ShowMediaPlayerInfo;
+            ShowSeekbar = AppDataHelper.ShowMediaSeekbar;
+            ShowShuffle = AppDataHelper.ShowMediaShuffle;
+            ShowRepeat = AppDataHelper.ShowMediaRepeat;
+            PinnedMediaAppUserModelId = AppDataHelper.PinnedMediaAppUserModelId;
+            PinnedAppPriorityMode = AppDataHelper.PinnedAppPriorityMode;
+            MediaAppFilteringMode = AppDataHelper.MediaAppFilteringMode;
+            MediaAppFilterList = AppDataHelper.MediaAppFilterList;
+            isInitializing = false;
 
             #region Volume control sub-module initialization
 
@@ -100,8 +269,6 @@ namespace ModernFlyouts
                 SecondaryContent = sessionsPanel;
             };
 
-            SetupMediaSessionManagers();
-
             #endregion
 
             PrimaryContent = volumeControl;
@@ -128,6 +295,11 @@ namespace ModernFlyouts
             ValidatePrimaryContentVisible();
             ValidateSecondaryContentVisible();
 
+            if (isMediaKey && !mediaBackendStarted)
+            {
+                return true;
+            }
+
             if ((isVolumeFlyout && PrimaryContentVisible) || (isMediaKey && SecondaryContentVisible))
             {
                 return true;
@@ -151,6 +323,7 @@ namespace ModernFlyouts
         private void ValidateSecondaryContentVisible()
         {
             SecondaryContentVisible = AnyMediaSessionsAvailable() && (!isVolumeFlyout || showGSMTCInVolumeFlyout);
+            RefreshMediaTimelineActivity();
         }
 
         private void OnShowVolumeControlInGSMTCFlyoutChanged()
@@ -190,9 +363,21 @@ namespace ModernFlyouts
             else { Application.Current.Dispatcher.Invoke(() => PrimaryContent = noDeviceMessageBlock); }
         }
 
+        private long lastVolumeNotificationTick;
+
         private void AudioEndpointVolume_OnVolumeNotification(AudioVolumeNotificationData data)
         {
+            Interlocked.Exchange(ref lastVolumeNotificationTick, Environment.TickCount64);
             UpdateVolume(data.MasterVolume * 100);
+        }
+
+        /// <summary>
+        /// Whether the default endpoint's volume or mute state changed within the given period.
+        /// </summary>
+        public bool HasRecentVolumeChange(TimeSpan within)
+        {
+            long last = Interlocked.Read(ref lastVolumeNotificationTick);
+            return last != 0 && Environment.TickCount64 - last <= within.TotalMilliseconds;
         }
 
         private bool _isInCodeValueChange; //Prevents a LOOP between changing volume.
@@ -304,11 +489,7 @@ namespace ModernFlyouts
         private void SetupMediaSessionManagers()
         {
             var npMediaSessionManager = new NowPlayingMediaSessionManager();
-            mediaSessionManagers.Add(npMediaSessionManager);
-
-            AllMediaSessions.Add(new CollectionContainer { Collection = npMediaSessionManager.MediaSessions });
-
-            npMediaSessionManager.MediaSessionsChanged += MediaSessionManager_MediaSessionsChanged;
+            SwitchMediaSessionManager(npMediaSessionManager);
         }
 
         private void MediaSessionManager_MediaSessionsChanged(object sender, EventArgs e)
@@ -317,6 +498,147 @@ namespace ModernFlyouts
         }
 
         private bool AnyMediaSessionsAvailable() => mediaSessionManagers.Any(x => x.ContainsAnySession());
+
+        private void EnsureMediaSessionBackendStarted()
+        {
+            if (mediaBackendStarted || mediaBackendRefreshInProgress)
+            {
+                return;
+            }
+
+            mediaBackendStarted = true;
+            _ = RefreshMediaSessionBackendAsync();
+        }
+
+        private bool IsMediaTimelineDisplayed()
+        {
+            return isFlyoutVisible && ShowSeekbar && SecondaryContentVisible;
+        }
+
+        private void RefreshMediaTimelineActivity()
+        {
+            foreach (var manager in mediaSessionManagers.OfType<EnhancedGSMTCMediaSessionManager>())
+            {
+                manager.RefreshTimelineActivity();
+            }
+        }
+
+        private async Task RefreshMediaSessionBackendAsync()
+        {
+            mediaBackendCancellationTokenSource?.Cancel();
+            mediaBackendCancellationTokenSource?.Dispose();
+            mediaBackendCancellationTokenSource = new CancellationTokenSource();
+            var refreshCancellationTokenSource = mediaBackendCancellationTokenSource;
+            var cancellationToken = refreshCancellationTokenSource.Token;
+            mediaBackendRefreshInProgress = true;
+
+            try
+            {
+                if (EnhancedMediaBackendMode == ModernFlyouts.Core.Media.Control.EnhancedMediaBackendMode.Disabled)
+                {
+                    EnhancedBackendDiagnosticsMessage = string.Empty;
+                    SwitchMediaSessionManager(new GSMTCMediaSessionManager());
+                    return;
+                }
+
+                var preflight = await MediaControlPreflight.RunAsync(cancellationToken);
+
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                if (preflight.IsAvailable)
+                {
+                    AppDataHelper.EnhancedMediaBackendLastPreflightSucceeded = true;
+                    EnhancedBackendDiagnosticsMessage = string.Empty;
+                    SwitchMediaSessionManager(new EnhancedGSMTCMediaSessionManager(CreateSelectionOptions, IsMediaTimelineDisplayed));
+                    return;
+                }
+
+                AppDataHelper.EnhancedMediaBackendLastPreflightSucceeded = false;
+                EnhancedBackendDiagnosticsMessage = preflight.DiagnosticMessage;
+                SwitchMediaSessionManager(new NowPlayingMediaSessionManager());
+            }
+            finally
+            {
+                if (ReferenceEquals(mediaBackendCancellationTokenSource, refreshCancellationTokenSource))
+                {
+                    mediaBackendRefreshInProgress = false;
+                }
+            }
+        }
+
+        private void StopMediaSessionBackend()
+        {
+            mediaBackendCancellationTokenSource?.Cancel();
+            mediaBackendCancellationTokenSource?.Dispose();
+            mediaBackendCancellationTokenSource = null;
+            mediaBackendRefreshInProgress = false;
+            mediaBackendStarted = false;
+
+            foreach (var mediaSessionManager in mediaSessionManagers)
+            {
+                mediaSessionManager.MediaSessionsChanged -= MediaSessionManager_MediaSessionsChanged;
+                mediaSessionManager.OnDisabled();
+            }
+
+            mediaSessionManagers.Clear();
+            AllMediaSessions.Clear();
+            ValidateSecondaryContentVisible();
+        }
+
+        private MediaSessionSelectionOptions CreateSelectionOptions()
+        {
+            return MediaSessionSelectionOptions.FromDelimitedList(
+                PinnedMediaAppUserModelId,
+                PinnedAppPriorityMode,
+                MediaAppFilteringMode,
+                MediaAppFilterList);
+        }
+
+        private void RefreshEnhancedSelectionOptions()
+        {
+            if (isInitializing)
+            {
+                return;
+            }
+
+            foreach (var manager in mediaSessionManagers.OfType<EnhancedGSMTCMediaSessionManager>())
+            {
+                manager.RefreshSelectionOptions();
+            }
+        }
+
+        private void SwitchMediaSessionManager(MediaSessionManager mediaSessionManager)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                foreach (var manager in mediaSessionManagers)
+                {
+                    manager.MediaSessionsChanged -= MediaSessionManager_MediaSessionsChanged;
+
+                    if (IsEnabled)
+                    {
+                        manager.OnDisabled();
+                    }
+                }
+
+                mediaSessionManagers.Clear();
+                AllMediaSessions.Clear();
+
+                mediaSessionManagers.Add(mediaSessionManager);
+                AllMediaSessions.Add(new CollectionContainer { Collection = mediaSessionManager.MediaSessions });
+                mediaSessionManager.MediaSessionsChanged += MediaSessionManager_MediaSessionsChanged;
+
+                if (IsEnabled)
+                {
+                    mediaSessionManager.OnEnabled();
+                }
+
+                ValidateSecondaryContentVisible();
+            });
+        }
 
         #endregion
 
@@ -352,15 +674,21 @@ namespace ModernFlyouts
 
             ValidatePrimaryContentVisible();
 
-            foreach (var mediaSessionManager in mediaSessionManagers)
+            if (mediaBackendStarted)
             {
-                mediaSessionManager.OnEnabled();
+                foreach (var mediaSessionManager in mediaSessionManagers)
+                {
+                    mediaSessionManager.OnEnabled();
+                }
             }
         }
 
         protected override void OnDisabled()
         {
             base.OnDisabled();
+
+            isFlyoutVisible = false;
+            StopMediaSessionBackend();
 
             client.DefaultDeviceChanged -= Client_DefaultDeviceChanged;
 
@@ -372,12 +700,20 @@ namespace ModernFlyouts
             PrimaryContent = null;
             PrimaryContentVisible = false;
 
-            foreach (var mediaSessionManager in mediaSessionManagers)
-            {
-                mediaSessionManager.OnDisabled();
-            }
-
             AppDataHelper.AudioModuleEnabled = IsEnabled;
+        }
+
+        public override void OnFlyoutShown()
+        {
+            isFlyoutVisible = true;
+            EnsureMediaSessionBackendStarted();
+            RefreshMediaTimelineActivity();
+        }
+
+        public override void OnFlyoutHidden()
+        {
+            isFlyoutVisible = false;
+            StopMediaSessionBackend();
         }
     }
 }

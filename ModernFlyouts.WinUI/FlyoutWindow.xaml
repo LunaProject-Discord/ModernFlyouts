@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="ModernFlyouts.WinUI.FlyoutWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:ModernFlyouts.WinUI.Controls"
+    Title="ModernFlyouts">
+
+    <Window.SystemBackdrop>
+        <controls:FlyoutBackdrop x:Name="Backdrop" />
+    </Window.SystemBackdrop>
+
+    <!--
+        Layout follows the WPF flyout (360 wide, 48 high rows in a 48 | * | 48 grid, 16 px icons,
+        32 px top bar) with Fluent details: 4 px control radius, divider strokes, theme text brushes.
+    -->
+    <!-- The pointer handlers sit on the outer Grid so the top bar hot zone counts as "over the flyout" -->
+    <Grid x:Name="RootGrid" VerticalAlignment="Top"
+          PointerEntered="RootGrid_PointerEntered" PointerExited="RootGrid_PointerExited">
+    <StackPanel x:Name="RootPanel" VerticalAlignment="Top">
+
+        <!-- Top bar: settings / reset position | drag handle | close -->
+        <Grid x:Name="TopBar" Height="32" Padding="2,2,2,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" Spacing="2">
+                <Button Style="{StaticResource FlyoutTopBarButtonStyle}" Click="SettingsButton_Click"
+                        ToolTipService.ToolTip="{x:Bind SettingsText}">
+                    <FontIcon Glyph="&#xE713;" FontSize="14" />
+                </Button>
+                <Button x:Name="AlignButton" Style="{StaticResource FlyoutTopBarButtonStyle}" Click="AlignButton_Click"
+                        ToolTipService.ToolTip="{x:Bind AlignText}">
+                    <FontIcon Glyph="&#xECE9;" FontSize="14" />
+                </Button>
+            </StackPanel>
+            <!-- Drag handle (moves the flyout; the position is remembered) -->
+            <Border x:Name="DragArea" Grid.Column="1" Background="Transparent" Margin="8,0"
+                    PointerPressed="DragArea_PointerPressed">
+                <Border Width="32" Height="4" CornerRadius="2" VerticalAlignment="Center"
+                        Background="{ThemeResource TextFillColorTertiaryBrush}" />
+            </Border>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="2">
+                <!-- Pin: top bar always visible / only while the pointer is over the flyout -->
+                <Button x:Name="PinButton" Style="{StaticResource FlyoutTopBarButtonStyle}" Click="PinButton_Click">
+                    <FontIcon x:Name="PinGlyph" Glyph="&#xE77A;" FontSize="14" />
+                </Button>
+                <Button Style="{StaticResource FlyoutTopBarButtonStyle}" Click="CloseButton_Click"
+                        ToolTipService.ToolTip="{x:Bind CloseText}">
+                    <FontIcon Glyph="&#xE8BB;" FontSize="12" />
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- Volume -->
+        <Grid x:Name="VolumeRow" Height="48">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="48" />
+            </Grid.ColumnDefinitions>
+            <Button Style="{StaticResource MediaButtonStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                    Click="MuteButton_Click">
+                <!-- Full speaker in a faint tone behind the current level (as in the WPF flyout) -->
+                <Grid>
+                    <FontIcon x:Name="VolumeShadowGlyph" Glyph="&#xE995;" Style="{StaticResource FlyoutLevelShadowGlyphStyle}" />
+                    <FontIcon x:Name="VolumeGlyph" Glyph="&#xE995;" Style="{StaticResource FlyoutLevelGlyphStyle}" />
+                </Grid>
+            </Button>
+            <Slider x:Name="VolumeSlider" Grid.Column="1" Minimum="0" Maximum="100" StepFrequency="1"
+                    VerticalAlignment="Center" Margin="8,0" IsThumbToolTipEnabled="False"
+                    ValueChanged="VolumeSlider_ValueChanged" />
+            <TextBlock x:Name="VolumeText" Grid.Column="2" Text="0"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Style="{StaticResource FlyoutValueTextStyle}" />
+        </Grid>
+
+        <!-- Brightness: one row per display (rows are created in code) -->
+        <StackPanel x:Name="BrightnessRow" Visibility="Collapsed" />
+
+        <!-- Icon + message (airplane mode, lock keys) -->
+        <Grid x:Name="InfoRow" Height="48" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="48" />
+            </Grid.ColumnDefinitions>
+            <FontIcon x:Name="InfoGlyph" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <TextBlock x:Name="InfoText" Grid.Column="1" FontSize="16" FontWeight="SemiBold"
+                       TextTrimming="CharacterEllipsis" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Grid>
+
+        <!-- Virtual desktop -->
+        <Grid x:Name="DesktopRow" Height="48" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="48" />
+            </Grid.ColumnDefinitions>
+            <FontIcon Glyph="&#xE7C4;" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
+                <TextBlock x:Name="DesktopNameText" FontSize="15" FontWeight="SemiBold"
+                           HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                <StackPanel x:Name="DesktopDots" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Media sessions (below the volume row, or above it when stacking is reversed).
+             Several sessions scroll sideways (one page each) or are stacked vertically. -->
+        <StackPanel x:Name="MediaSection" Visibility="Collapsed">
+            <Border x:Name="MediaDivider" Height="1" Background="{ThemeResource DividerStrokeColorDefaultBrush}" />
+            <ScrollViewer x:Name="SessionsScroller"
+                          HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"
+                          HorizontalSnapPointsType="MandatorySingle" VerticalSnapPointsType="MandatorySingle"
+                          ViewChanged="SessionsScroller_ViewChanged">
+                <StackPanel x:Name="SessionsPanel" />
+            </ScrollViewer>
+            <!-- Page dots for several sessions side by side -->
+            <StackPanel x:Name="SessionDots" Orientation="Horizontal" HorizontalAlignment="Center"
+                        Spacing="6" Margin="0,0,0,8" Visibility="Collapsed" />
+        </StackPanel>
+    </StackPanel>
+
+    </Grid>
+</Window>

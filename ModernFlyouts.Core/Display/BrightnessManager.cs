@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Management;
-using System.Windows;
+using ModernFlyouts.Core.Threading;
 using static ModernFlyouts.Core.Interop.NativeMethods;
 
 namespace ModernFlyouts.Core.Display
@@ -210,7 +210,7 @@ namespace ModernFlyouts.Core.Display
 
         private void BrightnessWatcher_Changed(object sender, BrightnessChangedEventArgs e)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            UiDispatcher.Invoke(() =>
             {
                 if (DefaultBrightnessController != null)
                     DefaultBrightnessController.UpdateBrightness(e.NewValue);

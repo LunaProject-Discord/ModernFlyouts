@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="ModernFlyouts.WinUI.Pages.GeneralPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:res="using:ModernFlyouts.Properties">
+
+    <ScrollViewer>
+        <!-- The Grid gives the max-width panel a normal layout slot; directly inside the
+             ScrollViewer it is centered by its desired width and overflows on wide windows. -->
+        <Grid>
+        <StackPanel Style="{StaticResource SettingsPagePanelStyle}">
+            <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_Behavior}" />
+
+            <toolkit:SettingsCard Header="{x:Bind res:Strings.Settings_RunAtStartup}">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE7E8;" /></toolkit:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind S.RunAtStartup, Mode=TwoWay}" />
+            </toolkit:SettingsCard>
+
+            <toolkit:SettingsCard Header="{x:Bind res:Strings.Settings_Language}">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xF2B7;" /></toolkit:SettingsCard.HeaderIcon>
+                <ComboBox x:Name="LanguageCombo" MinWidth="200" />
+            </toolkit:SettingsCard>
+
+            <!-- Shown once the language differs from the one the app started with -->
+            <InfoBar x:Name="LanguageRestartInfo" Severity="Informational" IsOpen="True" IsClosable="False"
+                     Message="{x:Bind res:Strings.Settings_RestartRequired}" Visibility="Collapsed">
+                <InfoBar.ActionButton>
+                    <Button Content="{x:Bind res:Strings.Settings_Restart}" Click="RestartButton_Click" />
+                </InfoBar.ActionButton>
+            </InfoBar>
+
+            <!-- Notification area icon, with its style inside -->
+            <toolkit:SettingsExpander Header="{x:Bind res:Strings.Settings_TrayIconEnabled}">
+                <toolkit:SettingsExpander.HeaderIcon><ImageIcon Source="ms-appx:///Assets/Logo.ico" /></toolkit:SettingsExpander.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind S.TrayIconEnabled, Mode=TwoWay}" />
+                <toolkit:SettingsExpander.Items>
+                    <toolkit:SettingsCard Header="{x:Bind res:Strings.Settings_UseColoredTrayIcon}"
+                                          IsEnabled="{x:Bind S.TrayIconEnabled, Mode=OneWay}">
+                        <ToggleSwitch IsOn="{x:Bind S.UseColoredTrayIcon, Mode=TwoWay}" />
+                    </toolkit:SettingsCard>
+                </toolkit:SettingsExpander.Items>
+            </toolkit:SettingsExpander>
+
+            <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_DefaultFlyout}" />
+
+            <toolkit:SettingsCard Header="{x:Bind res:Strings.Settings_DefaultFlyoutDescription}">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE737;" /></toolkit:SettingsCard.HeaderIcon>
+                <ComboBox x:Name="DefaultFlyoutCombo" MinWidth="200" />
+            </toolkit:SettingsCard>
+
+            <InfoBar x:Name="DefaultFlyoutWarning" Severity="Warning" IsOpen="True" IsClosable="False"
+                     Message="{x:Bind res:Strings.Settings_DefaultFlyoutWarningMessage}" />
+
+            <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_Additional}" />
+
+            <toolkit:SettingsCard Header="{x:Bind res:Strings.Settings_ResetToDefaults}">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE777;" /></toolkit:SettingsCard.HeaderIcon>
+                <Button Content="{x:Bind res:Strings.Settings_ResetToDefaults}" Click="ResetButton_Click" />
+            </toolkit:SettingsCard>
+        </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>

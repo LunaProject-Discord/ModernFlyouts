@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Windows.Input;
 using static ModernFlyouts.Core.Interop.NativeMethods;
 
 namespace ModernFlyouts.Core.Interop
@@ -9,11 +8,11 @@ namespace ModernFlyouts.Core.Interop
     {
         public event KeyDownEventHandler KeyDown;
 
-        public delegate void KeyDownEventHandler(Key key, int virtualKey);
+        public delegate void KeyDownEventHandler(int virtualKey);
 
         public event KeyUpEventHandler KeyUp;
 
-        public delegate void KeyUpEventHandler(Key key, int virtualKey);
+        public delegate void KeyUpEventHandler(int virtualKey);
 
         private const int WH_KEYBOARD_LL = 13;
         private const int HC_ACTION = 0;
@@ -27,7 +26,8 @@ namespace ModernFlyouts.Core.Interop
 
         #region Properties
 
-        public Key? CurrentKey { get; private set; }
+        /// <summary>Virtual-key code of the key currently held down, if any.</summary>
+        public int? CurrentKey { get; private set; }
 
         #endregion
 
@@ -50,16 +50,14 @@ namespace ModernFlyouts.Core.Interop
                 if (wParam == (IntPtr)WM_KEYDOWN || wParam == (IntPtr)WM_SYSKEYDOWN)
                 {
                     var vkcode = (int)((KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(KBDLLHOOKSTRUCT))).vkCode;
-                    var key = KeyInterop.KeyFromVirtualKey(vkcode);
-                    CurrentKey = key;
-                    KeyDown?.Invoke(key, vkcode);
+                    CurrentKey = vkcode;
+                    KeyDown?.Invoke(vkcode);
                 }
                 if (wParam == (IntPtr)WM_KEYUP || wParam == (IntPtr)WM_SYSKEYUP)
                 {
                     var vkcode = (int)((KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(KBDLLHOOKSTRUCT))).vkCode;
-                    var key = KeyInterop.KeyFromVirtualKey(vkcode);
                     CurrentKey = null;
-                    KeyUp?.Invoke(key, vkcode);
+                    KeyUp?.Invoke(vkcode);
                 }
             }
 

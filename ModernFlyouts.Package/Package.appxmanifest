@@ -9,9 +9,9 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="Usoppii.ModernFlyouts"
-    Publisher="CN=Usoppii"
-    Version="0.10.1.0" />
+    Name="LunaProject.ModernFlyouts"
+    Publisher="CN=Luna Project"
+    Version="0.10.8.0" />
 
   <Properties>
     <DisplayName>ms-resource:Resources/PackageDisplayName</DisplayName>

@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
-using System.Windows;
+using Windows.Foundation;
 
 namespace ModernFlyouts.Core.Display
 {

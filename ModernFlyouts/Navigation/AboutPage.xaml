@@ -15,23 +15,27 @@
                        Text="{x:Static local:Program.AppName}" />
             <Image Source="/Assets/Images/ModernFlyouts_128.png" HorizontalAlignment="Left" Height="128" />
             <TextBlock TextWrapping="Wrap" Text="{x:Static resx:Strings.About_AppDescription}" />
-            <TextBlock TextWrapping="Wrap" FontWeight="Bold" FontStyle="Italic" Text="{x:Static resx:Strings.About_FileABug}" />
             <TextBlock>
                 <Run Text="{x:Static resx:Strings.About_Version}" />
                 <Bold>
                     <Run Text="{x:Static local:Program.AppVersion}" />
                 </Bold>
             </TextBlock>
-            <ui:HyperlinkButton Content="{x:Static resx:Strings.About_GitHub}"
+            <TextBlock TextWrapping="Wrap" Margin="0,8,0,0">
+                <Run FontWeight="SemiBold" Text="Personal combined build: " />
+                <Run Text="based on the usoppii fork (.NET 10, ModernFlyouts 0.10 line) with the enhanced media backend from GlobalFlyouts (Astear17, Kinfani)." />
+            </TextBlock>
+            <TextBlock TextWrapping="Wrap" FontWeight="SemiBold" Margin="0,8,0,0" Text="Credits" />
+            <ui:HyperlinkButton Content="ModernFlyouts (original project)"
                                 NavigateUri="https://github.com/ModernFlyouts-Community/ModernFlyouts" />
             <ui:HyperlinkButton Content="{x:Static resx:Strings.About_Contributors}"
                                 NavigateUri="https://github.com/ModernFlyouts-Community/ModernFlyouts/graphs/contributors" />
-            <ui:HyperlinkButton Content="{x:Static resx:Strings.About_Dependencies}"
-                                NavigateUri="https://github.com/ModernFlyouts-Community/ModernFlyouts/network/dependencies" />
-            <ui:HyperlinkButton Content="{x:Static resx:Strings.About_OpenNewIssue}"
-                                NavigateUri="https://github.com/ModernFlyouts-Community/ModernFlyouts/issues/new/choose" />
-            <Button Style="{DynamicResource ButtonRevealStyle}"
-                    Content="{x:Static resx:Strings.About_RateAndReview}" Click="RateAndReviewButton_Click" />
+            <ui:HyperlinkButton Content="usoppii/ModernFlyouts"
+                                NavigateUri="https://github.com/usoppii/ModernFlyouts" />
+            <ui:HyperlinkButton Content="Astear17/GlobalFlyouts"
+                                NavigateUri="https://github.com/Astear17/GlobalFlyouts" />
+            <ui:HyperlinkButton Content="Kinfani/GlobalFlyouts"
+                                NavigateUri="https://github.com/Kinfani/GlobalFlyouts" />
         </ui:SimpleStackPanel>
     </controls:ScrollViewerEx>
 </Page>

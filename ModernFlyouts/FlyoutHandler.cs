@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using static ModernFlyouts.Core.Interop.NativeMethods;
@@ -31,6 +32,7 @@ namespace ModernFlyouts
         private List<FlyoutHelperBase> flyoutHelpers = new();
         private AirplaneModeWatcher airplaneModeWatcher = new();
         private FlyoutTriggerData prevTriggerData;
+        private FlyoutHelperBase visibleFlyoutHelper;
 
         #region Properties
 
@@ -55,6 +57,8 @@ namespace ModernFlyouts
         public LockKeysFlyoutHelper LockKeysFlyoutHelper { get; set; }
 
         public BrightnessFlyoutHelper BrightnessFlyoutHelper { get; set; }
+
+        public VirtualDesktopFlyoutHelper VirtualDesktopFlyoutHelper { get; set; }
 
         private DefaultFlyout defaultFlyout = DefaultValuesStore.PreferredDefaultFlyout;
 
@@ -145,6 +149,7 @@ namespace ModernFlyouts
             var apmdEnabled = AppDataHelper.AirplaneModeModuleEnabled;
             var lkkyEnabled = AppDataHelper.LockKeysModuleEnabled;
             var brEnabled = AppDataHelper.BrightnessModuleEnabled;
+            var vdEnabled = AppDataHelper.VirtualDesktopModuleEnabled;
 
             DefaultFlyout = AppDataHelper.DefaultFlyout;
 
@@ -181,11 +186,15 @@ namespace ModernFlyouts
             AirplaneModeFlyoutHelper = new AirplaneModeFlyoutHelper() { IsEnabled = apmdEnabled };
             LockKeysFlyoutHelper = new LockKeysFlyoutHelper() { IsEnabled = lkkyEnabled };
             BrightnessFlyoutHelper = new BrightnessFlyoutHelper() { IsEnabled = brEnabled };
+            VirtualDesktopFlyoutHelper = new VirtualDesktopFlyoutHelper() { IsEnabled = vdEnabled };
 
             flyoutHelpers.Add(AudioFlyoutHelper);
             flyoutHelpers.Add(AirplaneModeFlyoutHelper);
             flyoutHelpers.Add(LockKeysFlyoutHelper);
             flyoutHelpers.Add(BrightnessFlyoutHelper);
+            flyoutHelpers.Add(VirtualDesktopFlyoutHelper);
+
+            lastVirtualDesktopId = VirtualDesktopManager.Instance.TryGetCurrentDesktop()?.Id;
 
             foreach (var flyoutHelper in flyoutHelpers)
             {
@@ -259,6 +268,7 @@ namespace ModernFlyouts
                 SaveOnScreenFlyoutPosition();
                 UpdatePreferredMonitor();
             };
+            flyoutWindow.Closed += OnScreenFlyoutWindow_Closed;
 
             OnScreenFlyoutWindow = flyoutWindow;
 
@@ -330,6 +340,12 @@ namespace ModernFlyouts
                 if (Handled())
                     NativeFlyoutHandler.Instance.HideNativeFlyout();
 
+                // Windows 11 shows the virtual desktop switcher in the same host window.
+                if (TryShowVirtualDesktopFlyout())
+                {
+                    return;
+                }
+
                 if (prevTriggerData != null
                     && !prevTriggerData.IsExpired)
                 {
@@ -344,11 +360,10 @@ namespace ModernFlyouts
                 // we show the volume flyout as a fallback.
                 // Only volume flyout is shown as a fallback
                 // because other triggers are always detected perfectly.
-                ProcessFlyoutTrigger(new()
-                {
-                    TriggerType = FlyoutTriggerType.Volume,
-                    IsExpired = true
-                });
+                // On Windows 11 the same host window also shows non-volume
+                // indicators such as the virtual desktop switcher, so the
+                // fallback only fires when the volume actually changed.
+                ShowVolumeFlyoutIfVolumeChanged();
             }
             else if (DefaultFlyout == DefaultFlyout.None)
             {
@@ -358,6 +373,60 @@ namespace ModernFlyouts
             {
                 NativeFlyoutHandler.Instance.ShowNativeFlyout();
             }
+        }
+
+        private static readonly TimeSpan FallbackVolumeChangeWindow = TimeSpan.FromMilliseconds(500);
+
+        private static readonly TimeSpan FallbackVolumeChangeGrace = TimeSpan.FromMilliseconds(300);
+
+        private async void ShowVolumeFlyoutIfVolumeChanged()
+        {
+            // The volume notification and the native flyout event arrive
+            // asynchronously, so give the notification a moment to land.
+            if (!AudioFlyoutHelper.HasRecentVolumeChange(FallbackVolumeChangeWindow))
+            {
+                await Task.Delay(FallbackVolumeChangeGrace);
+
+                if (!AudioFlyoutHelper.HasRecentVolumeChange(FallbackVolumeChangeWindow + FallbackVolumeChangeGrace))
+                {
+                    // The shell may update the current desktop after showing its switcher.
+                    TryShowVirtualDesktopFlyout();
+                    return;
+                }
+            }
+
+            ProcessFlyoutTrigger(new()
+            {
+                TriggerType = FlyoutTriggerType.Volume,
+                IsExpired = true
+            });
+        }
+
+        private Guid? lastVirtualDesktopId;
+
+        private bool TryShowVirtualDesktopFlyout()
+        {
+            var desktop = VirtualDesktopManager.Instance.TryGetCurrentDesktop();
+            if (desktop == null)
+            {
+                return false;
+            }
+
+            bool changed = lastVirtualDesktopId.HasValue && lastVirtualDesktopId != desktop.Id;
+            lastVirtualDesktopId = desktop.Id;
+
+            if (!changed)
+            {
+                return false;
+            }
+
+            ProcessFlyoutTrigger(new()
+            {
+                TriggerType = FlyoutTriggerType.VirtualDesktop,
+                Data = desktop,
+                IsExpired = true
+            });
+            return true;
         }
 
         internal void ProcessFlyoutTrigger(FlyoutTriggerData triggerData = null)
@@ -397,6 +466,12 @@ namespace ModernFlyouts
 
             NativeFlyoutHandler.Instance.VerifyNativeFlyoutCreated();
 
+            if (visibleFlyoutHelper != null && !ReferenceEquals(visibleFlyoutHelper, helper))
+            {
+                visibleFlyoutHelper.OnFlyoutHidden();
+                visibleFlyoutHelper = null;
+            }
+
             if (helper.AlwaysHandleDefaultFlyout)
             {
                 NativeFlyoutHandler.Instance.HideNativeFlyout();
@@ -404,7 +479,20 @@ namespace ModernFlyouts
 
             OnScreenFlyoutView.FlyoutHelper = helper;
             OnScreenFlyoutWindow.IsOpen = true;
+            visibleFlyoutHelper = helper;
+            helper.OnFlyoutShown();
             OnScreenFlyoutWindow.StartCloseTimer();
+        }
+
+        private void OnScreenFlyoutWindow_Closed(object sender, RoutedEventArgs e)
+        {
+            if (visibleFlyoutHelper == null)
+            {
+                return;
+            }
+
+            visibleFlyoutHelper.OnFlyoutHidden();
+            visibleFlyoutHelper = null;
         }
 
         private bool Handled()

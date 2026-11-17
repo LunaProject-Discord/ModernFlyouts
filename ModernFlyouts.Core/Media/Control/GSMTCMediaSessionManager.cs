@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Windows;
+using System.Collections.Generic;
+using ModernFlyouts.Core.Threading;
 using Windows.Media.Control;
 
 namespace ModernFlyouts.Core.Media.Control
@@ -7,6 +8,23 @@ namespace ModernFlyouts.Core.Media.Control
     public class GSMTCMediaSessionManager : MediaSessionManager
     {
         private GlobalSystemMediaTransportControlsSessionManager GSMTCSessionManager;
+        private readonly Dictionary<string, GSMTCMediaSession> sessionsByAppId = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Func<bool> isTimelineDisplayActive;
+
+        /// <param name="isTimelineDisplayActive">Whether a timeline is on screen (null = always).</param>
+        public GSMTCMediaSessionManager(Func<bool> isTimelineDisplayActive = null)
+        {
+            this.isTimelineDisplayActive = isTimelineDisplayActive;
+        }
+
+        /// <summary>The timeline was shown or hidden: sessions start/stop their position ticker.</summary>
+        public void RefreshTimelineActivity()
+        {
+            foreach (var session in sessionsByAppId.Values)
+            {
+                session.RefreshTimelineActivity();
+            }
+        }
 
         public override async void OnEnabled()
         {
@@ -14,6 +32,7 @@ namespace ModernFlyouts.Core.Media.Control
             {
                 GSMTCSessionManager = await GlobalSystemMediaTransportControlsSessionManager.RequestAsync();
                 GSMTCSessionManager.SessionsChanged += GSMTCSessionsChanged;
+                GSMTCSessionManager.CurrentSessionChanged += GSMTCCurrentSessionChanged;
 
                 LoadSessions();
             }
@@ -22,7 +41,30 @@ namespace ModernFlyouts.Core.Media.Control
 
         private void GSMTCSessionsChanged(GlobalSystemMediaTransportControlsSessionManager sender, SessionsChangedEventArgs args)
         {
-            Application.Current.Dispatcher.Invoke(LoadSessions);
+            UiDispatcher.Invoke(LoadSessions);
+        }
+
+        private void GSMTCCurrentSessionChanged(GlobalSystemMediaTransportControlsSessionManager sender, CurrentSessionChangedEventArgs args)
+        {
+            UiDispatcher.Invoke(UpdateCurrentSession);
+        }
+
+        private void UpdateCurrentSession()
+        {
+            string currentAppId = GSMTCSessionManager?.GetCurrentSession()?.SourceAppUserModelId;
+            MediaSession current = null;
+
+            foreach (var pair in sessionsByAppId)
+            {
+                bool isCurrent = string.Equals(pair.Key, currentAppId, StringComparison.OrdinalIgnoreCase);
+                pair.Value.IsCurrent = isCurrent;
+                if (isCurrent)
+                {
+                    current = pair.Value;
+                }
+            }
+
+            CurrentMediaSession = current;
         }
 
         private void ClearSessions()
@@ -33,6 +75,8 @@ namespace ModernFlyouts.Core.Media.Control
             }
 
             MediaSessions.Clear();
+            sessionsByAppId.Clear();
+            CurrentMediaSession = null;
         }
 
         private void LoadSessions()
@@ -45,9 +89,14 @@ namespace ModernFlyouts.Core.Media.Control
 
                 foreach (var session in sessions)
                 {
-                    MediaSessions.Add(new GSMTCMediaSession(session));
+                    var mediaSession = new GSMTCMediaSession(session, isTimelineDisplayActive);
+                    MediaSessions.Add(mediaSession);
+                    sessionsByAppId[session.SourceAppUserModelId ?? string.Empty] = mediaSession;
                 }
             }
+
+            UpdateCurrentSession();
+            RaiseMediaSessionsChanged();
         }
 
         public override void OnDisabled()
@@ -57,10 +106,12 @@ namespace ModernFlyouts.Core.Media.Control
                 if (GSMTCSessionManager != null)
                 {
                     GSMTCSessionManager.SessionsChanged -= GSMTCSessionsChanged;
+                    GSMTCSessionManager.CurrentSessionChanged -= GSMTCCurrentSessionChanged;
                     GSMTCSessionManager = null;
                 }
 
                 ClearSessions();
+                RaiseMediaSessionsChanged();
             }
             catch { }
         }

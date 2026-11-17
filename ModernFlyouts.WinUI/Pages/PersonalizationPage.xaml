@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="ModernFlyouts.WinUI.Pages.PersonalizationPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:res="using:ModernFlyouts.Properties">
+
+    <ScrollViewer>
+        <!-- The Grid gives the max-width panel a normal layout slot; directly inside the
+             ScrollViewer it is centered by its desired width and overflows on wide windows. -->
+        <Grid>
+        <StackPanel Style="{StaticResource SettingsPagePanelStyle}">
+            <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_Appearance}" />
+
+            <toolkit:SettingsCard Header="{x:Bind res:Strings.Settings_FlyoutTheme}">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE793;" /></toolkit:SettingsCard.HeaderIcon>
+                <ComboBox x:Name="FlyoutThemeCombo" MinWidth="200" />
+            </toolkit:SettingsCard>
+
+            <toolkit:SettingsCard Header="{x:Bind res:Strings.Settings_AppTheme}">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE790;" /></toolkit:SettingsCard.HeaderIcon>
+                <ComboBox x:Name="AppThemeCombo" MinWidth="200" />
+            </toolkit:SettingsCard>
+
+            <toolkit:SettingsCard Header="{x:Bind res:Strings.Settings_FlyoutBackgroundOpacity}">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xEF1F;" /></toolkit:SettingsCard.HeaderIcon>
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <TextBlock VerticalAlignment="Center" Text="{x:Bind PercentText(S.FlyoutBackgroundOpacity), Mode=OneWay}" />
+                    <Slider Width="180" Minimum="0" Maximum="100" StepFrequency="1" VerticalAlignment="Center"
+                            Value="{x:Bind S.FlyoutBackgroundOpacity, Mode=TwoWay}" />
+                </StackPanel>
+            </toolkit:SettingsCard>
+
+            <toolkit:SettingsCard Header="{x:Bind res:Strings.Settings_TopBarVisibility}">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE8A0;" /></toolkit:SettingsCard.HeaderIcon>
+                <ComboBox x:Name="TopBarCombo" MinWidth="200" />
+            </toolkit:SettingsCard>
+
+            <toolkit:SettingsCard Header="{x:Bind res:Strings.Settings_FlyoutAnimationEnabled}">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE945;" /></toolkit:SettingsCard.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind S.FlyoutAnimationEnabled, Mode=TwoWay}" />
+            </toolkit:SettingsCard>
+
+            <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_Behavior}" />
+
+            <toolkit:SettingsCard x:Name="TimeoutCard" Header="{x:Bind res:Strings.Settings_FlyoutTimeout}">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE916;" /></toolkit:SettingsCard.HeaderIcon>
+                <NumberBox x:Name="TimeoutBox" MinWidth="200" Minimum="500" Maximum="60000"
+                           SmallChange="250" LargeChange="1000" SpinButtonPlacementMode="Inline" />
+            </toolkit:SettingsCard>
+        </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>

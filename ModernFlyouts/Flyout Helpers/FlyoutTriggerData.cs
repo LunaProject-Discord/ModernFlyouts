@@ -5,7 +5,8 @@
         Volume,
         Media,
         AirplaneMode,
-        Brightness
+        Brightness,
+        VirtualDesktop
     }
 
     public class FlyoutTriggerData

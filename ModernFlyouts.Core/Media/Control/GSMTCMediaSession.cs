@@ -1,13 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using ModernFlyouts.Core.AppInformation;
-using ModernFlyouts.Core.Helpers;
+using ModernFlyouts.Core.Threading;
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Windows.Media.Control;
 using Windows.Storage.Streams;
 
@@ -19,9 +15,23 @@ namespace ModernFlyouts.Core.Media.Control
         private SourceAppInfo sourceAppInfo;
         private int currentTrackNumber;
 
-        public GSMTCMediaSession(GlobalSystemMediaTransportControlsSession globalSystemMediaTransportControlsSession)
+        // Players (e.g. browsers) report the position rarely, often only when playback starts, so
+        // the shown position is advanced from the last report while playing.
+        private readonly UiTimer timelineTimer = new() { Interval = TimeSpan.FromMilliseconds(500) };
+        private TimeSpan reportedPosition;
+        private DateTimeOffset reportedAtUtc;
+        private double playbackRate = 1.0;
+        private bool playbackStateKnown;
+
+        // Whether a timeline is on screen; null = always (the WPF app). The ticker only runs while
+        // something shows it.
+        private readonly Func<bool> isTimelineDisplayActive;
+
+        public GSMTCMediaSession(GlobalSystemMediaTransportControlsSession globalSystemMediaTransportControlsSession,
+            Func<bool> isTimelineDisplayActive = null)
         {
             GSMTCSession = globalSystemMediaTransportControlsSession;
+            this.isTimelineDisplayActive = isTimelineDisplayActive;
             Initialize();
         }
 
@@ -38,12 +48,15 @@ namespace ModernFlyouts.Core.Media.Control
             GSMTCSession.MediaPropertiesChanged += GSMTCSession_MediaPropertiesChanged;
             GSMTCSession.PlaybackInfoChanged += GSMTCSession_PlaybackInfoChanged;
             GSMTCSession.TimelinePropertiesChanged += GSMTCSession_TimelinePropertiesChanged;
+            timelineTimer.Tick += (_, _) => AdvanceTimeline();
 
             UpdateSessionInfo(GSMTCSession);
         }
 
         public override void Disconnect()
         {
+            timelineTimer.Stop();
+
             if (GSMTCSession != null)
             {
                 GSMTCSession.MediaPropertiesChanged -= GSMTCSession_MediaPropertiesChanged;
@@ -60,7 +73,7 @@ namespace ModernFlyouts.Core.Media.Control
 
         private void GSMTCSession_MediaPropertiesChanged(GlobalSystemMediaTransportControlsSession session, MediaPropertiesChangedEventArgs args)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            UiDispatcher.Invoke(() =>
             {
                 UpdateSessionInfo(session);
             });
@@ -68,7 +81,7 @@ namespace ModernFlyouts.Core.Media.Control
 
         private void GSMTCSession_PlaybackInfoChanged(GlobalSystemMediaTransportControlsSession session, PlaybackInfoChangedEventArgs args)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            UiDispatcher.Invoke(() =>
             {
                 UpdatePlaybackInfo(session);
             });
@@ -76,7 +89,7 @@ namespace ModernFlyouts.Core.Media.Control
 
         private void GSMTCSession_TimelinePropertiesChanged(GlobalSystemMediaTransportControlsSession session, TimelinePropertiesChangedEventArgs args)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            UiDispatcher.Invoke(() =>
             {
                 UpdateTimelineInfo(session);
             });
@@ -89,10 +102,7 @@ namespace ModernFlyouts.Core.Media.Control
             sourceAppInfo.InfoFetched -= SourceAppInfo_InfoFetched;
             MediaSourceName = sourceAppInfo.DisplayName;
 
-            if (BitmapHelper.TryCreateBitmapImageFromStream(sourceAppInfo.LogoStream, out var bitmap))
-            {
-                MediaSourceIcon = bitmap;
-            }
+            SetMediaSourceIconFromStream(sourceAppInfo.LogoStream);
         }
 
         #region Updating Properties
@@ -106,7 +116,18 @@ namespace ModernFlyouts.Core.Media.Control
                     var playback = session.GetPlaybackInfo();
                     if (playback != null)
                     {
-                        IsPlaying = playback.PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing;
+                        bool playing = playback.PlaybackStatus == GlobalSystemMediaTransportControlsSessionPlaybackStatus.Playing;
+                        if (playbackStateKnown && playing != IsPlaying)
+                        {
+                            // Players don't always report the position on pause/resume: keep the
+                            // shown position and count elapsed time from now on.
+                            reportedPosition = CalculatePosition();
+                            reportedAtUtc = DateTimeOffset.UtcNow;
+                        }
+
+                        IsPlaying = playing;
+                        playbackStateKnown = true;
+                        playbackRate = playback.PlaybackRate is double rate && rate > 0 ? rate : 1.0;
                         IsShuffleActive = playback.IsShuffleActive;
                         AutoRepeatMode = playback.AutoRepeatMode switch
                         {
@@ -119,6 +140,8 @@ namespace ModernFlyouts.Core.Media.Control
                 }
             }
             catch { }
+
+            UpdateTimelineTimer();
         }
 
         private void UpdateTimelineInfo(GlobalSystemMediaTransportControlsSession session)
@@ -127,11 +150,14 @@ namespace ModernFlyouts.Core.Media.Control
             {
                 var timeline = session.GetTimelineProperties();
 
-                if (session.GetPlaybackInfo().Controls.IsPlaybackPositionEnabled && timeline != null)
+                // Shown (read-only) even when the player doesn't allow seeking.
+                if (timeline != null && timeline.EndTime > timeline.StartTime)
                 {
                     TimelineStartTime = timeline.StartTime;
                     TimelineEndTime = timeline.EndTime;
-                    SetPlaybackPosition(timeline.Position);
+                    reportedPosition = timeline.Position;
+                    reportedAtUtc = GetReportTime(timeline);
+                    SetPlaybackPosition(CalculatePosition());
 
                     IsTimelinePropertiesEnabled = true;
                 }
@@ -139,12 +165,84 @@ namespace ModernFlyouts.Core.Media.Control
                 {
                     TimelineStartTime = TimeSpan.Zero;
                     TimelineEndTime = TimeSpan.Zero;
-                    PlaybackPosition = TimeSpan.Zero;
+                    SetPlaybackPosition(TimeSpan.Zero); // internal: the public setter would seek the player
 
                     IsTimelinePropertiesEnabled = false;
                 }
             }
             catch { }
+
+            UpdateTimelineTimer();
+        }
+
+        /// <summary>When the position was reported (LastUpdatedTime), or now if that is unusable.</summary>
+        private static DateTimeOffset GetReportTime(GlobalSystemMediaTransportControlsSessionTimelineProperties timeline)
+        {
+            var now = DateTimeOffset.UtcNow;
+            var updated = timeline.LastUpdatedTime;
+            if (updated.Year < 2000 || updated > now || now - updated > TimeSpan.FromHours(12))
+            {
+                return now;
+            }
+
+            return updated.ToUniversalTime();
+        }
+
+        private TimeSpan CalculatePosition()
+        {
+            var position = reportedPosition;
+            if (IsPlaying)
+            {
+                var elapsed = DateTimeOffset.UtcNow - reportedAtUtc;
+                if (elapsed > TimeSpan.Zero)
+                {
+                    position += TimeSpan.FromTicks((long)(elapsed.Ticks * playbackRate));
+                }
+            }
+
+            if (position < TimelineStartTime) position = TimelineStartTime;
+            if (position > TimelineEndTime) position = TimelineEndTime;
+            return position;
+        }
+
+        private void AdvanceTimeline()
+        {
+            if (!ShouldRunTimelineTimer())
+            {
+                timelineTimer.Stop();
+                return;
+            }
+
+            SetPlaybackPosition(CalculatePosition());
+        }
+
+        private bool ShouldRunTimelineTimer() =>
+            IsPlaying && IsTimelinePropertiesEnabled && (isTimelineDisplayActive?.Invoke() ?? true);
+
+        /// <summary>The timeline was shown or hidden: catch up the position and start/stop the ticker.</summary>
+        public void RefreshTimelineActivity()
+        {
+            if (IsTimelinePropertiesEnabled)
+            {
+                SetPlaybackPosition(CalculatePosition());
+            }
+
+            UpdateTimelineTimer();
+        }
+
+        private void UpdateTimelineTimer()
+        {
+            if (ShouldRunTimelineTimer())
+            {
+                if (!timelineTimer.IsEnabled)
+                {
+                    timelineTimer.Start();
+                }
+            }
+            else
+            {
+                timelineTimer.Stop();
+            }
         }
 
         private async void UpdateSessionInfo(GlobalSystemMediaTransportControlsSession session)
@@ -199,9 +297,10 @@ namespace ModernFlyouts.Core.Media.Control
                     };
                 }
 
-                UpdateTimelineInfo(session);
-
+                // Playback state first: the timeline uses it to advance the reported position.
                 UpdatePlaybackInfo(session);
+
+                UpdateTimelineInfo(session);
 
                 Thumbnail = await GetThumbnailImageSourceAsync(mediaInfo?.Thumbnail);
             }
@@ -218,57 +317,31 @@ namespace ModernFlyouts.Core.Media.Control
         private bool IsSourceAppSpotify() => string.Equals(GSMTCSession.SourceAppUserModelId, SpotifyPackagedAUMID)
             || string.Equals(GSMTCSession.SourceAppUserModelId, SpotifyUnpackagedAUMID);
 
-        private async Task<ImageSource> GetThumbnailImageSourceAsync(IRandomAccessStreamReference thumbnail)
+        private async Task<MediaArtwork> GetThumbnailImageSourceAsync(IRandomAccessStreamReference thumbnail)
         {
-            if (thumbnail != null)
-            {
-                using var strm = await thumbnail.OpenReadAsync();
-                if (strm != null && strm.Size > 0)
-                {
-                    using var dreader = new DataReader(strm);
-                    await dreader.LoadAsync((uint)strm.Size);
-                    var buffer = new byte[(int)strm.Size];
-                    dreader.ReadBytes(buffer);
-
-                    using var nstream = new MemoryStream(buffer);
-                    nstream.Seek(0, SeekOrigin.Begin);
-                    if (nstream != null && nstream.Length > 0)
-                    {
-                        return GetModifiedThumbnail(BitmapFrame.Create(nstream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad));
-                    }
-                }
-            }
-
-            return null;
+            return GetModifiedThumbnail(await MediaArtwork.DecodeAsync(thumbnail));
         }
 
-        private BitmapSource GetModifiedThumbnail(BitmapSource bitmapSource)
+        private MediaArtwork GetModifiedThumbnail(MediaArtwork artwork)
         {
-            if (IsSourceAppSpotify())
+            if (artwork != null && IsSourceAppSpotify())
             {
-                return GetModifiedThumbnailForSpotify(bitmapSource);
+                return GetModifiedThumbnailForSpotify(artwork);
             }
 
-            return bitmapSource;
+            return artwork;
         }
 
         /// <summary>
         /// Gets a modified version of the original thumbnail provided by Spotify.
         /// It crops and removes extra padding and Spotify branding from the original thumbnail provided by Spotify.
         /// </summary>
-        /// <param name="bitmapSource">The original thumbnail provided by the source.</param>
+        /// <param name="artwork">The original thumbnail provided by the source.</param>
         /// <returns>A cropped variant of the original thumbnail with extra padding and Spotify branding removed.</returns>
         /// <remarks>F*** you Spotify!</remarks>
-        private BitmapSource GetModifiedThumbnailForSpotify(BitmapSource bitmapSource)
+        private static MediaArtwork GetModifiedThumbnailForSpotify(MediaArtwork artwork)
         {
-            CroppedBitmap croppedBitmap = null;
-
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                croppedBitmap = new CroppedBitmap(bitmapSource, new Int32Rect(33, 0, 234, 234));
-            });
-
-            return croppedBitmap;
+            return artwork.Crop(33, 0, 234, 234);
         }
 
         #endregion
@@ -335,6 +408,10 @@ namespace ModernFlyouts.Core.Media.Control
 
         protected override async void PlaybackPositionChanged(TimeSpan playbackPosition)
         {
+            // Count on from the requested position; players often don't report the new one.
+            reportedPosition = playbackPosition;
+            reportedAtUtc = DateTimeOffset.UtcNow;
+
             try
             {
                 await GSMTCSession?.TryChangePlaybackPositionAsync(playbackPosition.Ticks);

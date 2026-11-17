@@ -34,9 +34,11 @@
 
             <converters:IndexToVisibilityConverter x:Key="IndexToVisibilityConverter" />
             <converters:TextToTooltipEnabledConverter x:Key="TextToTooltipEnabledConverter" />
+            <converters:ThumbnailWidthConverter x:Key="ThumbnailWidthConverter" />
             <converters:ScrollButtonVisibilityConverter x:Key="ScrollButtonVisibilityConverter" />
             <converters:EnumToLocalizedStringConverter x:Key="EnumToLocalizedStringConverter" />
             <converters:InvertBooleanToVisibilityConverter x:Key="InvertBooleanToVisibilityConverter" />
+            <converters:BooleanAndToVisibilityConverter x:Key="BooleanAndToVisibilityConverter" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
             <converters:PlayPauseButtonTooltipConverter x:Key="PlayPauseButtonTooltipConverter" />

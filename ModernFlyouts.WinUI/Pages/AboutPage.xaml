@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="ModernFlyouts.WinUI.Pages.AboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:res="using:ModernFlyouts.Properties">
+
+    <ScrollViewer>
+        <!-- The Grid gives the max-width panel a normal layout slot; directly inside the
+             ScrollViewer it is centered by its desired width and overflows on wide windows. -->
+        <Grid>
+        <StackPanel Style="{StaticResource SettingsPagePanelStyle}">
+            <!-- App, version and description -->
+            <toolkit:SettingsExpander x:Name="AppCard" Header="ModernFlyouts" IsExpanded="True" Margin="0,8,0,0">
+                <toolkit:SettingsExpander.HeaderIcon>
+                    <ImageIcon Source="ms-appx:///Assets/Logo.ico" />
+                </toolkit:SettingsExpander.HeaderIcon>
+                <toolkit:SettingsExpander.Items>
+                    <toolkit:SettingsCard ContentAlignment="Left">
+                        <StackPanel Spacing="4">
+                            <TextBlock TextWrapping="Wrap" Text="{x:Bind res:Strings.About_AppDescription}" />
+                            <TextBlock TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                       Text="Personal combined build (WinUI 3): based on the usoppii fork (ModernFlyouts 0.10 line) with the enhanced media backend from GlobalFlyouts (Astear17, Kinfani)." />
+                        </StackPanel>
+                    </toolkit:SettingsCard>
+                </toolkit:SettingsExpander.Items>
+            </toolkit:SettingsExpander>
+
+            <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_Credits}" />
+
+            <!-- Project links (open in the browser) -->
+            <toolkit:SettingsCard Header="ModernFlyouts" Description="ModernFlyouts-Community/ModernFlyouts"
+                                  IsClickEnabled="True" Click="LinkCard_Click" Tag="https://github.com/ModernFlyouts-Community/ModernFlyouts">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE943;" /></toolkit:SettingsCard.HeaderIcon>
+                <toolkit:SettingsCard.ActionIcon><FontIcon Glyph="&#xE8A7;" /></toolkit:SettingsCard.ActionIcon>
+            </toolkit:SettingsCard>
+            <toolkit:SettingsCard Header="usoppii/ModernFlyouts" Description="ModernFlyouts 0.10"
+                                  IsClickEnabled="True" Click="LinkCard_Click" Tag="https://github.com/usoppii/ModernFlyouts">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE943;" /></toolkit:SettingsCard.HeaderIcon>
+                <toolkit:SettingsCard.ActionIcon><FontIcon Glyph="&#xE8A7;" /></toolkit:SettingsCard.ActionIcon>
+            </toolkit:SettingsCard>
+            <toolkit:SettingsCard Header="Astear17/GlobalFlyouts" Description="GlobalFlyouts"
+                                  IsClickEnabled="True" Click="LinkCard_Click" Tag="https://github.com/Astear17/GlobalFlyouts">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE943;" /></toolkit:SettingsCard.HeaderIcon>
+                <toolkit:SettingsCard.ActionIcon><FontIcon Glyph="&#xE8A7;" /></toolkit:SettingsCard.ActionIcon>
+            </toolkit:SettingsCard>
+            <toolkit:SettingsCard Header="Kinfani/GlobalFlyouts" Description="GlobalFlyouts"
+                                  IsClickEnabled="True" Click="LinkCard_Click" Tag="https://github.com/Kinfani/GlobalFlyouts">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE943;" /></toolkit:SettingsCard.HeaderIcon>
+                <toolkit:SettingsCard.ActionIcon><FontIcon Glyph="&#xE8A7;" /></toolkit:SettingsCard.ActionIcon>
+            </toolkit:SettingsCard>
+        </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>

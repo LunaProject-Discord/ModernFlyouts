@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="ModernFlyouts.WinUI.Pages.ModuleTogglePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls">
+
+    <!-- Used by modules whose only setting is on/off (brightness, airplane mode, virtual desktop). -->
+    <ScrollViewer>
+        <!-- The Grid gives the max-width panel a normal layout slot; directly inside the
+             ScrollViewer it is centered by its desired width and overflows on wide windows. -->
+        <Grid>
+        <StackPanel Style="{StaticResource SettingsPagePanelStyle}">
+            <toolkit:SettingsCard x:Name="EnableCard" Margin="0,8,0,0">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon x:Name="EnableIcon" /></toolkit:SettingsCard.HeaderIcon>
+                <ToggleSwitch x:Name="EnableSwitch" />
+            </toolkit:SettingsCard>
+        </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>

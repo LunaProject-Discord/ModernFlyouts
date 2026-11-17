@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="ModernFlyouts.WinUI.Pages.LockKeysPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:res="using:ModernFlyouts.Properties">
+
+    <ScrollViewer>
+        <!-- The Grid gives the max-width panel a normal layout slot; directly inside the
+             ScrollViewer it is centered by its desired width and overflows on wide windows. -->
+        <Grid>
+        <StackPanel Style="{StaticResource SettingsPagePanelStyle}">
+            <!-- The module switch, with the keys it covers inside -->
+            <toolkit:SettingsExpander Header="{x:Bind res:Strings.Settings_EnableModule_LockKeys}"
+                                      Description="{x:Bind res:Strings.LockKeysFlyoutHelper_SelectKeyDescription}"
+                                      IsExpanded="True" Margin="0,8,0,0">
+                <toolkit:SettingsExpander.HeaderIcon><FontIcon Glyph="&#xE72E;" /></toolkit:SettingsExpander.HeaderIcon>
+                <ToggleSwitch IsOn="{x:Bind S.LockKeysModuleEnabled, Mode=TwoWay}" />
+                <toolkit:SettingsExpander.Items>
+                    <toolkit:SettingsCard Header="{x:Bind res:Strings.LockKeysFlyoutHelper_CapsLock}"
+                                          IsEnabled="{x:Bind S.LockKeysModuleEnabled, Mode=OneWay}">
+                        <ToggleSwitch IsOn="{x:Bind S.CapsLockEnabled, Mode=TwoWay}" />
+                    </toolkit:SettingsCard>
+                    <toolkit:SettingsCard Header="{x:Bind res:Strings.LockKeysFlyoutHelper_NumLock}"
+                                          IsEnabled="{x:Bind S.LockKeysModuleEnabled, Mode=OneWay}">
+                        <ToggleSwitch IsOn="{x:Bind S.NumLockEnabled, Mode=TwoWay}" />
+                    </toolkit:SettingsCard>
+                    <toolkit:SettingsCard Header="{x:Bind res:Strings.LockKeysFlyoutHelper_ScrollLock}"
+                                          IsEnabled="{x:Bind S.LockKeysModuleEnabled, Mode=OneWay}">
+                        <ToggleSwitch IsOn="{x:Bind S.ScrollLockEnabled, Mode=TwoWay}" />
+                    </toolkit:SettingsCard>
+                    <toolkit:SettingsCard Header="{x:Bind res:Strings.LockKeysFlyoutHelper_Insert}"
+                                          IsEnabled="{x:Bind S.LockKeysModuleEnabled, Mode=OneWay}">
+                        <ToggleSwitch IsOn="{x:Bind S.InsertEnabled, Mode=TwoWay}" />
+                    </toolkit:SettingsCard>
+                </toolkit:SettingsExpander.Items>
+            </toolkit:SettingsExpander>
+        </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>

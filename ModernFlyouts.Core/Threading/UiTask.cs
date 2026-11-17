@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Threading;
 
 namespace ModernFlyouts.Core.Threading
 {
@@ -26,19 +24,16 @@ namespace ModernFlyouts.Core.Threading
 
     public class UiTaskMethodBuilder
     {
-        private readonly Dispatcher _dispatcher;
-
-        public UiTaskMethodBuilder(Dispatcher dispatcher)
+        public UiTaskMethodBuilder()
         {
-            _dispatcher = dispatcher;
         }
 
         public void Start<TStateMachine>(ref TStateMachine stateMachine)
             where TStateMachine : IAsyncStateMachine
         {
-            if (!_dispatcher.CheckAccess())
+            if (!UiDispatcher.CheckAccess())
             {
-                _dispatcher.BeginInvoke(new Action(stateMachine.MoveNext));
+                UiDispatcher.Post(stateMachine.MoveNext);
             }
             else
             {
@@ -48,7 +43,7 @@ namespace ModernFlyouts.Core.Threading
 
         public static UiTaskMethodBuilder Create()
         {
-            return new UiTaskMethodBuilder(Application.Current.Dispatcher);
+            return new UiTaskMethodBuilder();
         }
 
         public void SetStateMachine(IAsyncStateMachine stateMachine)
@@ -89,9 +84,9 @@ namespace ModernFlyouts.Core.Threading
         {
             return () =>
             {
-                if (!_dispatcher.CheckAccess())
+                if (!UiDispatcher.CheckAccess())
                 {
-                    _dispatcher.BeginInvoke(new Action(stateMachine.MoveNext));
+                    UiDispatcher.Post(stateMachine.MoveNext);
                 }
                 else
                 {

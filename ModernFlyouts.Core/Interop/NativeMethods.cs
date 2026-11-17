@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
-using System.Windows;
+using Windows.Foundation;
 
 namespace ModernFlyouts.Core.Interop
 {
