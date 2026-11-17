@@ -118,7 +118,17 @@ namespace ModernFlyouts.WinUI
             VolumeSlider.AddHandler(UIElement.PointerWheelChangedEvent, new PointerEventHandler(VolumeSlider_PointerWheelChanged), true);
 
             ApplySettings();
-            AppSettings.Instance.PropertyChanged += (_, _) => DispatcherQueue.TryEnqueue(ApplySettings);
+            AppSettings.Instance.PropertyChanged += (_, e) =>
+            {
+                if (!SettingsNotAffectingFlyout.Contains(e.PropertyName ?? string.Empty))
+                {
+                    DispatcherQueue.TryEnqueue(ApplySettings);
+                }
+            };
+
+            // Bubbling pointer moves, also those handled by controls (slider, buttons): they drive the
+            // auto-hide top bar.
+            RootGrid.AddHandler(UIElement.PointerMovedEvent, new PointerEventHandler(RootGrid_PointerMoved), true);
         }
 
         public string SettingsText => Strings.SettingsItem;
@@ -137,6 +147,22 @@ namespace ModernFlyouts.WinUI
         public bool IsTimelineDisplayed => IsShown && MediaSection.Visibility == Visibility.Visible;
 
         public event Action? SettingsRequested;
+
+        /// <summary>Settings of other parts (settings window, tray, media selection, startup...).</summary>
+        private static readonly HashSet<string> SettingsNotAffectingFlyout = new()
+        {
+            nameof(AppSettings.RunAtStartup),
+            nameof(AppSettings.Language),
+            nameof(AppSettings.AppTheme),
+            nameof(AppSettings.TrayIconEnabled),
+            nameof(AppSettings.UseColoredTrayIcon),
+            nameof(AppSettings.DefaultFlyout),
+            nameof(AppSettings.EnhancedMediaBackendMode),
+            nameof(AppSettings.PinnedMediaAppUserModelId),
+            nameof(AppSettings.PinnedAppPriorityMode),
+            nameof(AppSettings.MediaAppFilteringMode),
+            nameof(AppSettings.MediaAppFilterList),
+        };
 
         private void ApplySettings()
         {
@@ -309,9 +335,13 @@ namespace ModernFlyouts.WinUI
             _animatingOut = false;
             AppWindow.Hide();
             IsShown = false;
-            // Closed with the pointer on it (close button): no exit event will follow.
+            // Closed with the pointer on it (close button, timeout): no exit event will follow.
             _pointerWatchTimer.Stop();
             _pointerOver = false;
+            foreach (var panel in _mediaPanels)
+            {
+                panel.ResetPointerState();
+            }
             _media?.RefreshTimelineActivity();
         }
 
@@ -510,7 +540,6 @@ namespace ModernFlyouts.WinUI
             }
 
             TopBar.Visibility = mode == TopBarVisibility.Collapsed ? Visibility.Collapsed : Visibility.Visible;
-            TopBarHotZone.Visibility = autoHide && !_topBarExpanded ? Visibility.Visible : Visibility.Collapsed;
             AnimateTopBar(autoHide && !_topBarExpanded ? 0 : TopBarHeightDip, animate);
 
             // Pinned = always visible; unpinned = only while pointing at the top of the flyout.
@@ -762,20 +791,27 @@ namespace ModernFlyouts.WinUI
         /// </summary>
         private Brush GetDotBrush(bool current)
         {
-            bool dark = RootGrid.ActualTheme == ElementTheme.Dark;
-            if (current)
+            // Built once per theme / accent color (RefreshDotColors drops them).
+            if (_currentDotBrush == null || _otherDotBrush == null)
             {
-                return new SolidColorBrush(s_uiSettings.GetColorValue(dark
+                bool dark = RootGrid.ActualTheme == ElementTheme.Dark;
+                _currentDotBrush = new SolidColorBrush(s_uiSettings.GetColorValue(dark
                     ? Windows.UI.ViewManagement.UIColorType.AccentLight2
                     : Windows.UI.ViewManagement.UIColorType.AccentDark1));
+                _otherDotBrush = new SolidColorBrush(dark ? Windows.UI.Color.FromArgb(0xFF, 0xFF, 0xFF, 0xFF) : Windows.UI.Color.FromArgb(0xE4, 0, 0, 0));
             }
 
-            return new SolidColorBrush(dark ? Windows.UI.Color.FromArgb(0xFF, 0xFF, 0xFF, 0xFF) : Windows.UI.Color.FromArgb(0xE4, 0, 0, 0));
+            return current ? _currentDotBrush : _otherDotBrush;
         }
+
+        private Brush? _currentDotBrush;
+        private Brush? _otherDotBrush;
 
         /// <summary>Recolors the indicators after a theme change.</summary>
         private void RefreshDotColors()
         {
+            _currentDotBrush = null;
+            _otherDotBrush = null;
             foreach (var dot in DesktopDots.Children.OfType<Border>())
             {
                 dot.Background = GetDotBrush(dot.Tag is true);
@@ -865,15 +901,22 @@ namespace ModernFlyouts.WinUI
 
         private void RootGrid_PointerMoved(object sender, PointerRoutedEventArgs e)
         {
-            // Collapse once the pointer has moved clearly below the bar (not while it is still growing).
-            if (_topBarExpanded && !_topBarTimer.IsRunning
-                && e.GetCurrentPoint(RootPanel).Position.Y > TopBar.ActualHeight + TopBarHotZoneDip)
+            double y = e.GetCurrentPoint(RootPanel).Position.Y;
+            if (!_topBarExpanded)
             {
+                // Auto-hide: pointing at the top edge brings the bar back. A position check (not an
+                // overlay) so the controls under the strip stay clickable.
+                if (y <= TopBarHotZoneDip)
+                {
+                    SetTopBarExpanded(true);
+                }
+            }
+            else if (!_topBarTimer.IsRunning && y > TopBar.ActualHeight + TopBarHotZoneDip)
+            {
+                // Collapse once the pointer is clearly below the bar (not while it is still growing).
                 SetTopBarExpanded(false);
             }
         }
-
-        private void TopBarHotZone_PointerEntered(object sender, PointerRoutedEventArgs e) => SetTopBarExpanded(true);
 
         #endregion
 

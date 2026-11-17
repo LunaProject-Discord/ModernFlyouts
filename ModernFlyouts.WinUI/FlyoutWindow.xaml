@@ -16,7 +16,7 @@
     -->
     <!-- The pointer handlers sit on the outer Grid so the top bar hot zone counts as "over the flyout" -->
     <Grid x:Name="RootGrid" VerticalAlignment="Top"
-          PointerEntered="RootGrid_PointerEntered" PointerExited="RootGrid_PointerExited" PointerMoved="RootGrid_PointerMoved">
+          PointerEntered="RootGrid_PointerEntered" PointerExited="RootGrid_PointerExited">
     <StackPanel x:Name="RootPanel" VerticalAlignment="Top">
 
         <!-- Top bar: settings / reset position | drag handle | close -->
@@ -123,9 +123,5 @@
         </StackPanel>
     </StackPanel>
 
-    <!-- Auto-hide (as in the WPF flyout): the collapsed top bar leaves a thin invisible strip over
-         the top of the content; pointing at it brings the bar back. -->
-    <Border x:Name="TopBarHotZone" Height="10" VerticalAlignment="Top" Background="Transparent"
-            Visibility="Collapsed" PointerEntered="TopBarHotZone_PointerEntered" />
     </Grid>
 </Window>

@@ -21,6 +21,7 @@ namespace ModernFlyouts.WinUI.Controls
         private bool _updatingTimeline;
         private bool _scrubbing;
         private bool _pointerOverTimeline;
+        private bool _alignmentApplied;
         private bool _showPlayerInfo = true;
         private bool _showSeekbar = true;
         private bool _showShuffle = true;
@@ -53,31 +54,31 @@ namespace ModernFlyouts.WinUI.Controls
         public bool ShowPlayerInfo
         {
             get => _showPlayerInfo;
-            set { _showPlayerInfo = value; UpdateAll(); }
+            set { if (_showPlayerInfo != value) { _showPlayerInfo = value; UpdateAll(); } }
         }
 
         public bool ShowSeekbar
         {
             get => _showSeekbar;
-            set { _showSeekbar = value; UpdateTimeline(); }
+            set { if (_showSeekbar != value) { _showSeekbar = value; UpdateTimeline(); } }
         }
 
         public bool ShowShuffle
         {
             get => _showShuffle;
-            set { _showShuffle = value; UpdateAll(); }
+            set { if (_showShuffle != value) { _showShuffle = value; UpdateAll(); } }
         }
 
         public bool ShowRepeat
         {
             get => _showRepeat;
-            set { _showRepeat = value; UpdateAll(); }
+            set { if (_showRepeat != value) { _showRepeat = value; UpdateAll(); } }
         }
 
         public bool UseThumbnailAsBackground
         {
             get => _useThumbnailAsBackground;
-            set { _useThumbnailAsBackground = value; UpdateAll(); }
+            set { if (_useThumbnailAsBackground != value) { _useThumbnailAsBackground = value; UpdateAll(); } }
         }
 
         /// <summary>Artwork on the right (default) or on the left of the title.</summary>
@@ -86,6 +87,12 @@ namespace ModernFlyouts.WinUI.Controls
             get => _alignThumbnailToRight;
             set
             {
+                if (_alignThumbnailToRight == value && _alignmentApplied)
+                {
+                    return;
+                }
+
+                _alignmentApplied = true;
                 _alignThumbnailToRight = value;
                 InfoColumn.Width = value ? new GridLength(1, GridUnitType.Star) : GridLength.Auto;
                 ArtworkColumn.Width = value ? GridLength.Auto : new GridLength(1, GridUnitType.Star);
@@ -257,6 +264,13 @@ namespace ModernFlyouts.WinUI.Controls
             TimelineSlider.IsHitTestVisible = canSeek;
             TimelineSlider.IsTabStop = canSeek;
             TimelineProgress.Opacity = slider ? 0 : 1;
+        }
+
+        /// <summary>The flyout hid with the pointer on it: start with the progress bar next time.</summary>
+        public void ResetPointerState()
+        {
+            _pointerOverTimeline = false;
+            UpdateTimelineMode(_session?.IsPlaybackPositionEnabled == true);
         }
 
         private void SeekPanel_PointerEntered(object sender, PointerRoutedEventArgs e)

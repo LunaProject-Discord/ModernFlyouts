@@ -23,9 +23,15 @@ namespace ModernFlyouts.Core.Media.Control
         private double playbackRate = 1.0;
         private bool playbackStateKnown;
 
-        public GSMTCMediaSession(GlobalSystemMediaTransportControlsSession globalSystemMediaTransportControlsSession)
+        // Whether a timeline is on screen; null = always (the WPF app). The ticker only runs while
+        // something shows it.
+        private readonly Func<bool> isTimelineDisplayActive;
+
+        public GSMTCMediaSession(GlobalSystemMediaTransportControlsSession globalSystemMediaTransportControlsSession,
+            Func<bool> isTimelineDisplayActive = null)
         {
             GSMTCSession = globalSystemMediaTransportControlsSession;
+            this.isTimelineDisplayActive = isTimelineDisplayActive;
             Initialize();
         }
 
@@ -159,7 +165,7 @@ namespace ModernFlyouts.Core.Media.Control
                 {
                     TimelineStartTime = TimeSpan.Zero;
                     TimelineEndTime = TimeSpan.Zero;
-                    PlaybackPosition = TimeSpan.Zero;
+                    SetPlaybackPosition(TimeSpan.Zero); // internal: the public setter would seek the player
 
                     IsTimelinePropertiesEnabled = false;
                 }
@@ -201,7 +207,7 @@ namespace ModernFlyouts.Core.Media.Control
 
         private void AdvanceTimeline()
         {
-            if (!IsPlaying || !IsTimelinePropertiesEnabled)
+            if (!ShouldRunTimelineTimer())
             {
                 timelineTimer.Stop();
                 return;
@@ -210,9 +216,23 @@ namespace ModernFlyouts.Core.Media.Control
             SetPlaybackPosition(CalculatePosition());
         }
 
+        private bool ShouldRunTimelineTimer() =>
+            IsPlaying && IsTimelinePropertiesEnabled && (isTimelineDisplayActive?.Invoke() ?? true);
+
+        /// <summary>The timeline was shown or hidden: catch up the position and start/stop the ticker.</summary>
+        public void RefreshTimelineActivity()
+        {
+            if (IsTimelinePropertiesEnabled)
+            {
+                SetPlaybackPosition(CalculatePosition());
+            }
+
+            UpdateTimelineTimer();
+        }
+
         private void UpdateTimelineTimer()
         {
-            if (IsPlaying && IsTimelinePropertiesEnabled)
+            if (ShouldRunTimelineTimer())
             {
                 if (!timelineTimer.IsEnabled)
                 {
@@ -388,6 +408,10 @@ namespace ModernFlyouts.Core.Media.Control
 
         protected override async void PlaybackPositionChanged(TimeSpan playbackPosition)
         {
+            // Count on from the requested position; players often don't report the new one.
+            reportedPosition = playbackPosition;
+            reportedAtUtc = DateTimeOffset.UtcNow;
+
             try
             {
                 await GSMTCSession?.TryChangePlaybackPositionAsync(playbackPosition.Ticks);

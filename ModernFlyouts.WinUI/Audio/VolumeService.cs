@@ -35,20 +35,25 @@ namespace ModernFlyouts.WinUI.Audio
 
         public double Volume
         {
+            // Under the lock: the default device may be swapped (and disposed) on another thread.
             get
             {
-                var device = _device;
-                try { return device == null ? 0 : Math.Round(device.AudioEndpointVolume.MasterVolumeLevelScalar * 100); }
-                catch { return 0; }
+                lock (_gate)
+                {
+                    try { return _device == null ? 0 : Math.Round(_device.AudioEndpointVolume.MasterVolumeLevelScalar * 100); }
+                    catch { return 0; }
+                }
             }
             set
             {
-                var device = _device;
-                try
+                lock (_gate)
                 {
-                    if (device != null) device.AudioEndpointVolume.MasterVolumeLevelScalar = (float)Math.Clamp(value / 100.0, 0, 1);
+                    try
+                    {
+                        if (_device != null) _device.AudioEndpointVolume.MasterVolumeLevelScalar = (float)Math.Clamp(value / 100.0, 0, 1);
+                    }
+                    catch { }
                 }
-                catch { }
             }
         }
 
@@ -56,18 +61,22 @@ namespace ModernFlyouts.WinUI.Audio
         {
             get
             {
-                var device = _device;
-                try { return device?.AudioEndpointVolume.Mute ?? false; }
-                catch { return false; }
+                lock (_gate)
+                {
+                    try { return _device?.AudioEndpointVolume.Mute ?? false; }
+                    catch { return false; }
+                }
             }
             set
             {
-                var device = _device;
-                try
+                lock (_gate)
                 {
-                    if (device != null) device.AudioEndpointVolume.Mute = value;
+                    try
+                    {
+                        if (_device != null) _device.AudioEndpointVolume.Mute = value;
+                    }
+                    catch { }
                 }
-                catch { }
             }
         }
 

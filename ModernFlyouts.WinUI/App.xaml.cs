@@ -478,7 +478,9 @@ namespace ModernFlyouts.WinUI
                 {
                     applying = true;
                     bool actual = await StartupRegistration.SetEnabledAsync(S.RunAtStartup);
-                    UiDispatcher.Post(() => S.RunAtStartup = actual);
+                    // Still guarded: reflecting a refused request must not start another one.
+                    // (The continuation runs on the UI thread, where the setting was changed.)
+                    S.RunAtStartup = actual;
                 }
                 catch (Exception ex)
                 {

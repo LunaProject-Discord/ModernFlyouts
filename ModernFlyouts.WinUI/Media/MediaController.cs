@@ -111,7 +111,7 @@ namespace ModernFlyouts.WinUI.Media
             MediaSessionManager manager;
             if (mode == EnhancedMediaBackendMode.Disabled)
             {
-                manager = new GSMTCMediaSessionManager();
+                manager = new GSMTCMediaSessionManager(_isTimelineDisplayed);
                 BackendName = "GSMTC (enhanced backend disabled)";
                 Attach(manager);
                 return;
@@ -158,10 +158,11 @@ namespace ModernFlyouts.WinUI.Media
             CurrentSessionChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        /// <summary>Lets the enhanced backend start/stop its timeline ticker.</summary>
+        /// <summary>Lets the backend start/stop its timeline ticker (only while a timeline is shown).</summary>
         public void RefreshTimelineActivity()
         {
             (_manager as EnhancedGSMTCMediaSessionManager)?.RefreshTimelineActivity();
+            (_manager as GSMTCMediaSessionManager)?.RefreshTimelineActivity();
         }
     }
 }

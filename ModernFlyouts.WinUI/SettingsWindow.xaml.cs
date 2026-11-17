@@ -124,6 +124,9 @@ namespace ModernFlyouts.WinUI
         /// <summary>After any navigation: header and pane selection.</summary>
         private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
         {
+            // There is no back navigation; don't keep the history of the long-lived window.
+            ContentFrame.BackStack.Clear();
+
             if (e.Content is Page page)
             {
                 page.Tag = e.Parameter; // remembers which module a shared page shows

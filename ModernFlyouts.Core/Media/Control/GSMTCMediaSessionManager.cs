@@ -9,6 +9,22 @@ namespace ModernFlyouts.Core.Media.Control
     {
         private GlobalSystemMediaTransportControlsSessionManager GSMTCSessionManager;
         private readonly Dictionary<string, GSMTCMediaSession> sessionsByAppId = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Func<bool> isTimelineDisplayActive;
+
+        /// <param name="isTimelineDisplayActive">Whether a timeline is on screen (null = always).</param>
+        public GSMTCMediaSessionManager(Func<bool> isTimelineDisplayActive = null)
+        {
+            this.isTimelineDisplayActive = isTimelineDisplayActive;
+        }
+
+        /// <summary>The timeline was shown or hidden: sessions start/stop their position ticker.</summary>
+        public void RefreshTimelineActivity()
+        {
+            foreach (var session in sessionsByAppId.Values)
+            {
+                session.RefreshTimelineActivity();
+            }
+        }
 
         public override async void OnEnabled()
         {
@@ -73,7 +89,7 @@ namespace ModernFlyouts.Core.Media.Control
 
                 foreach (var session in sessions)
                 {
-                    var mediaSession = new GSMTCMediaSession(session);
+                    var mediaSession = new GSMTCMediaSession(session, isTimelineDisplayActive);
                     MediaSessions.Add(mediaSession);
                     sessionsByAppId[session.SourceAppUserModelId ?? string.Empty] = mediaSession;
                 }
