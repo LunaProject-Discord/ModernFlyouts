@@ -26,8 +26,6 @@ namespace ModernFlyouts.WinUI
             Title = Properties.Strings.SettingsItem;
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(AppTitleBar);
-            // Caption buttons as tall as the 48 px title bar (as in Windows Settings).
-            AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
             AppWindow.SetIcon(System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Logo.ico"));
             AppWindow.Resize(new SizeInt32(1100, 760));
             if (AppWindow.Presenter is OverlappedPresenter presenter)
@@ -118,7 +116,7 @@ namespace ModernFlyouts.WinUI
             ContentFrame.Navigate(page, parameter, new EntranceNavigationTransitionInfo());
         }
 
-        /// <summary>After any navigation (including back): header, selection and back button.</summary>
+        /// <summary>After any navigation: header and pane selection.</summary>
         private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
         {
             if (e.Content is Page page)
@@ -138,16 +136,6 @@ namespace ModernFlyouts.WinUI
                 _syncingSelection = true;
                 NavView.SelectedItem = item;
                 _syncingSelection = false;
-            }
-
-            AppTitleBar.IsBackButtonEnabled = ContentFrame.CanGoBack;
-        }
-
-        private void AppTitleBar_BackRequested(TitleBar sender, object args)
-        {
-            if (ContentFrame.CanGoBack)
-            {
-                ContentFrame.GoBack();
             }
         }
 

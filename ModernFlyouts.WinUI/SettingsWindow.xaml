@@ -15,10 +15,10 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- WinUI title bar, as in Windows Settings / WinUI Gallery: back, pane toggle, icon, title -->
-        <TitleBar x:Name="AppTitleBar" Title="{x:Bind res:Strings.SettingsItem}"
-                  IsBackButtonVisible="True" IsBackButtonEnabled="False" IsPaneToggleButtonVisible="True"
-                  BackRequested="AppTitleBar_BackRequested" PaneToggleRequested="AppTitleBar_PaneToggleRequested">
+        <!-- WinUI title bar (48 px as before): pane toggle, icon, title -->
+        <TitleBar x:Name="AppTitleBar" Title="{x:Bind res:Strings.SettingsItem}" Height="48"
+                  IsBackButtonVisible="False" IsPaneToggleButtonVisible="True"
+                  PaneToggleRequested="AppTitleBar_PaneToggleRequested">
             <TitleBar.IconSource>
                 <ImageIconSource ImageSource="ms-appx:///Assets/Logo.ico" />
             </TitleBar.IconSource>
