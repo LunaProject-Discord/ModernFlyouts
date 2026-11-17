@@ -14,8 +14,10 @@
         Layout follows the WPF flyout (360 wide, 48 high rows in a 48 | * | 48 grid, 16 px icons,
         32 px top bar) with Fluent details: 4 px control radius, divider strokes, theme text brushes.
     -->
-    <StackPanel x:Name="RootPanel" VerticalAlignment="Top"
-                PointerEntered="RootPanel_PointerEntered" PointerExited="RootPanel_PointerExited">
+    <!-- The pointer handlers sit on the outer Grid so the top bar hot zone counts as "over the flyout" -->
+    <Grid x:Name="RootGrid" VerticalAlignment="Top"
+          PointerEntered="RootGrid_PointerEntered" PointerExited="RootGrid_PointerExited" PointerMoved="RootGrid_PointerMoved">
+    <StackPanel x:Name="RootPanel" VerticalAlignment="Top">
 
         <!-- Top bar: settings / reset position | drag handle | close -->
         <Grid x:Name="TopBar" Height="32" Padding="2,2,2,0">
@@ -121,4 +123,10 @@
                         Spacing="6" Margin="0,0,0,8" Visibility="Collapsed" />
         </StackPanel>
     </StackPanel>
+
+    <!-- Auto-hide (as in the WPF flyout): the collapsed top bar leaves a thin invisible strip over
+         the top of the content; pointing at it brings the bar back. -->
+    <Border x:Name="TopBarHotZone" Height="10" VerticalAlignment="Top" Background="Transparent"
+            Visibility="Collapsed" PointerEntered="TopBarHotZone_PointerEntered" />
+    </Grid>
 </Window>

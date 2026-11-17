@@ -68,7 +68,8 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <TextBlock x:Name="HeaderText" Margin="40,24,40,8" Style="{StaticResource TitleTextBlockStyle}" />
+                <!-- Same width as the page content (SettingsPagePanelStyle) so they line up on wide windows -->
+                <TextBlock x:Name="HeaderText" Margin="40,24,40,8" MaxWidth="1000" Style="{StaticResource TitleTextBlockStyle}" />
                 <Frame x:Name="ContentFrame" Grid.Row="1" />
             </Grid>
         </NavigationView>

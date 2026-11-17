@@ -205,9 +205,31 @@ namespace ModernFlyouts.WinUI
 
         public void ShowSettings()
         {
-            _settingsWindow ??= new SettingsWindow();
+            if (_settingsWindow == null)
+            {
+                // Creating the window can pump messages; a second request arriving meanwhile
+                // (tray click, relaunch) must not create another window.
+                if (_creatingSettingsWindow)
+                {
+                    return;
+                }
+
+                _creatingSettingsWindow = true;
+                try
+                {
+                    _settingsWindow = new SettingsWindow();
+                    Log("settings window created");
+                }
+                finally
+                {
+                    _creatingSettingsWindow = false;
+                }
+            }
+
             _settingsWindow.ShowAndActivate();
         }
+
+        private bool _creatingSettingsWindow;
 
         /// <summary>Removes the tray icon and hooks, gives the OSD back to Windows, then exits.</summary>
         private void ExitApp()

@@ -229,7 +229,7 @@ namespace ModernFlyouts.WinUI.Interop
             uint trayEvent = (uint)((long)lParam & 0xFFFF);
             switch (trayEvent)
             {
-                case WM_LBUTTONUP:
+                // A left click sends WM_LBUTTONUP and then NIN_SELECT (version 4); react once.
                 case NIN_SELECT:
                 case NIN_KEYSELECT:
                     OpenSettingsRequested?.Invoke();

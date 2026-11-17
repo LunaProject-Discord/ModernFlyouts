@@ -17,6 +17,9 @@
     </Page.Resources>
 
     <ScrollViewer>
+        <!-- The Grid gives the max-width panel a normal layout slot; directly inside the
+             ScrollViewer it is centered by its desired width and overflows on wide windows. -->
+        <Grid>
         <StackPanel Style="{StaticResource SettingsPagePanelStyle}">
             <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_FlyoutPlacement}" />
 
@@ -61,5 +64,6 @@
                 <Button Content="{x:Bind res:Strings.Settings_AlignFlyout}" Click="PreviewButton_Click" />
             </controls:SettingsCard>
         </StackPanel>
+        </Grid>
     </ScrollViewer>
 </Page>

@@ -65,6 +65,21 @@ namespace ModernFlyouts.WinUI
         private bool _animatingOut;
         private int _animationFromY;
 
+        // Top bar (WPF sizes and timing): 32 px; auto-hide collapses it to nothing and leaves a
+        // 10 px strip to bring it back; it collapses again once the pointer is 10 px below it.
+        private const double TopBarHeightDip = 32;
+        private const double TopBarHotZoneDip = 10;
+        private const double TopBarAnimationMs = 167;
+        private readonly DispatcherQueueTimer _topBarTimer;
+        private readonly Stopwatch _topBarClock = new();
+        private double _topBarFrom;
+        private double _topBarTo = TopBarHeightDip;
+        private bool _topBarExpanded = true;
+
+        // After a pointer-exit caused by a resize (pointer still inside), WinUI won't report the
+        // real exit; watch the cursor until it actually leaves.
+        private readonly DispatcherQueueTimer _pointerWatchTimer;
+
         public FlyoutWindow(VolumeService volume)
         {
             InitializeComponent();
@@ -81,6 +96,22 @@ namespace ModernFlyouts.WinUI
             _animationTimer.Interval = TimeSpan.FromMilliseconds(8);
             _animationTimer.IsRepeating = true;
             _animationTimer.Tick += (_, _) => AnimationStep();
+
+            _topBarTimer = DispatcherQueue.CreateTimer();
+            _topBarTimer.Interval = TimeSpan.FromMilliseconds(8);
+            _topBarTimer.IsRepeating = true;
+            _topBarTimer.Tick += (_, _) => TopBarAnimationStep();
+
+            _pointerWatchTimer = DispatcherQueue.CreateTimer();
+            _pointerWatchTimer.Interval = TimeSpan.FromMilliseconds(100);
+            _pointerWatchTimer.IsRepeating = true;
+            _pointerWatchTimer.Tick += (_, _) =>
+            {
+                if (!IsShown || !IsCursorOverWindow())
+                {
+                    OnPointerLeft();
+                }
+            };
 
             _volume.VolumeChanged += (v, muted) => DispatcherQueue.TryEnqueue(() => UpdateVolume(v, muted));
             UpdateVolume(_volume.Volume, _volume.IsMuted);
@@ -191,6 +222,12 @@ namespace ModernFlyouts.WinUI
             UpdateRows();
 
             bool appearing = !IsShown || _animatingOut;
+            if (!IsShown)
+            {
+                // A new appearance starts with an auto-hidden top bar tucked away.
+                _topBarExpanded = false;
+                UpdateTopBar(animate: false);
+            }
             PlaceWindow(animate: appearing);
 
             if (!IsShown)
@@ -248,6 +285,9 @@ namespace ModernFlyouts.WinUI
             _animatingOut = false;
             AppWindow.Hide();
             IsShown = false;
+            // Closed with the pointer on it (close button): no exit event will follow.
+            _pointerWatchTimer.Stop();
+            _pointerOver = false;
             _media?.RefreshTimelineActivity();
         }
 
@@ -435,14 +475,78 @@ namespace ModernFlyouts.WinUI
 
         #region Top bar
 
-        private void UpdateTopBar()
+        private void UpdateTopBar(bool animate = true)
         {
             var mode = AppSettings.Instance.TopBarVisibility;
+            bool autoHide = mode == TopBarVisibility.AutoHide;
+            if (mode == TopBarVisibility.Visible)
+            {
+                // Unpinning keeps the bar out while the pointer is still on it.
+                _topBarExpanded = true;
+            }
+
             TopBar.Visibility = mode == TopBarVisibility.Collapsed ? Visibility.Collapsed : Visibility.Visible;
-            TopBar.Opacity = mode == TopBarVisibility.AutoHide && !_pointerOver ? 0 : 1;
-            // Pinned = always visible; unpinned = only while the pointer is over the flyout.
-            PinGlyph.Glyph = mode == TopBarVisibility.AutoHide ? "" : "";
-            ToolTipService.SetToolTip(PinButton, mode == TopBarVisibility.AutoHide ? Strings.PinTopBar : Strings.UnpinTopBar);
+            TopBarHotZone.Visibility = autoHide && !_topBarExpanded ? Visibility.Visible : Visibility.Collapsed;
+            AnimateTopBar(autoHide && !_topBarExpanded ? 0 : TopBarHeightDip, animate);
+
+            // Pinned = always visible; unpinned = only while pointing at the top of the flyout.
+            PinGlyph.Glyph = autoHide ? "\uE718" : "\uE77A";
+            ToolTipService.SetToolTip(PinButton, autoHide ? Strings.PinTopBar : Strings.UnpinTopBar);
+        }
+
+        private void SetTopBarExpanded(bool expanded)
+        {
+            if (_topBarExpanded == expanded || AppSettings.Instance.TopBarVisibility != TopBarVisibility.AutoHide)
+            {
+                return;
+            }
+
+            _topBarExpanded = expanded;
+            UpdateTopBar();
+        }
+
+        /// <summary>Grows or shrinks the top bar; the window follows its height.</summary>
+        private void AnimateTopBar(double target, bool animate)
+        {
+            if (target == _topBarTo && (_topBarTimer.IsRunning || TopBar.Height == target))
+            {
+                return;
+            }
+
+            _topBarFrom = TopBar.Height;
+            _topBarTo = target;
+
+            if (!animate || !IsShown || !AppSettings.Instance.FlyoutAnimationEnabled)
+            {
+                _topBarTimer.Stop();
+                SetTopBarHeight(target);
+                return;
+            }
+
+            _topBarClock.Restart();
+            _topBarTimer.Start();
+        }
+
+        private void TopBarAnimationStep()
+        {
+            double p = Math.Min(1, _topBarClock.Elapsed.TotalMilliseconds / TopBarAnimationMs);
+            double eased = Math.Sqrt(1 - (1 - p) * (1 - p)); // circle ease-out, as in the WPF flyout
+            SetTopBarHeight(_topBarFrom + (_topBarTo - _topBarFrom) * eased);
+
+            if (p >= 1)
+            {
+                _topBarTimer.Stop();
+            }
+        }
+
+        private void SetTopBarHeight(double height)
+        {
+            TopBar.Height = height;
+            TopBar.Opacity = height / TopBarHeightDip;
+            if (IsShown)
+            {
+                PlaceWindow(animate: false);
+            }
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
@@ -665,19 +769,57 @@ namespace ModernFlyouts.WinUI
             }
         }
 
-        private void RootPanel_PointerEntered(object sender, PointerRoutedEventArgs e)
+        private void RootGrid_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
+            _pointerWatchTimer.Stop();
             _pointerOver = true;
             _hideTimer.Stop();
-            UpdateTopBar();
         }
 
-        private void RootPanel_PointerExited(object sender, PointerRoutedEventArgs e)
+        private void RootGrid_PointerExited(object sender, PointerRoutedEventArgs e)
         {
+            // Resizing the window under the pointer (top bar growing/shrinking) also raises this.
+            if (IsCursorOverWindow())
+            {
+                _pointerWatchTimer.Start();
+                return;
+            }
+
+            OnPointerLeft();
+        }
+
+        private void OnPointerLeft()
+        {
+            _pointerWatchTimer.Stop();
             _pointerOver = false;
-            UpdateTopBar();
+            SetTopBarExpanded(false);
             RestartHideTimer();
         }
+
+        private bool IsCursorOverWindow()
+        {
+            if (!Native.GetCursorPos(out var cursor))
+            {
+                return false;
+            }
+
+            var origin = new Native.POINT();
+            Native.ClientToScreen(_hwnd, ref origin);
+            return cursor.X >= origin.X && cursor.X < origin.X + _clientSize.Width
+                && cursor.Y >= origin.Y && cursor.Y < origin.Y + _clientSize.Height;
+        }
+
+        private void RootGrid_PointerMoved(object sender, PointerRoutedEventArgs e)
+        {
+            // Collapse once the pointer has moved clearly below the bar (not while it is still growing).
+            if (_topBarExpanded && !_topBarTimer.IsRunning
+                && e.GetCurrentPoint(RootPanel).Position.Y > TopBar.ActualHeight + TopBarHotZoneDip)
+            {
+                SetTopBarExpanded(false);
+            }
+        }
+
+        private void TopBarHotZone_PointerEntered(object sender, PointerRoutedEventArgs e) => SetTopBarExpanded(true);
 
         #endregion
 

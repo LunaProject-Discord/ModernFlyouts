@@ -134,6 +134,9 @@ namespace ModernFlyouts.WinUI.Interop
         [DllImport("user32.dll")]
         public static extern bool GetClientRect(IntPtr hWnd, out RECT rect);
 
+        [DllImport("user32.dll")]
+        public static extern bool GetCursorPos(out POINT point);
+
         public static string GetClassName(IntPtr hWnd)
         {
             var sb = new StringBuilder(256);

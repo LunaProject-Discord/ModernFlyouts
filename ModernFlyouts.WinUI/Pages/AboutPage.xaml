@@ -6,6 +6,9 @@
     xmlns:res="using:ModernFlyouts.Properties">
 
     <ScrollViewer>
+        <!-- The Grid gives the max-width panel a normal layout slot; directly inside the
+             ScrollViewer it is centered by its desired width and overflows on wide windows. -->
+        <Grid>
         <StackPanel Style="{StaticResource SettingsPagePanelStyle}" Spacing="4">
             <Border Margin="0,8,0,0" Padding="16" CornerRadius="6" BorderThickness="1"
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
@@ -32,5 +35,6 @@
                 </StackPanel>
             </Border>
         </StackPanel>
+        </Grid>
     </ScrollViewer>
 </Page>

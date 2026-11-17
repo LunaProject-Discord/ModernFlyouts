@@ -7,10 +7,14 @@
 
     <!-- Used by modules whose only setting is on/off (brightness, airplane mode, virtual desktop). -->
     <ScrollViewer>
+        <!-- The Grid gives the max-width panel a normal layout slot; directly inside the
+             ScrollViewer it is centered by its desired width and overflows on wide windows. -->
+        <Grid>
         <StackPanel Style="{StaticResource SettingsPagePanelStyle}">
             <controls:SettingsCard x:Name="EnableCard" Margin="0,8,0,4">
                 <ToggleSwitch x:Name="EnableSwitch" />
             </controls:SettingsCard>
         </StackPanel>
+        </Grid>
     </ScrollViewer>
 </Page>

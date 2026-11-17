@@ -7,6 +7,9 @@
     xmlns:res="using:ModernFlyouts.Properties">
 
     <ScrollViewer>
+        <!-- The Grid gives the max-width panel a normal layout slot; directly inside the
+             ScrollViewer it is centered by its desired width and overflows on wide windows. -->
+        <Grid>
         <StackPanel Style="{StaticResource SettingsPagePanelStyle}">
             <controls:SettingsCard Glyph="&#xE767;" Header="{x:Bind res:Strings.Settings_EnableModule_Audio}" Margin="0,8,0,4">
                 <ToggleSwitch IsOn="{x:Bind S.AudioModuleEnabled, Mode=TwoWay}" />
@@ -91,5 +94,6 @@
                 </controls:SettingsCard>
             </StackPanel>
         </StackPanel>
+        </Grid>
     </ScrollViewer>
 </Page>
