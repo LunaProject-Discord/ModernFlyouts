@@ -16,6 +16,21 @@ namespace ModernFlyouts.WinUI.Controls
         private DesktopAcrylicController? _controller;
         private readonly SystemBackdropConfiguration _configuration = new() { IsInputActive = true };
         private double _opacity = 1.0;
+        private SystemBackdropTheme _theme = SystemBackdropTheme.Dark;
+
+        /// <summary>
+        /// Light or dark, set by the flyout (it resolves "follow the Windows mode" itself).
+        /// Asking XAML for the default configuration instead throws when the theme changes.
+        /// </summary>
+        public ElementTheme Theme
+        {
+            get => _theme == SystemBackdropTheme.Light ? ElementTheme.Light : ElementTheme.Dark;
+            set
+            {
+                _theme = value == ElementTheme.Light ? SystemBackdropTheme.Light : SystemBackdropTheme.Dark;
+                Apply();
+            }
+        }
 
         /// <summary>0 (blur only) to 1 (standard acrylic).</summary>
         public double BackgroundOpacity
@@ -32,7 +47,6 @@ namespace ModernFlyouts.WinUI.Controls
         {
             base.OnTargetConnected(connectedTarget, xamlRoot);
 
-            _configuration.Theme = GetDefaultSystemBackdropConfiguration(connectedTarget, xamlRoot).Theme;
             _controller = new DesktopAcrylicController();
             Apply();
             _controller.AddSystemBackdropTarget(connectedTarget);
@@ -53,13 +67,14 @@ namespace ModernFlyouts.WinUI.Controls
 
         protected override void OnDefaultSystemBackdropConfigurationChanged(ICompositionSupportsSystemBackdrop target, XamlRoot xamlRoot)
         {
-            // The flyout theme (or the system theme) changed.
-            _configuration.Theme = GetDefaultSystemBackdropConfiguration(target, xamlRoot).Theme;
-            Apply();
+            // Nothing to do: the theme comes from the Theme property. (The base implementation
+            // and GetDefaultSystemBackdropConfiguration are not used; the latter throws
+            // ArgumentException for this target when the theme changes.)
         }
 
         private void Apply()
         {
+            _configuration.Theme = _theme;
             if (_controller == null)
             {
                 return;

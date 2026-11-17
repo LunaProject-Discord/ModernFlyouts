@@ -161,12 +161,14 @@ namespace ModernFlyouts.WinUI
 
         /// <summary>
         /// Light/dark as chosen; the default follows the Windows mode (like the shell's own
-        /// flyouts), not the app mode. Set on the window's root so the acrylic matches too.
+        /// flyouts), not the app mode. The acrylic gets the same theme.
         /// </summary>
         public void ApplyTheme()
         {
             var theme = AppSettings.Instance.FlyoutTheme;
-            RootGrid.RequestedTheme = theme == ElementTheme.Default ? WindowsTheme.Current : theme;
+            var resolved = theme == ElementTheme.Default ? WindowsTheme.Current : theme;
+            RootGrid.RequestedTheme = resolved;
+            Backdrop.Theme = resolved;
         }
 
         #region Showing
