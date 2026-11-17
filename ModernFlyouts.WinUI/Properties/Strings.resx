@@ -587,4 +587,37 @@
   <data name="Settings.ExpandDirectionDescription" xml:space="preserve">
     <value>Used when the flyout has been moved by dragging</value>
   </data>
+  <data name="Settings.MediaControlsGroup" xml:space="preserve">
+    <value>Media controls</value>
+  </data>
+  <data name="Settings.MediaControlsGroupDescription" xml:space="preserve">
+    <value>What the media controls show</value>
+  </data>
+  <data name="Settings.ThumbnailGroup" xml:space="preserve">
+    <value>Thumbnail</value>
+  </data>
+  <data name="Settings.ThumbnailGroupDescription" xml:space="preserve">
+    <value>Album art background and position</value>
+  </data>
+  <data name="Settings.MediaSessionsGroup" xml:space="preserve">
+    <value>Multiple media sessions</value>
+  </data>
+  <data name="Settings.MediaSessionsGroupDescription" xml:space="preserve">
+    <value>How sessions of several players are shown</value>
+  </data>
+  <data name="Settings.MediaAppsSection" xml:space="preserve">
+    <value>Media apps</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroup" xml:space="preserve">
+    <value>Pinned player</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroupDescription" xml:space="preserve">
+    <value>Prefer the session of one player</value>
+  </data>
+  <data name="Settings.AppFilterDescription" xml:space="preserve">
+    <value>Show or hide the sessions of specific apps</value>
+  </data>
+  <data name="Settings.Credits" xml:space="preserve">
+    <value>Credits</value>
+  </data>
 </root>

@@ -35,7 +35,7 @@ namespace ModernFlyouts.WinUI.Pages
                     () => s.VirtualDesktopModuleEnabled, v => s.VirtualDesktopModuleEnabled = v),
             };
 
-            EnableCard.Glyph = glyph;
+            EnableIcon.Glyph = glyph;
             EnableCard.Header = header;
             EnableSwitch.IsOn = get();
             EnableSwitch.Toggled += (_, _) => set(EnableSwitch.IsOn);

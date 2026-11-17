@@ -482,4 +482,37 @@
   <data name="Settings.ExpandDirectionDescription" xml:space="preserve">
     <value>フライアウトをドラッグで移動したときに使われます</value>
   </data>
+  <data name="Settings.MediaControlsGroup" xml:space="preserve">
+    <value>メディアコントロールの表示項目</value>
+  </data>
+  <data name="Settings.MediaControlsGroupDescription" xml:space="preserve">
+    <value>メディアコントロールに表示する項目を選びます</value>
+  </data>
+  <data name="Settings.ThumbnailGroup" xml:space="preserve">
+    <value>サムネイル</value>
+  </data>
+  <data name="Settings.ThumbnailGroupDescription" xml:space="preserve">
+    <value>アルバムアートの背景と配置</value>
+  </data>
+  <data name="Settings.MediaSessionsGroup" xml:space="preserve">
+    <value>複数のメディアセッション</value>
+  </data>
+  <data name="Settings.MediaSessionsGroupDescription" xml:space="preserve">
+    <value>複数のプレイヤーのセッションの表示方法</value>
+  </data>
+  <data name="Settings.MediaAppsSection" xml:space="preserve">
+    <value>表示するメディアアプリ</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroup" xml:space="preserve">
+    <value>固定するプレイヤー</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroupDescription" xml:space="preserve">
+    <value>特定のプレイヤーのセッションを優先して表示します</value>
+  </data>
+  <data name="Settings.AppFilterDescription" xml:space="preserve">
+    <value>特定のアプリのセッションを表示または非表示にします</value>
+  </data>
+  <data name="Settings.Credits" xml:space="preserve">
+    <value>クレジット</value>
+  </data>
 </root>

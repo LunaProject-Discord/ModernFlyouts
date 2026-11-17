@@ -109,9 +109,11 @@ namespace ModernFlyouts.WinUI.Pages
         private void UpdateState()
         {
             bool manual = S.PlacementMode == FlyoutWindowPlacementMode.Manual;
-            ModeCard.Description = manual ? Strings.Settings_ManualPlacementDescription : string.Empty;
-            AutoPanel.Opacity = manual ? 0.5 : 1;
-            AutoPanel.IsHitTestVisible = !manual;
+            ModeCard.Description = manual ? Strings.Settings_ManualPlacementDescription : null;
+            // Only the settings of the current mode are shown inside the expander.
+            PositionCard.Visibility = manual ? Visibility.Collapsed : Visibility.Visible;
+            MarginCard.Visibility = manual ? Visibility.Collapsed : Visibility.Visible;
+            ExpandCard.Visibility = manual ? Visibility.Visible : Visibility.Collapsed;
 
             bool wasUpdating = _updating;
             _updating = true;

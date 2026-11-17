@@ -1379,5 +1379,104 @@ namespace ModernFlyouts.Properties {
             }
         }
         
-}
+        /// <summary>
+        ///   Looks up a localized string similar to Media controls.
+        /// </summary>
+        public static string Settings_MediaControlsGroup {
+            get {
+                return ResourceManager.GetString("Settings.MediaControlsGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to What the media controls show.
+        /// </summary>
+        public static string Settings_MediaControlsGroupDescription {
+            get {
+                return ResourceManager.GetString("Settings.MediaControlsGroupDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Thumbnail.
+        /// </summary>
+        public static string Settings_ThumbnailGroup {
+            get {
+                return ResourceManager.GetString("Settings.ThumbnailGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Album art background and position.
+        /// </summary>
+        public static string Settings_ThumbnailGroupDescription {
+            get {
+                return ResourceManager.GetString("Settings.ThumbnailGroupDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Multiple media sessions.
+        /// </summary>
+        public static string Settings_MediaSessionsGroup {
+            get {
+                return ResourceManager.GetString("Settings.MediaSessionsGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to How sessions of several players are shown.
+        /// </summary>
+        public static string Settings_MediaSessionsGroupDescription {
+            get {
+                return ResourceManager.GetString("Settings.MediaSessionsGroupDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Media apps.
+        /// </summary>
+        public static string Settings_MediaAppsSection {
+            get {
+                return ResourceManager.GetString("Settings.MediaAppsSection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pinned player.
+        /// </summary>
+        public static string Settings_PinnedPlayerGroup {
+            get {
+                return ResourceManager.GetString("Settings.PinnedPlayerGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prefer the session of one player.
+        /// </summary>
+        public static string Settings_PinnedPlayerGroupDescription {
+            get {
+                return ResourceManager.GetString("Settings.PinnedPlayerGroupDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show or hide the sessions of specific apps.
+        /// </summary>
+        public static string Settings_AppFilterDescription {
+            get {
+                return ResourceManager.GetString("Settings.AppFilterDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Credits.
+        /// </summary>
+        public static string Settings_Credits {
+            get {
+                return ResourceManager.GetString("Settings.Credits", resourceCulture);
+            }
+        }
+        
+    }
 }

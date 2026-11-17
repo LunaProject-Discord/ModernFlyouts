@@ -29,7 +29,10 @@ namespace ModernFlyouts.WinUI
             // Caption buttons as tall as the 48 px title bar, so they line up with its content.
             AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
             AppWindow.SetIcon(System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Logo.ico"));
-            AppWindow.Resize(new SizeInt32(1100, 760));
+            // 1040 x 720 DIP: wide enough that expander headers keep their switch or list beside the
+            // title (CommunityToolkit moves it underneath below 476 px).
+            double scale = Interop.Native.GetDpiForWindow(WinRT.Interop.WindowNative.GetWindowHandle(this)) / 96.0;
+            AppWindow.Resize(new SizeInt32((int)(1040 * scale), (int)(720 * scale)));
             if (AppWindow.Presenter is OverlappedPresenter presenter)
             {
                 presenter.PreferredMinimumWidth = 500;

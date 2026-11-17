@@ -3,7 +3,7 @@
     x:Class="ModernFlyouts.WinUI.Pages.AudioPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="using:ModernFlyouts.WinUI.Controls"
+    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
     xmlns:res="using:ModernFlyouts.Properties">
 
     <ScrollViewer>
@@ -11,87 +11,120 @@
              ScrollViewer it is centered by its desired width and overflows on wide windows. -->
         <Grid>
         <StackPanel Style="{StaticResource SettingsPagePanelStyle}">
-            <controls:SettingsCard Glyph="&#xE767;" Header="{x:Bind res:Strings.Settings_EnableModule_Audio}" Margin="0,8,0,4">
+            <toolkit:SettingsCard Header="{x:Bind res:Strings.Settings_EnableModule_Audio}" Margin="0,8,0,0">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE767;" /></toolkit:SettingsCard.HeaderIcon>
                 <ToggleSwitch IsOn="{x:Bind S.AudioModuleEnabled, Mode=TwoWay}" />
-            </controls:SettingsCard>
+            </toolkit:SettingsCard>
 
-            <StackPanel IsHitTestVisible="{x:Bind S.AudioModuleEnabled, Mode=OneWay}"
-                        Opacity="{x:Bind OpacityFor(S.AudioModuleEnabled), Mode=OneWay}">
+            <!-- Everything below only applies while the module is on -->
+            <ContentControl IsEnabled="{x:Bind S.AudioModuleEnabled, Mode=OneWay}" IsTabStop="False"
+                            HorizontalContentAlignment="Stretch">
+            <StackPanel Spacing="4">
                 <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_Modules_Audio_Media}" />
 
-                <controls:SettingsCard Glyph="&#xE8D6;" Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowGSMTCInVolumeFlyout}">
+                <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowGSMTCInVolumeFlyout}">
+                    <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE8D6;" /></toolkit:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind S.ShowMediaInVolumeFlyout, Mode=TwoWay}" />
-                </controls:SettingsCard>
+                </toolkit:SettingsCard>
 
-                <controls:SettingsCard Glyph="&#xE946;" Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowPlayerInfo}">
-                    <ToggleSwitch IsOn="{x:Bind S.ShowMediaPlayerInfo, Mode=TwoWay}" />
-                </controls:SettingsCard>
-
-                <controls:SettingsCard Glyph="&#xE768;" Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowSeekbar}">
-                    <ToggleSwitch IsOn="{x:Bind S.ShowMediaSeekbar, Mode=TwoWay}" />
-                </controls:SettingsCard>
-
-                <controls:SettingsCard Glyph="&#xE767;" Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowVolumeControlInGSMTCFlyout}">
+                <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowVolumeControlInGSMTCFlyout}">
+                    <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE767;" /></toolkit:SettingsCard.HeaderIcon>
                     <ToggleSwitch IsOn="{x:Bind S.ShowVolumeControlInMediaFlyout, Mode=TwoWay}" />
-                </controls:SettingsCard>
+                </toolkit:SettingsCard>
 
-                <controls:SettingsCard Glyph="&#xE8B1;" Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowShuffle}">
-                    <ToggleSwitch IsOn="{x:Bind S.ShowMediaShuffle, Mode=TwoWay}" />
-                </controls:SettingsCard>
+                <!-- What the media controls show -->
+                <toolkit:SettingsExpander Header="{x:Bind res:Strings.Settings_MediaControlsGroup}"
+                                          Description="{x:Bind res:Strings.Settings_MediaControlsGroupDescription}">
+                    <toolkit:SettingsExpander.HeaderIcon><FontIcon Glyph="&#xE90B;" /></toolkit:SettingsExpander.HeaderIcon>
+                    <toolkit:SettingsExpander.Items>
+                        <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowPlayerInfo}">
+                            <ToggleSwitch IsOn="{x:Bind S.ShowMediaPlayerInfo, Mode=TwoWay}" />
+                        </toolkit:SettingsCard>
+                        <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowSeekbar}">
+                            <ToggleSwitch IsOn="{x:Bind S.ShowMediaSeekbar, Mode=TwoWay}" />
+                        </toolkit:SettingsCard>
+                        <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowShuffle}">
+                            <ToggleSwitch IsOn="{x:Bind S.ShowMediaShuffle, Mode=TwoWay}" />
+                        </toolkit:SettingsCard>
+                        <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowRepeat}">
+                            <ToggleSwitch IsOn="{x:Bind S.ShowMediaRepeat, Mode=TwoWay}" />
+                        </toolkit:SettingsCard>
+                    </toolkit:SettingsExpander.Items>
+                </toolkit:SettingsExpander>
 
-                <controls:SettingsCard Glyph="&#xE8EE;" Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowRepeat}">
-                    <ToggleSwitch IsOn="{x:Bind S.ShowMediaRepeat, Mode=TwoWay}" />
-                </controls:SettingsCard>
+                <!-- Album art -->
+                <toolkit:SettingsExpander Header="{x:Bind res:Strings.Settings_ThumbnailGroup}"
+                                          Description="{x:Bind res:Strings.Settings_ThumbnailGroupDescription}">
+                    <toolkit:SettingsExpander.HeaderIcon><FontIcon Glyph="&#xE91B;" /></toolkit:SettingsExpander.HeaderIcon>
+                    <toolkit:SettingsExpander.Items>
+                        <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_UseThumbnailAsBackground}">
+                            <ToggleSwitch IsOn="{x:Bind S.UseThumbnailAsBackground, Mode=TwoWay}" />
+                        </toolkit:SettingsCard>
+                        <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_ThumbnailAlignment}">
+                            <ComboBox x:Name="ThumbnailAlignmentCombo" MinWidth="200" />
+                        </toolkit:SettingsCard>
+                    </toolkit:SettingsExpander.Items>
+                </toolkit:SettingsExpander>
 
-                <controls:SettingsCard Glyph="&#xE91B;" Header="{x:Bind res:Strings.AudioFlyoutHelper_UseThumbnailAsBackground}">
-                    <ToggleSwitch IsOn="{x:Bind S.UseThumbnailAsBackground, Mode=TwoWay}" />
-                </controls:SettingsCard>
+                <!-- Several players at once -->
+                <toolkit:SettingsExpander Header="{x:Bind res:Strings.Settings_MediaSessionsGroup}"
+                                          Description="{x:Bind res:Strings.Settings_MediaSessionsGroupDescription}">
+                    <toolkit:SettingsExpander.HeaderIcon><FontIcon Glyph="&#xE8A9;" /></toolkit:SettingsExpander.HeaderIcon>
+                    <toolkit:SettingsExpander.Items>
+                        <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_SessionsPanelOrientation}">
+                            <ComboBox x:Name="OrientationCombo" MinWidth="200" />
+                        </toolkit:SettingsCard>
+                        <toolkit:SettingsCard x:Name="MaxSessionsCard" Header="{x:Bind res:Strings.AudioFlyoutHelper_MaxVerticalSessionControlsCount}">
+                            <NumberBox Minimum="1" Maximum="5" SmallChange="1" SpinButtonPlacementMode="Inline" MinWidth="120"
+                                       Value="{x:Bind S.MaxVerticalSessionControlsCount, Mode=TwoWay}" />
+                        </toolkit:SettingsCard>
+                    </toolkit:SettingsExpander.Items>
+                </toolkit:SettingsExpander>
 
-                <controls:SettingsCard Glyph="&#xE8E4;" Header="{x:Bind res:Strings.AudioFlyoutHelper_ThumbnailAlignment}">
-                    <ComboBox x:Name="ThumbnailAlignmentCombo" MinWidth="200" />
-                </controls:SettingsCard>
+                <!-- Which player is shown -->
+                <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_MediaAppsSection}" />
 
-                <controls:SettingsCard Glyph="&#xE8A9;" Header="{x:Bind res:Strings.AudioFlyoutHelper_SessionsPanelOrientation}">
-                    <ComboBox x:Name="OrientationCombo" MinWidth="200" />
-                </controls:SettingsCard>
-
-                <controls:SettingsCard x:Name="MaxSessionsCard" Glyph="&#xE8FD;" Header="{x:Bind res:Strings.AudioFlyoutHelper_MaxVerticalSessionControlsCount}">
-                    <NumberBox Minimum="1" Maximum="5" SmallChange="1" SpinButtonPlacementMode="Inline" MinWidth="120"
-                               Value="{x:Bind S.MaxVerticalSessionControlsCount, Mode=TwoWay}" />
-                </controls:SettingsCard>
-
-                <!-- Which player is shown (enhanced backend) -->
-                <controls:SettingsCard Glyph="&#xE718;" Header="{x:Bind res:Strings.AudioFlyoutHelper_PinnedAppUserModelId}">
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                        <TextBox Text="{x:Bind S.PinnedMediaAppUserModelId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="220" />
-                        <Button x:Name="PinnedAppPicker" Click="AppPicker_Click" Tag="pinned">
-                            <FontIcon Glyph="&#xE70D;" FontSize="12" />
-                        </Button>
-                    </StackPanel>
-                </controls:SettingsCard>
-
-                <controls:SettingsCard Glyph="&#xE8CB;" Header="{x:Bind res:Strings.AudioFlyoutHelper_PinnedAppPriority}">
-                    <ComboBox x:Name="PinnedPriorityCombo" MinWidth="200" MaxWidth="280" />
-                </controls:SettingsCard>
-
-                <controls:SettingsCard Glyph="&#xE71C;" Header="{x:Bind res:Strings.AudioFlyoutHelper_AppFilteringMode}">
-                    <ComboBox x:Name="FilteringModeCombo" MinWidth="200" />
-                </controls:SettingsCard>
-
-                <controls:SettingsCard Glyph="&#xE8FD;" Header="{x:Bind res:Strings.AudioFlyoutHelper_AppFilterList}">
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                        <TextBox Text="{x:Bind S.MediaAppFilterList, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 Width="220" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="64" />
-                        <Button x:Name="FilterAppPicker" Click="AppPicker_Click" Tag="filter" VerticalAlignment="Top">
-                            <FontIcon Glyph="&#xE710;" FontSize="12" />
-                        </Button>
-                    </StackPanel>
-                </controls:SettingsCard>
-
-                <controls:SettingsCard x:Name="BackendCard" Glyph="&#xE9D9;" Header="{x:Bind res:Strings.AudioFlyoutHelper_EnhancedMediaBackend}">
+                <toolkit:SettingsCard x:Name="BackendCard" Header="{x:Bind res:Strings.AudioFlyoutHelper_EnhancedMediaBackend}">
+                    <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE9D9;" /></toolkit:SettingsCard.HeaderIcon>
                     <ComboBox x:Name="BackendCombo" MinWidth="200" />
-                </controls:SettingsCard>
+                </toolkit:SettingsCard>
+
+                <toolkit:SettingsExpander Header="{x:Bind res:Strings.Settings_PinnedPlayerGroup}"
+                                          Description="{x:Bind res:Strings.Settings_PinnedPlayerGroupDescription}">
+                    <toolkit:SettingsExpander.HeaderIcon><FontIcon Glyph="&#xE718;" /></toolkit:SettingsExpander.HeaderIcon>
+                    <toolkit:SettingsExpander.Items>
+                        <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_PinnedAppUserModelId}">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBox Text="{x:Bind S.PinnedMediaAppUserModelId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="220" />
+                                <Button x:Name="PinnedAppPicker" Click="AppPicker_Click" Tag="pinned">
+                                    <FontIcon Glyph="&#xE70D;" FontSize="12" />
+                                </Button>
+                            </StackPanel>
+                        </toolkit:SettingsCard>
+                        <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_PinnedAppPriority}">
+                            <ComboBox x:Name="PinnedPriorityCombo" MinWidth="200" MaxWidth="280" />
+                        </toolkit:SettingsCard>
+                    </toolkit:SettingsExpander.Items>
+                </toolkit:SettingsExpander>
+
+                <toolkit:SettingsExpander Header="{x:Bind res:Strings.AudioFlyoutHelper_AppFilteringMode}"
+                                          Description="{x:Bind res:Strings.Settings_AppFilterDescription}">
+                    <toolkit:SettingsExpander.HeaderIcon><FontIcon Glyph="&#xE71C;" /></toolkit:SettingsExpander.HeaderIcon>
+                    <ComboBox x:Name="FilteringModeCombo" MinWidth="200" />
+                    <toolkit:SettingsExpander.Items>
+                        <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_AppFilterList}">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBox Text="{x:Bind S.MediaAppFilterList, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         Width="220" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="64" />
+                                <Button x:Name="FilterAppPicker" Click="AppPicker_Click" Tag="filter" VerticalAlignment="Top">
+                                    <FontIcon Glyph="&#xE710;" FontSize="12" />
+                                </Button>
+                            </StackPanel>
+                        </toolkit:SettingsCard>
+                    </toolkit:SettingsExpander.Items>
+                </toolkit:SettingsExpander>
             </StackPanel>
+            </ContentControl>
         </StackPanel>
         </Grid>
     </ScrollViewer>
