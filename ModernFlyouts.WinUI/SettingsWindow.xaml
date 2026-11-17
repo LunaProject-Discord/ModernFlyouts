@@ -16,7 +16,7 @@
         </Grid.RowDefinitions>
 
         <!-- WinUI title bar, laid out like WinUI Gallery's: pane toggle, icon, title -->
-        <TitleBar x:Name="AppTitleBar" Title="{x:Bind res:Strings.SettingsItem}"
+        <TitleBar x:Name="AppTitleBar" Title="ModernFlyouts" Subtitle="{x:Bind res:Strings.SettingsItem}"
                   IsBackButtonVisible="False" IsPaneToggleButtonVisible="True"
                   PaneToggleRequested="AppTitleBar_PaneToggleRequested">
             <!-- With content the title bar uses its 48 px (expanded) layout, as in WinUI Gallery -->
