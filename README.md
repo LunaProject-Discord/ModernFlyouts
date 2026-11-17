@@ -85,7 +85,9 @@ Debug builds accept a few options for trying things out: `--settings`, `--settin
 | `ModernFlyouts.WinUI` | The WinUI 3 app |
 | `ModernFlyouts.Core` | Shared logic (media backends, displays, interop), UI-framework independent |
 | `ModernFlyouts.Core.Tests` | Unit tests |
-| `ModernFlyouts` | The original WPF app (kept for reference) |
+
+The original WPF app is in the history of this repository and in
+[ModernFlyouts](https://github.com/ModernFlyouts-Community/ModernFlyouts).
 
 ## Credits
 
