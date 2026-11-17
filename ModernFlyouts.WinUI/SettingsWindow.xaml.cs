@@ -26,6 +26,8 @@ namespace ModernFlyouts.WinUI
             Title = Properties.Strings.SettingsItem;
             ExtendsContentIntoTitleBar = true;
             SetTitleBar(AppTitleBar);
+            // Caption buttons as tall as the 48 px title bar, so they line up with its content.
+            AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
             AppWindow.SetIcon(System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "Logo.ico"));
             AppWindow.Resize(new SizeInt32(1100, 760));
             if (AppWindow.Presenter is OverlappedPresenter presenter)
