@@ -197,6 +197,16 @@ namespace ModernFlyouts.WinUI
             ShowKind(FlyoutKind.Brightness);
         }
 
+#if DEBUG
+        internal void PreviewBrightnessIconLevel(double level)
+        {
+            foreach (var row in BrightnessRow.Children.OfType<BrightnessRowControl>())
+            {
+                row.PreviewIconLevel(level);
+            }
+        }
+#endif
+
         public void ShowInfo(string glyph, string text)
         {
             InfoGlyph.Glyph = glyph;

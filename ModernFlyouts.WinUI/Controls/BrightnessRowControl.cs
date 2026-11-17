@@ -14,7 +14,7 @@ namespace ModernFlyouts.WinUI.Controls
     /// </summary>
     internal sealed class BrightnessRowControl : Grid
     {
-        private readonly FontIcon _glyph;
+        private readonly BrightnessIcon _glyph;
         private readonly TextBlock _index;
         private readonly Slider _slider;
         private readonly TextBlock _value;
@@ -29,7 +29,7 @@ namespace ModernFlyouts.WinUI.Controls
             ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(48) });
 
             var icon = new Grid { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-            _glyph = new FontIcon { FontSize = 16 };
+            _glyph = new BrightnessIcon();
             _index = new TextBlock
             {
                 FontSize = 9,
@@ -76,6 +76,11 @@ namespace ModernFlyouts.WinUI.Controls
 
         public BrightnessController Controller { get; }
 
+#if DEBUG
+        /// <summary>Shows the icon at another level without touching the display (--demo-brightness).</summary>
+        internal void PreviewIconLevel(double level) => _glyph.Level = level;
+#endif
+
         /// <summary>Raised when the user changes the value (keeps the flyout open).</summary>
         public event EventHandler? Interacted;
 
@@ -93,8 +98,9 @@ namespace ModernFlyouts.WinUI.Controls
             _updating = false;
 
             _value.Text = Controller.Brightness.ToString("0");
-            // Brightness / LowerBrightness glyphs, as in the WPF version.
-            _glyph.Glyph = Controller.Brightness > 50 ? "" : "";
+            // The sun's rays follow the level.
+            double range = Controller.Maximum - Controller.Minimum;
+            _glyph.Level = range > 0 ? (Controller.Brightness - Controller.Minimum) / range : 1;
         }
 
         private void Slider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)

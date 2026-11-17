@@ -178,6 +178,18 @@ namespace ModernFlyouts.WinUI
             {
                 _flyout.ShowVirtualDesktop("Desktop 2", 1, 4);
             }
+            else if (Array.IndexOf(Environment.GetCommandLineArgs(), "--demo-brightness") > 0)
+            {
+                // Brightness flyout; the icon steps through levels without changing the display.
+                _flyout.ShowBrightness();
+                double[] levels = { 0, 0.33, 0.66, 1 };
+                for (int i = 0; i < levels.Length; i++)
+                {
+                    double level = levels[i];
+                    _ = System.Threading.Tasks.Task.Delay(1500 + i * 1000).ContinueWith(_ =>
+                        UiDispatcher.Post(() => { _flyout.ShowBrightness(); _flyout.PreviewBrightnessIconLevel(level); }));
+                }
+            }
             else if (Array.IndexOf(Environment.GetCommandLineArgs(), "--demo-traymenu") > 0)
             {
                 // Where the notification area is: bottom right corner of the primary screen.
