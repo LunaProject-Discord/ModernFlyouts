@@ -368,4 +368,151 @@
   <data name="Settings.VerticalAlignment" xml:space="preserve">
     <value>&amp;تراز عمودی</value>
   </data>
+  <data name="Settings.FollowWindowsMode" xml:space="preserve">
+    <value>مطابق با حالت Windows</value>
+  </data>
+  <data name="Settings.Restart" xml:space="preserve">
+    <value>راه‌اندازی مجدد</value>
+  </data>
+  <data name="Settings.FollowAppMode" xml:space="preserve">
+    <value>مطابق با حالت برنامه</value>
+  </data>
+  <data name="AudioFlyoutHelper.EnhancedMediaBackend" xml:space="preserve">
+    <value>بخش پشتیبان رسانه پیشرفته</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowPlayerInfo" xml:space="preserve">
+    <value>نمایش نام پخش‌کننده</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowSeekbar" xml:space="preserve">
+    <value>نمایش نوار جستجو</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowShuffle" xml:space="preserve">
+    <value>نمایش دکمه پخش تصادفی</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowRepeat" xml:space="preserve">
+    <value>نمایش دکمه تکرار</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppUserModelId" xml:space="preserve">
+    <value>شناسه برنامه پخش‌کننده سنجاق‌شده</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppPriority" xml:space="preserve">
+    <value>اولویت پخش‌کننده سنجاق‌شده</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilteringMode" xml:space="preserve">
+    <value>فیلتر کردن برنامه‌ها</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilterList" xml:space="preserve">
+    <value>فهرست فیلتر برنامه‌ها (جداشده با ویرگول، نقطه‌ویرگول یا خط جدید)</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Auto" xml:space="preserve">
+    <value>خودکار</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Enabled" xml:space="preserve">
+    <value>فعال</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Disabled" xml:space="preserve">
+    <value>غیرفعال</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Disabled" xml:space="preserve">
+    <value>غیرفعال</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Allowlist" xml:space="preserve">
+    <value>فهرست مجاز</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Blocklist" xml:space="preserve">
+    <value>فهرست مسدود</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.PreferPinnedOnlyWhenPlaying" xml:space="preserve">
+    <value>ترجیح برنامه سنجاق‌شده فقط هنگام پخش</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.AlwaysPreferPinnedIfEligible" xml:space="preserve">
+    <value>همیشه ترجیح برنامه سنجاق‌شده در صورت امکان</value>
+  </data>
+  <data name="Settings.Modules.VirtualDesktop" xml:space="preserve">
+    <value>دسکتاپ‌های مجازی</value>
+  </data>
+  <data name="Settings.EnableModule.VirtualDesktop" xml:space="preserve">
+    <value>فعال کردن پنجره بازشوی دسکتاپ‌های مجازی</value>
+  </data>
+  <data name="VirtualDesktopFlyoutHelper.DefaultName" xml:space="preserve">
+    <value>دسکتاپ {0}</value>
+  </data>
+  <data name="Settings.FlyoutMargin" xml:space="preserve">
+    <value>فاصله از لبه صفحه</value>
+  </data>
+  <data name="Settings.PrimaryDisplay" xml:space="preserve">
+    <value>نمایشگر اصلی</value>
+  </data>
+  <data name="Settings.FlyoutPosition" xml:space="preserve">
+    <value>موقعیت</value>
+  </data>
+  <data name="Settings.ManualPlacementDescription" xml:space="preserve">
+    <value>برای جابه‌جایی، دستگیره بالای پنجره بازشو را بکشید. موقعیت به خاطر سپرده می‌شود.</value>
+  </data>
+  <data name="Settings.ChooseFromMediaApps" xml:space="preserve">
+    <value>انتخاب از برنامه‌های رسانه</value>
+  </data>
+  <data name="Settings.NoMediaAppsYet" xml:space="preserve">
+    <value>هنوز هیچ برنامه رسانه‌ای شناسایی نشده است. چیزی پخش کنید و دوباره امتحان کنید.</value>
+  </data>
+  <data name="Settings.ExpandDirectionDescription" xml:space="preserve">
+    <value>هنگامی که پنجره بازشو با کشیدن جابه‌جا شده باشد استفاده می‌شود</value>
+  </data>
+  <data name="Settings.MediaControlsGroup" xml:space="preserve">
+    <value>کنترل‌های رسانه</value>
+  </data>
+  <data name="Settings.MediaControlsGroupDescription" xml:space="preserve">
+    <value>آنچه کنترل‌های رسانه نمایش می‌دهند</value>
+  </data>
+  <data name="Settings.ThumbnailGroup" xml:space="preserve">
+    <value>تصویر کوچک</value>
+  </data>
+  <data name="Settings.ThumbnailGroupDescription" xml:space="preserve">
+    <value>پس‌زمینه و موقعیت تصویر آلبوم</value>
+  </data>
+  <data name="Settings.MediaSessionsGroup" xml:space="preserve">
+    <value>چند جلسه رسانه</value>
+  </data>
+  <data name="Settings.MediaSessionsGroupDescription" xml:space="preserve">
+    <value>نحوه نمایش جلسه‌های چند پخش‌کننده</value>
+  </data>
+  <data name="Settings.MediaAppsSection" xml:space="preserve">
+    <value>برنامه‌های رسانه</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroup" xml:space="preserve">
+    <value>پخش‌کننده سنجاق‌شده</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroupDescription" xml:space="preserve">
+    <value>ترجیح جلسه یک پخش‌کننده</value>
+  </data>
+  <data name="Settings.AppFilterDescription" xml:space="preserve">
+    <value>نمایش یا پنهان کردن جلسه‌های برنامه‌های خاص</value>
+  </data>
+  <data name="Settings.Credits" xml:space="preserve">
+    <value>قدردانی</value>
+  </data>
+  <data name="Settings.FlyoutAnimationEnabled" xml:space="preserve">
+    <value>پویانمایی محو شدن</value>
+  </data>
+  <data name="Settings.DisplayDescription" xml:space="preserve">
+    <value>نمایشگری را که پنجره بازشو روی آن نمایش داده می‌شود انتخاب کنید</value>
+  </data>
+  <data name="Settings.FlyoutAlignment" xml:space="preserve">
+    <value>تراز پنجره بازشو</value>
+  </data>
+  <data name="Settings.FlyoutContentStackingDirection" xml:space="preserve">
+    <value>جهت چیدمان محتوای پنجره بازشو</value>
+  </data>
+  <data name="Settings.FlyoutExpandDirection" xml:space="preserve">
+    <value>جهت گسترش پنجره بازشو</value>
+  </data>
+  <data name="Settings.FlyoutPlacement" xml:space="preserve">
+    <value>جای‌گذاری پنجره بازشو</value>
+  </data>
+  <data name="Settings.FlyoutPlacementMode" xml:space="preserve">
+    <value>حالت جای‌گذاری</value>
+  </data>
+  <data name="AudioFlyoutHelper.UseThumbnailAsBackground" xml:space="preserve">
+    <value>استفاده از تصویر کوچک رسانه به‌عنوان پس‌زمینه کنترل‌های رسانه</value>
+  </data>
 </root>

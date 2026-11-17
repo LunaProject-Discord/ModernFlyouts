@@ -368,4 +368,151 @@
   <data name="Settings.VerticalAlignment" xml:space="preserve">
     <value>अनुलंब संरेखण</value>
   </data>
+  <data name="Settings.FollowWindowsMode" xml:space="preserve">
+    <value>Windows मोड के अनुसार</value>
+  </data>
+  <data name="Settings.Restart" xml:space="preserve">
+    <value>पुनः प्रारंभ करें</value>
+  </data>
+  <data name="Settings.FollowAppMode" xml:space="preserve">
+    <value>ऐप मोड के अनुसार</value>
+  </data>
+  <data name="AudioFlyoutHelper.EnhancedMediaBackend" xml:space="preserve">
+    <value>उन्नत मीडिया बैकएंड</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowPlayerInfo" xml:space="preserve">
+    <value>प्लेयर का नाम दिखाएँ</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowSeekbar" xml:space="preserve">
+    <value>सीक बार दिखाएँ</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowShuffle" xml:space="preserve">
+    <value>शफ़ल बटन दिखाएँ</value>
+  </data>
+  <data name="AudioFlyoutHelper.ShowRepeat" xml:space="preserve">
+    <value>रिपीट बटन दिखाएँ</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppUserModelId" xml:space="preserve">
+    <value>पिन किए गए प्लेयर की ऐप आईडी</value>
+  </data>
+  <data name="AudioFlyoutHelper.PinnedAppPriority" xml:space="preserve">
+    <value>पिन किए गए प्लेयर की प्राथमिकता</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilteringMode" xml:space="preserve">
+    <value>ऐप फ़िल्टरिंग</value>
+  </data>
+  <data name="AudioFlyoutHelper.AppFilterList" xml:space="preserve">
+    <value>ऐप फ़िल्टर सूची (अल्पविराम, अर्धविराम या नई पंक्ति से अलग)</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Auto" xml:space="preserve">
+    <value>स्वचालित</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Enabled" xml:space="preserve">
+    <value>सक्षम</value>
+  </data>
+  <data name="Enums.EnhancedMediaBackendMode.Disabled" xml:space="preserve">
+    <value>अक्षम</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Disabled" xml:space="preserve">
+    <value>अक्षम</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Allowlist" xml:space="preserve">
+    <value>अनुमति सूची</value>
+  </data>
+  <data name="Enums.MediaAppFilteringMode.Blocklist" xml:space="preserve">
+    <value>अवरोध सूची</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.PreferPinnedOnlyWhenPlaying" xml:space="preserve">
+    <value>केवल चलाते समय पिन किए गए ऐप को प्राथमिकता दें</value>
+  </data>
+  <data name="Enums.PinnedAppPriorityMode.AlwaysPreferPinnedIfEligible" xml:space="preserve">
+    <value>संभव हो तो हमेशा पिन किए गए ऐप को प्राथमिकता दें</value>
+  </data>
+  <data name="Settings.Modules.VirtualDesktop" xml:space="preserve">
+    <value>वर्चुअल डेस्कटॉप</value>
+  </data>
+  <data name="Settings.EnableModule.VirtualDesktop" xml:space="preserve">
+    <value>वर्चुअल डेस्कटॉप फ़्लायआउट सक्षम करें</value>
+  </data>
+  <data name="VirtualDesktopFlyoutHelper.DefaultName" xml:space="preserve">
+    <value>डेस्कटॉप {0}</value>
+  </data>
+  <data name="Settings.FlyoutMargin" xml:space="preserve">
+    <value>स्क्रीन के किनारे से दूरी</value>
+  </data>
+  <data name="Settings.PrimaryDisplay" xml:space="preserve">
+    <value>प्राथमिक डिस्प्ले</value>
+  </data>
+  <data name="Settings.FlyoutPosition" xml:space="preserve">
+    <value>स्थिति</value>
+  </data>
+  <data name="Settings.ManualPlacementDescription" xml:space="preserve">
+    <value>फ़्लायआउट को ले जाने के लिए उसके ऊपर का हैंडल खींचें। स्थिति याद रखी जाती है।</value>
+  </data>
+  <data name="Settings.ChooseFromMediaApps" xml:space="preserve">
+    <value>मीडिया ऐप्स में से चुनें</value>
+  </data>
+  <data name="Settings.NoMediaAppsYet" xml:space="preserve">
+    <value>अभी तक कोई मीडिया ऐप नहीं मिला। कुछ चलाएँ और फिर से प्रयास करें।</value>
+  </data>
+  <data name="Settings.ExpandDirectionDescription" xml:space="preserve">
+    <value>जब फ़्लायआउट को खींचकर ले जाया गया हो तब उपयोग होता है</value>
+  </data>
+  <data name="Settings.MediaControlsGroup" xml:space="preserve">
+    <value>मीडिया नियंत्रण</value>
+  </data>
+  <data name="Settings.MediaControlsGroupDescription" xml:space="preserve">
+    <value>मीडिया नियंत्रण क्या दिखाते हैं</value>
+  </data>
+  <data name="Settings.ThumbnailGroup" xml:space="preserve">
+    <value>थंबनेल</value>
+  </data>
+  <data name="Settings.ThumbnailGroupDescription" xml:space="preserve">
+    <value>एल्बम कला की पृष्ठभूमि और स्थिति</value>
+  </data>
+  <data name="Settings.MediaSessionsGroup" xml:space="preserve">
+    <value>एकाधिक मीडिया सत्र</value>
+  </data>
+  <data name="Settings.MediaSessionsGroupDescription" xml:space="preserve">
+    <value>कई प्लेयर के सत्र कैसे दिखाए जाते हैं</value>
+  </data>
+  <data name="Settings.MediaAppsSection" xml:space="preserve">
+    <value>मीडिया ऐप्स</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroup" xml:space="preserve">
+    <value>पिन किया गया प्लेयर</value>
+  </data>
+  <data name="Settings.PinnedPlayerGroupDescription" xml:space="preserve">
+    <value>एक प्लेयर के सत्र को प्राथमिकता दें</value>
+  </data>
+  <data name="Settings.AppFilterDescription" xml:space="preserve">
+    <value>विशिष्ट ऐप्स के सत्र दिखाएँ या छिपाएँ</value>
+  </data>
+  <data name="Settings.Credits" xml:space="preserve">
+    <value>आभार</value>
+  </data>
+  <data name="Settings.FlyoutAnimationEnabled" xml:space="preserve">
+    <value>फ़ेड एनिमेशन</value>
+  </data>
+  <data name="Settings.DisplayDescription" xml:space="preserve">
+    <value>वह डिस्प्ले चुनें जिस पर फ़्लायआउट दिखाया जाए</value>
+  </data>
+  <data name="Settings.FlyoutAlignment" xml:space="preserve">
+    <value>फ़्लायआउट संरेखण</value>
+  </data>
+  <data name="Settings.FlyoutContentStackingDirection" xml:space="preserve">
+    <value>फ़्लायआउट सामग्री स्टैकिंग दिशा</value>
+  </data>
+  <data name="Settings.FlyoutExpandDirection" xml:space="preserve">
+    <value>फ़्लायआउट विस्तार दिशा</value>
+  </data>
+  <data name="Settings.FlyoutPlacement" xml:space="preserve">
+    <value>फ़्लायआउट प्लेसमेंट</value>
+  </data>
+  <data name="Settings.FlyoutPlacementMode" xml:space="preserve">
+    <value>प्लेसमेंट मोड</value>
+  </data>
+  <data name="AudioFlyoutHelper.UseThumbnailAsBackground" xml:space="preserve">
+    <value>मीडिया थंबनेल को मीडिया नियंत्रण की पृष्ठभूमि के रूप में उपयोग करें</value>
+  </data>
 </root>
