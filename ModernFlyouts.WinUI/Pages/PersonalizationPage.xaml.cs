@@ -15,7 +15,9 @@ namespace ModernFlyouts.WinUI.Pages
             // The flyout's default follows the Windows mode (taskbar), not the app mode.
             EnumChoices.Bind(FlyoutThemeCombo, Enum.GetValues<ElementTheme>(), () => S.FlyoutTheme, v => S.FlyoutTheme = v,
                 v => v == ElementTheme.Default ? Strings.Settings_FollowWindowsMode : EnumChoices.GetDisplayName(v));
-            EnumChoices.Bind(AppThemeCombo, () => S.AppTheme, v => S.AppTheme = v);
+            // The settings window's default follows the app mode (what XAML does by itself).
+            EnumChoices.Bind(AppThemeCombo, Enum.GetValues<ElementTheme>(), () => S.AppTheme, v => S.AppTheme = v,
+                v => v == ElementTheme.Default ? Strings.Settings_FollowAppMode : EnumChoices.GetDisplayName(v));
             EnumChoices.Bind(TopBarCombo, () => S.TopBarVisibility, v => S.TopBarVisibility = v);
 
             // ms, as in the WPF version; show the recommended value like the original star hint.

@@ -1222,6 +1222,15 @@ namespace ModernFlyouts.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to App mode.
+        /// </summary>
+        public static string Settings_FollowAppMode {
+            get {
+                return ResourceManager.GetString("Settings.FollowAppMode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Windows mode.
         /// </summary>
         public static string Settings_FollowWindowsMode {
