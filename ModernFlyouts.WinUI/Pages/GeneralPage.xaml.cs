@@ -27,8 +27,17 @@ namespace ModernFlyouts.WinUI.Pages
                 {
                     S.Language = (string)item.Tag;
                 }
+                UpdateLanguageRestartInfo();
             };
+            UpdateLanguageRestartInfo();
         }
+
+        private void UpdateLanguageRestartInfo()
+        {
+            LanguageRestartInfo.Visibility = S.Language == Localization.AppliedSetting ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void RestartButton_Click(object sender, RoutedEventArgs e) => (Application.Current as App)?.RestartApp();
 
         public AppSettings S => AppSettings.Instance;
 

@@ -17,10 +17,17 @@
                 <ToggleSwitch IsOn="{x:Bind S.RunAtStartup, Mode=TwoWay}" />
             </controls:SettingsCard>
 
-            <controls:SettingsCard Glyph="&#xF2B7;" Header="{x:Bind res:Strings.Settings_Language}"
-                                   Description="{x:Bind res:Strings.Settings_LanguageDescription}">
+            <controls:SettingsCard Glyph="&#xF2B7;" Header="{x:Bind res:Strings.Settings_Language}">
                 <ComboBox x:Name="LanguageCombo" MinWidth="200" />
             </controls:SettingsCard>
+
+            <!-- Shown once the language differs from the one the app started with -->
+            <InfoBar x:Name="LanguageRestartInfo" Severity="Informational" IsOpen="True" IsClosable="False"
+                     Message="{x:Bind res:Strings.Settings_RestartRequired}" Margin="0,0,0,4" Visibility="Collapsed">
+                <InfoBar.ActionButton>
+                    <Button Content="{x:Bind res:Strings.Settings_Restart}" Click="RestartButton_Click" />
+                </InfoBar.ActionButton>
+            </InfoBar>
 
             <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_DefaultFlyout}" />
 

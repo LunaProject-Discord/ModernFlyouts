@@ -202,13 +202,13 @@
     <value>Vertical</value>
   </data>
   <data name="Enums.TopBarVisibility.AutoHide" xml:space="preserve">
-    <value>Auto-hide</value>
+    <value>Show automatically</value>
   </data>
   <data name="Enums.TopBarVisibility.Collapsed" xml:space="preserve">
-    <value>Collapsed</value>
+    <value>Hidden</value>
   </data>
   <data name="Enums.TopBarVisibility.Visible" xml:space="preserve">
-    <value>Visible</value>
+    <value>Always show</value>
   </data>
   <data name="ExitItem" xml:space="preserve">
     <value>Exit</value>
@@ -396,10 +396,13 @@
     <value>System default</value>
   </data>
   <data name="Settings.FollowWindowsMode" xml:space="preserve">
-    <value>Windows mode</value>
+    <value>Match Windows mode</value>
+  </data>
+  <data name="Settings.Restart" xml:space="preserve">
+    <value>Restart</value>
   </data>
   <data name="Settings.FollowAppMode" xml:space="preserve">
-    <value>App mode</value>
+    <value>Match app mode</value>
   </data>
   <data name="Settings.TopBarVisibility" xml:space="preserve">
     <value>TopBar visibility</value>
@@ -429,7 +432,7 @@
     <value>Align flyout to this position</value>
   </data>
   <data name="Settings.RestartRequired" xml:space="preserve">
-    <value>Restart required to apply some changes</value>
+    <value>Restart required to apply the changes</value>
   </data>
   <data name="Enums.FlyoutWindowAlignments.Bottom" xml:space="preserve">
     <value>Bottom</value>

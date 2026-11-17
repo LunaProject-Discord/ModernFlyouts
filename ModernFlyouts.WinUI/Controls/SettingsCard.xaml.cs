@@ -40,8 +40,48 @@ namespace ModernFlyouts.WinUI.Controls
 
         public object? Action
         {
-            get => ActionPresenter.Content;
-            set => ActionPresenter.Content = value;
+            get => _action;
+            set
+            {
+                _action = value;
+                ActionPresenter.Content = value is ToggleSwitch toggle ? WrapToggleSwitch(toggle) : value;
+            }
+        }
+
+        private object? _action;
+
+        /// <summary>
+        /// Windows Settings layout for switches: the state text ("Off") on the left and the switch
+        /// itself flush with the right edge. WinUI draws the text to the right of the switch and
+        /// reserves a wide minimum width, so the text is shown separately and the switch is cut
+        /// down to its track.
+        /// </summary>
+        private static FrameworkElement WrapToggleSwitch(ToggleSwitch toggle)
+        {
+            var state = new TextBlock
+            {
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(0, 0, 12, 0),
+            };
+
+            // OnContent/OffContent may be set later (x:Bind), so read them when updating.
+            void Update() => state.Text = toggle.IsOn
+                ? toggle.OnContent as string ?? Properties.Strings.Settings_On
+                : toggle.OffContent as string ?? Properties.Strings.Settings_Off;
+
+            toggle.MinWidth = 0;
+            toggle.Width = 40; // the track; WinUI's own state text (to its right) is clipped away
+            toggle.VerticalAlignment = VerticalAlignment.Center;
+            toggle.Toggled += (_, _) => Update();
+            toggle.RegisterPropertyChangedCallback(ToggleSwitch.OnContentProperty, (_, _) => Update());
+            toggle.RegisterPropertyChangedCallback(ToggleSwitch.OffContentProperty, (_, _) => Update());
+            toggle.RegisterPropertyChangedCallback(ToggleSwitch.IsOnProperty, (_, _) => Update());
+            Update();
+
+            var panel = new StackPanel { Orientation = Orientation.Horizontal };
+            panel.Children.Add(state);
+            panel.Children.Add(toggle);
+            return panel;
         }
     }
 }

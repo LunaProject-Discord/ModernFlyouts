@@ -203,6 +203,9 @@
   <data name="Settings.FollowWindowsMode" xml:space="preserve">
     <value>Windows モードに合わせる</value>
   </data>
+  <data name="Settings.Restart" xml:space="preserve">
+    <value>再起動</value>
+  </data>
   <data name="Settings.FollowAppMode" xml:space="preserve">
     <value>アプリ モードに合わせる</value>
   </data>
@@ -318,7 +321,7 @@
     <value>フライアウトをこの位置に合わせる</value>
   </data>
   <data name="Settings.RestartRequired" xml:space="preserve">
-    <value>変更を適用するために再起動が必要です</value>
+    <value>変更を適用するには再起動が必要です</value>
   </data>
   <data name="AudioFlyoutHelper.UseThumbnailAsBackground" xml:space="preserve">
     <value>メディアのサムネイルをメディアコントロールの背景にする</value>

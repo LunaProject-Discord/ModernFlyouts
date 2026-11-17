@@ -1195,7 +1195,7 @@ namespace ModernFlyouts.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Restart required to apply some changes.
+        ///   Looks up a localized string similar to Restart required to apply the changes.
         /// </summary>
         public static string Settings_RestartRequired {
             get {
@@ -1222,7 +1222,16 @@ namespace ModernFlyouts.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to App mode.
+        ///   Looks up a localized string similar to Restart.
+        /// </summary>
+        public static string Settings_Restart {
+            get {
+                return ResourceManager.GetString("Settings.Restart", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Match app mode.
         /// </summary>
         public static string Settings_FollowAppMode {
             get {
@@ -1231,7 +1240,7 @@ namespace ModernFlyouts.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Windows mode.
+        ///   Looks up a localized string similar to Match Windows mode.
         /// </summary>
         public static string Settings_FollowWindowsMode {
             get {

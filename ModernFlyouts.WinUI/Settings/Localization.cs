@@ -21,9 +21,13 @@ namespace ModernFlyouts.WinUI.Settings
 
         public static CultureInfo Current { get; private set; } = CultureInfo.CurrentUICulture;
 
+        /// <summary>The language setting in effect (applied at startup; changes need a restart).</summary>
+        public static string AppliedSetting { get; private set; } = string.Empty;
+
         public static void Apply()
         {
-            Current = Resolve(AppSettings.Instance.Language);
+            AppliedSetting = AppSettings.Instance.Language;
+            Current = Resolve(AppliedSetting);
 
             CultureInfo.DefaultThreadCurrentUICulture = Current;
             CultureInfo.CurrentUICulture = Current;

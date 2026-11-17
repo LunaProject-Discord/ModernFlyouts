@@ -228,18 +228,47 @@ namespace ModernFlyouts.WinUI
         private void ExitApp()
         {
             Log("exit");
-            _trayIcon?.Dispose();
-            _shellHook?.Dispose();
-            _keyboardHook = null;
-            _airplaneModeWatcher?.Stop();
-            _flyout?.HideFlyout();
-            S.Flush(); // a change made just before exiting is still waiting for the save timer
+            ReleaseResources();
 
             Exit();
 
             // Exit() only closes the XAML side; background work (media/audio callbacks, timers)
             // can keep the process alive with no UI. Make sure it ends.
             System.Threading.Tasks.Task.Delay(1500).ContinueWith(_ => Environment.Exit(0));
+        }
+
+        /// <summary>Restarts the app (e.g. to apply a new language) and reopens the settings.</summary>
+        public void RestartApp()
+        {
+            Log("restart");
+            ReleaseResources();
+
+            // Let the new process become the main instance instead of redirecting to this one.
+            try
+            {
+                AppInstance.GetCurrent().UnregisterKey();
+            }
+            catch (Exception ex)
+            {
+                Log($"unregister instance key failed: {ex.Message}");
+            }
+
+            // Only returns when the restart could not be started.
+            var failure = AppInstance.Restart("--settings");
+            Log($"restart failed: {failure}");
+            Exit();
+            System.Threading.Tasks.Task.Delay(1500).ContinueWith(_ => Environment.Exit(0));
+        }
+
+        /// <summary>Tray icon, hooks and pending settings, before the process goes away.</summary>
+        private void ReleaseResources()
+        {
+            _trayIcon?.Dispose();
+            _shellHook?.Dispose();
+            _keyboardHook = null;
+            _airplaneModeWatcher?.Stop();
+            _flyout?.HideFlyout();
+            S.Flush(); // a change made just before exiting is still waiting for the save timer
         }
 
         private void ShowFromShell(bool moduleEnabled, Action show)
