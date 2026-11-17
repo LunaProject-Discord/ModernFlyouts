@@ -56,6 +56,18 @@ namespace ModernFlyouts.WinUI
             NavView.SelectedItem = NavView.MenuItems.OfType<NavigationViewItem>().First();
         }
 
+#if DEBUG
+        /// <summary>Selects a page by its tag (--settings-page, for screenshots).</summary>
+        internal void SelectPage(string tag)
+        {
+            var item = AllItems.FirstOrDefault(i => (string?)i.Tag == tag);
+            if (item != null)
+            {
+                NavView.SelectedItem = item;
+            }
+        }
+#endif
+
         public void ShowAndActivate()
         {
             AppWindow.Show();

@@ -13,7 +13,7 @@
         <StackPanel Style="{StaticResource SettingsPagePanelStyle}">
             <toolkit:SettingsCard Header="{x:Bind res:Strings.Settings_EnableModule_Audio}" Margin="0,8,0,0">
                 <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE767;" /></toolkit:SettingsCard.HeaderIcon>
-                <ToggleSwitch IsOn="{x:Bind S.AudioModuleEnabled, Mode=TwoWay}" />
+                <ToggleSwitch OnContent="{x:Bind res:Strings.Settings_On}" OffContent="{x:Bind res:Strings.Settings_Off}" IsOn="{x:Bind S.AudioModuleEnabled, Mode=TwoWay}" />
             </toolkit:SettingsCard>
 
             <!-- Everything below only applies while the module is on -->
@@ -24,12 +24,12 @@
 
                 <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowGSMTCInVolumeFlyout}">
                     <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE8D6;" /></toolkit:SettingsCard.HeaderIcon>
-                    <ToggleSwitch IsOn="{x:Bind S.ShowMediaInVolumeFlyout, Mode=TwoWay}" />
+                    <ToggleSwitch OnContent="{x:Bind res:Strings.Settings_On}" OffContent="{x:Bind res:Strings.Settings_Off}" IsOn="{x:Bind S.ShowMediaInVolumeFlyout, Mode=TwoWay}" />
                 </toolkit:SettingsCard>
 
                 <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowVolumeControlInGSMTCFlyout}">
                     <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE767;" /></toolkit:SettingsCard.HeaderIcon>
-                    <ToggleSwitch IsOn="{x:Bind S.ShowVolumeControlInMediaFlyout, Mode=TwoWay}" />
+                    <ToggleSwitch OnContent="{x:Bind res:Strings.Settings_On}" OffContent="{x:Bind res:Strings.Settings_Off}" IsOn="{x:Bind S.ShowVolumeControlInMediaFlyout, Mode=TwoWay}" />
                 </toolkit:SettingsCard>
 
                 <!-- What the media controls show -->
@@ -38,16 +38,16 @@
                     <toolkit:SettingsExpander.HeaderIcon><FontIcon Glyph="&#xE90B;" /></toolkit:SettingsExpander.HeaderIcon>
                     <toolkit:SettingsExpander.Items>
                         <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowPlayerInfo}">
-                            <ToggleSwitch IsOn="{x:Bind S.ShowMediaPlayerInfo, Mode=TwoWay}" />
+                            <ToggleSwitch OnContent="{x:Bind res:Strings.Settings_On}" OffContent="{x:Bind res:Strings.Settings_Off}" IsOn="{x:Bind S.ShowMediaPlayerInfo, Mode=TwoWay}" />
                         </toolkit:SettingsCard>
                         <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowSeekbar}">
-                            <ToggleSwitch IsOn="{x:Bind S.ShowMediaSeekbar, Mode=TwoWay}" />
+                            <ToggleSwitch OnContent="{x:Bind res:Strings.Settings_On}" OffContent="{x:Bind res:Strings.Settings_Off}" IsOn="{x:Bind S.ShowMediaSeekbar, Mode=TwoWay}" />
                         </toolkit:SettingsCard>
                         <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowShuffle}">
-                            <ToggleSwitch IsOn="{x:Bind S.ShowMediaShuffle, Mode=TwoWay}" />
+                            <ToggleSwitch OnContent="{x:Bind res:Strings.Settings_On}" OffContent="{x:Bind res:Strings.Settings_Off}" IsOn="{x:Bind S.ShowMediaShuffle, Mode=TwoWay}" />
                         </toolkit:SettingsCard>
                         <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_ShowRepeat}">
-                            <ToggleSwitch IsOn="{x:Bind S.ShowMediaRepeat, Mode=TwoWay}" />
+                            <ToggleSwitch OnContent="{x:Bind res:Strings.Settings_On}" OffContent="{x:Bind res:Strings.Settings_Off}" IsOn="{x:Bind S.ShowMediaRepeat, Mode=TwoWay}" />
                         </toolkit:SettingsCard>
                     </toolkit:SettingsExpander.Items>
                 </toolkit:SettingsExpander>
@@ -58,7 +58,7 @@
                     <toolkit:SettingsExpander.HeaderIcon><FontIcon Glyph="&#xE91B;" /></toolkit:SettingsExpander.HeaderIcon>
                     <toolkit:SettingsExpander.Items>
                         <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_UseThumbnailAsBackground}">
-                            <ToggleSwitch IsOn="{x:Bind S.UseThumbnailAsBackground, Mode=TwoWay}" />
+                            <ToggleSwitch OnContent="{x:Bind res:Strings.Settings_On}" OffContent="{x:Bind res:Strings.Settings_Off}" IsOn="{x:Bind S.UseThumbnailAsBackground, Mode=TwoWay}" />
                         </toolkit:SettingsCard>
                         <toolkit:SettingsCard Header="{x:Bind res:Strings.AudioFlyoutHelper_ThumbnailAlignment}">
                             <ComboBox x:Name="ThumbnailAlignmentCombo" MinWidth="200" />

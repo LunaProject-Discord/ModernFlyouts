@@ -3,7 +3,8 @@
     x:Class="ModernFlyouts.WinUI.Pages.ModuleTogglePage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls">
+    xmlns:toolkit="using:CommunityToolkit.WinUI.Controls"
+    xmlns:res="using:ModernFlyouts.Properties">
 
     <!-- Used by modules whose only setting is on/off (brightness, airplane mode, virtual desktop). -->
     <ScrollViewer>
@@ -13,7 +14,7 @@
         <StackPanel Style="{StaticResource SettingsPagePanelStyle}">
             <toolkit:SettingsCard x:Name="EnableCard" Margin="0,8,0,0">
                 <toolkit:SettingsCard.HeaderIcon><FontIcon x:Name="EnableIcon" /></toolkit:SettingsCard.HeaderIcon>
-                <ToggleSwitch x:Name="EnableSwitch" />
+                <ToggleSwitch OnContent="{x:Bind res:Strings.Settings_On}" OffContent="{x:Bind res:Strings.Settings_Off}" x:Name="EnableSwitch" />
             </toolkit:SettingsCard>
         </StackPanel>
         </Grid>
