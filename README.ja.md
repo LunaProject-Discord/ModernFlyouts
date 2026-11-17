@@ -84,7 +84,9 @@ dotnet build ModernFlyouts.WinUI\ModernFlyouts.WinUI.csproj -c Debug -p:Platform
 | `ModernFlyouts.WinUI` | WinUI 3 アプリ本体 |
 | `ModernFlyouts.Core` | 共通の処理（メディアのバックエンド、ディスプレイ、Windows API の呼び出し）。UI フレームワークに依存しない |
 | `ModernFlyouts.Core.Tests` | 単体テスト |
-| `ModernFlyouts` | 元の WPF アプリ（参照用に残しています） |
+
+元の WPF アプリは、このリポジトリの履歴と
+[ModernFlyouts](https://github.com/ModernFlyouts-Community/ModernFlyouts) にあります。
 
 ## クレジット
 

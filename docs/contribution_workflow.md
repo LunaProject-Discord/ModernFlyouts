@@ -33,7 +33,7 @@ Please do not:
 * **DON'T** commit code that you didn't write (stealing code = bad. Only we can do that LOL).
 * **DON'T** submit PRs that alter licensing related files or headers.
 * **DON'T** add or change APIs or UI without filing an issue and discussing it first.
-* **DON'T** commit un-necessary changes such as changes to the **ModernFlyouts.Package.wapproj** and the **Package.appxmanifest** files and changes that you did accidentally. Please stage, review and then commit changes.
+* **DON'T** commit un-necessary changes such as changes to the **ModernFlyouts.WinUI.csproj** and the **Package.appxmanifest** files (version, signing) and changes that you did accidentally. Please stage, review and then commit changes.
 
 ## Commit Messages
 

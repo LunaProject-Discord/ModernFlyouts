@@ -43,7 +43,7 @@ We'll then give you some guidelines regarding the project and source code struct
 
 ### Code contribution process
 
-- [Setup and build environment](docs/developer_guide.md)
+- [Setup and build environment](README.md#building)
 - [Contribution Workflow](docs/contribution_workflow.md)
 
 ### Copying files from other projects
@@ -60,11 +60,10 @@ The following rules must be followed for PRs that include files from another pro
 First of all, we must thank you for stepping forward to contribute support a language!
 We know how time consuming and hard it is to translate the text resources used by this app. Unfortunately in the past we had to ask some contributors to redo all their work from scratch due to some technical difficulties on our side. That's why we want you to know these pre-cautions to be taken before contributing translations.
 
-**Read these docs first:** [Setup and build environment](docs/developer_guide.md) and [Contribution Workflow](docs/contribution_workflow.md).
+**Read these docs first:** [Setup and build environment](README.md#building) and [Contribution Workflow](docs/contribution_workflow.md).
 
 Please remember these points! We have suffered enough pain telling contributors to redo their work.
 
-- **(!!!Important!!!)** The files you need to translate are present in the [ModernFlyouts/MultilingualResources](ModernFlyouts/MultilingualResources) directory.
-- The **RESX files** (i.e. **Strings.(lang-code).resx** ) present inside the [ModernFlyouts/Properties](ModernFlyouts/Properties) directory are intended for internal use and are modified every time the project is built.
-- Only the **ModernFlyouts.(lang-code).xlf** files present inside the [ModernFlyouts/MultilingualResources](ModernFlyouts/MultilingualResources) directory are stable and intended to be translated by contributors.
-- Please don't modify any files other than file related to your target language! Which is **ModernFlyouts.(lang-code).xlf** for e.g. **ModernFlyouts.en-GB.xlf**.
+- The texts are in the **RESX files** in the [ModernFlyouts.WinUI/Properties](ModernFlyouts.WinUI/Properties) directory: **Strings.resx** is the English source, **Strings.(lang-code).resx** the translations (e.g. **Strings.en-GB.resx**).
+- Translate the `<value>` of each entry and keep the `name`, placeholders such as `{0}` and the XML structure unchanged. A missing entry falls back to English.
+- Please don't modify any files other than the file of your target language!
