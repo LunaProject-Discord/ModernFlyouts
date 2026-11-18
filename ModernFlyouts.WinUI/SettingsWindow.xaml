@@ -29,7 +29,7 @@
         </TitleBar>
 
         <!-- The pane toggle lives in the title bar; the pane collapses on narrow windows -->
-        <NavigationView x:Name="NavView" Grid.Row="1" PaneDisplayMode="Auto" OpenPaneLength="280"
+        <NavigationView x:Name="NavView" Grid.Row="1" PaneDisplayMode="Auto"
                         IsBackButtonVisible="Collapsed" IsSettingsVisible="False" IsPaneToggleButtonVisible="False"
                         IsTitleBarAutoPaddingEnabled="False" ExpandedModeThresholdWidth="800"
                         SelectionChanged="NavView_SelectionChanged">
