@@ -515,4 +515,7 @@
   <data name="Settings.Credits" xml:space="preserve">
     <value>クレジット</value>
   </data>
+  <data name="Settings.SourceCode" xml:space="preserve">
+    <value>ソースコード</value>
+  </data>
 </root>

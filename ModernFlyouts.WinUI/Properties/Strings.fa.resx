@@ -515,4 +515,7 @@
   <data name="AudioFlyoutHelper.UseThumbnailAsBackground" xml:space="preserve">
     <value>استفاده از تصویر کوچک رسانه به‌عنوان پس‌زمینه کنترل‌های رسانه</value>
   </data>
+  <data name="Settings.SourceCode" xml:space="preserve">
+    <value>کد منبع</value>
+  </data>
 </root>

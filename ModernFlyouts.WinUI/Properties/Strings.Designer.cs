@@ -1470,6 +1470,15 @@ namespace ModernFlyouts.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Source code.
+        /// </summary>
+        public static string Settings_SourceCode {
+            get {
+                return ResourceManager.GetString("Settings.SourceCode", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Credits.
         /// </summary>
         public static string Settings_Credits {

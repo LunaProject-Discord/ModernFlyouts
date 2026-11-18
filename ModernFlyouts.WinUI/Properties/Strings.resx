@@ -620,4 +620,7 @@
   <data name="Settings.Credits" xml:space="preserve">
     <value>Credits</value>
   </data>
+  <data name="Settings.SourceCode" xml:space="preserve">
+    <value>Source code</value>
+  </data>
 </root>

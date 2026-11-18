@@ -27,6 +27,14 @@
                 </toolkit:SettingsExpander.Items>
             </toolkit:SettingsExpander>
 
+            <!-- This repository (as in TouchKeyboard's about page) -->
+            <toolkit:SettingsCard Header="{x:Bind res:Strings.Settings_SourceCode}"
+                                  Description="LunaProject-Discord/ModernFlyouts（MIT License）"
+                                  IsClickEnabled="True" Click="LinkCard_Click" Tag="https://github.com/LunaProject-Discord/ModernFlyouts">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE943;" /></toolkit:SettingsCard.HeaderIcon>
+                <toolkit:SettingsCard.ActionIcon><FontIcon Glyph="&#xE8A7;" /></toolkit:SettingsCard.ActionIcon>
+            </toolkit:SettingsCard>
+
             <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_Credits}" />
 
             <!-- Project links (open in the browser) -->

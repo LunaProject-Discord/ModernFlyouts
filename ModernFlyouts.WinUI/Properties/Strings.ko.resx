@@ -515,4 +515,7 @@
   <data name="Settings.FlyoutAnimationEnabled" xml:space="preserve">
     <value>페이드 애니메이션</value>
   </data>
+  <data name="Settings.SourceCode" xml:space="preserve">
+    <value>소스 코드</value>
+  </data>
 </root>

@@ -515,4 +515,7 @@
   <data name="AudioFlyoutHelper.UseThumbnailAsBackground" xml:space="preserve">
     <value>Använd mediets miniatyr som bakgrund för mediekontrollerna</value>
   </data>
+  <data name="Settings.SourceCode" xml:space="preserve">
+    <value>Källkod</value>
+  </data>
 </root>

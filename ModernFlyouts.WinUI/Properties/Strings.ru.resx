@@ -516,4 +516,7 @@
   <data name="Enums.StackingDirection.Descending" xml:space="preserve">
     <value>По убыванию</value>
   </data>
+  <data name="Settings.SourceCode" xml:space="preserve">
+    <value>Исходный код</value>
+  </data>
 </root>
