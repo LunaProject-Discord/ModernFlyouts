@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 using ModernFlyouts.Core.Threading;
 using static ModernFlyouts.Core.Interop.NativeMethods;
@@ -168,14 +166,25 @@ namespace ModernFlyouts.Core.Interop
 
         #endregion
 
+        // Windows 11 22H2 moved the OSD into a XAML island host.
+        private static readonly bool IsXamlOsd = Environment.OSVersion.Version.Build >= 22620;
+        private static readonly string HostClass = IsXamlOsd ? "XamlExplorerHostIslandWindow" : "NativeHWNDHost";
+        private static readonly string HostName = IsXamlOsd ? null : "";
+        private static readonly string DuiClass = IsXamlOsd ? "Windows.UI.Composition.DesktopWindowContentBridge" : "DirectUIHWND";
+        private static readonly string DuiName = IsXamlOsd ? "DesktopWindowXamlSource" : "";
+
+        private static readonly TimeSpan ShellCheckInterval = TimeSpan.FromSeconds(5);
+
         private bool _hasNativeFlyoutCreated;
 
         private WndProcHookManager hookManager;
         private WinEventDelegate _procDelegate;
         private IntPtr HHookID = IntPtr.Zero;
 
-        // Polls every 3 s for the shell OSD host after explorer restarted (runs on the UI thread).
-        private Timer rehooktimer;
+        // Periodic check (on the UI thread) that the hook still targets the running shell and
+        // the OSD host still exists: explorer can restart or recreate the OSD without the hook
+        // seeing a destroy event, and the OSD host is only created the first time it is needed.
+        private Timer shellCheckTimer;
 
         public event EventHandler NativeFlyoutShown;
 
@@ -189,31 +198,26 @@ namespace ModernFlyouts.Core.Interop
         {
             _hasNativeFlyoutCreated = GetAllInfos();
             Debug.WriteLine($"{nameof(NativeFlyoutHandler)}: Native Flyout Host has been created - {_hasNativeFlyoutCreated}");
+            if (!_hasNativeFlyoutCreated)
+            {
+                ShellProcessId = GetShellProcessId();
+            }
             Hook();
 
-            rehooktimer = new Timer(_ => UiDispatcher.Post(TryRehook), null, Timeout.Infinite, Timeout.Infinite);
+            shellCheckTimer = new Timer(_ => UiDispatcher.Post(CheckShell), null, ShellCheckInterval, ShellCheckInterval);
         }
 
         #region Native Flyout Hooking
 
         private void Hook()
         {
-            if (!_hasNativeFlyoutCreated)
+            if (ShellProcessId == 0)
             {
-                ShellProcessId = (uint)GetShellProcessId();
+                return; // explorer is not running yet; CheckShell hooks it once it is
             }
 
-            if (ShellProcessId != 0)
-            {
-                HHookID = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_STATECHANGE, IntPtr.Zero, _procDelegate, ShellProcessId, 0, WINEVENT_OUTOFCONTEXT);
-
-                if (HHookID == IntPtr.Zero)
-                {
-                    throw new Exception("Could not set Native Flyout hook");
-                }
-
-                Debug.WriteLine(nameof(NativeFlyoutHandler) + ": Hooked!");
-            }
+            HHookID = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_STATECHANGE, IntPtr.Zero, _procDelegate, ShellProcessId, 0, WINEVENT_OUTOFCONTEXT);
+            Debug.WriteLine(nameof(NativeFlyoutHandler) + (HHookID == IntPtr.Zero ? ": Could not set Native Flyout hook" : ": Hooked!"));
         }
 
         private void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hWnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
@@ -223,21 +227,15 @@ namespace ModernFlyouts.Core.Interop
                 return;
             }
 
-            if (!_hasNativeFlyoutCreated && (eventType == EVENT_OBJECT_CREATE || eventType == EVENT_OBJECT_SHOW))
+            // A new OSD host (created on first use, or recreated by the shell): take it over.
+            if (hWnd != HWndHost
+                && (eventType == EVENT_OBJECT_CREATE || eventType == EVENT_OBJECT_SHOW)
+                && GetWindowClassName(hWnd) == HostClass
+                && TryGetFlyoutHost(hWnd, false, out IntPtr hWndDUI, out uint pid))
             {
-                if (GetWindowClassName(hWnd) == "NativeHWNDHost")
-                {
-                    _hasNativeFlyoutCreated = GetAllInfos();
-                    if (_hasNativeFlyoutCreated && hWnd == HWndHost)
-                    {
-                        hookManager.OnHwndCreated(hWnd);
-
-                        if (eventType == EVENT_OBJECT_SHOW)
-                        {
-                            OnNativeFlyoutShown();
-                        }
-                    }
-                }
+                SetHost(hWnd, hWndDUI, pid);
+                hookManager.OnHwndCreated(hWnd);
+                Debug.WriteLine(nameof(NativeFlyoutHandler) + ": Native Flyout Host found!");
             }
 
             if (hWnd == HWndHost)
@@ -289,11 +287,8 @@ namespace ModernFlyouts.Core.Interop
         {
             Debug.WriteLine(nameof(NativeFlyoutHandler) + ": Native Flyout Destroyed!");
 
-            HWndHost = IntPtr.Zero;
-            HWndDUI = IntPtr.Zero;
-            ShellProcessId = 0;
-            _hasNativeFlyoutCreated = false;
-            rehooktimer.Change(TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(3));
+            // The hook stays: the shell creates a new host, which WinEventProc picks up.
+            ClearHost();
         }
 
         private void Rehook()
@@ -306,20 +301,37 @@ namespace ModernFlyouts.Core.Interop
 
         private void Unhook()
         {
-            if (!(HHookID == IntPtr.Zero))
+            if (HHookID != IntPtr.Zero)
             {
                 UnhookWinEvent(HHookID);
+                HHookID = IntPtr.Zero;
                 Debug.WriteLine(nameof(NativeFlyoutHandler) + ": Unhooked!");
             }
         }
 
-        private void TryRehook()
+        private void CheckShell()
         {
-            ShellProcessId = (uint)GetShellProcessId();
-            if (ShellProcessId != 0)
+            uint shellPid = GetShellProcessId();
+            if (shellPid == 0)
             {
-                rehooktimer.Change(Timeout.Infinite, Timeout.Infinite);
+                return; // explorer is (re)starting
+            }
+
+            if (shellPid != ShellProcessId || HHookID == IntPtr.Zero)
+            {
+                // explorer restarted: the hook and the OSD host went away with the old process.
+                Debug.WriteLine(nameof(NativeFlyoutHandler) + ": Shell process changed");
+                ClearHost();
+                ShellProcessId = shellPid;
                 Rehook();
+                _hasNativeFlyoutCreated = GetAllInfos();
+                return;
+            }
+
+            if (_hasNativeFlyoutCreated && !IsWindow(HWndHost))
+            {
+                ClearHost();
+                _hasNativeFlyoutCreated = GetAllInfos();
             }
         }
 
@@ -327,70 +339,104 @@ namespace ModernFlyouts.Core.Interop
 
         #region Da agjhtual mnadive phlyout ghantling
 
-        private static int GetShellProcessId()
+        private static uint GetShellProcessId()
         {
-            return Process.GetProcessesByName("explorer").FirstOrDefault(p => IsShellProcess(p.Id))?.Id ?? 0;
+            IntPtr hWndShell = GetShellWindow();
+            if (hWndShell == IntPtr.Zero)
+            {
+                return 0;
+            }
+
+            GetWindowThreadProcessId(hWndShell, out int pid);
+            return (uint)pid;
         }
 
-        private static bool IsShellProcess(int id)
+        private static bool IsExplorerProcess(int pid)
         {
-            var hWndShell = GetShellWindow();
-            GetWindowThreadProcessId(hWndShell, out int pid);
+            try
+            {
+                using var process = Process.GetProcessById(pid);
+                return string.Equals(process.ProcessName, "explorer", StringComparison.OrdinalIgnoreCase);
+            }
+            catch (Exception)
+            {
+                return false; // the process has exited
+            }
+        }
 
-            return id == pid;
+        /// <summary>Whether <paramref name="hWndHost"/> is the shell's OSD host (in the band above the lock screen).</summary>
+        private static bool TryGetFlyoutHost(IntPtr hWndHost, bool checkProcessName, out IntPtr hWndDUI, out uint processId)
+        {
+            processId = 0;
+            hWndDUI = FindWindowEx(hWndHost, IntPtr.Zero, DuiClass, DuiName);
+            if (hWndDUI == IntPtr.Zero)
+            {
+                return false;
+            }
+
+            GetWindowThreadProcessId(hWndHost, out int pid);
+            if (checkProcessName && !IsExplorerProcess(pid))
+            {
+                return false;
+            }
+
+            GetWindowBand(hWndHost, out UIntPtr pdwBand);
+            if (pdwBand != (UIntPtr)ZBandID.AboveLockUX)
+            {
+                return false;
+            }
+
+            processId = (uint)pid;
+            return true;
+        }
+
+        private void SetHost(IntPtr hWndHost, IntPtr hWndDUI, uint processId)
+        {
+            HWndHost = hWndHost;
+            HWndDUI = hWndDUI;
+            ShellProcessId = processId;
+            _hasNativeFlyoutCreated = true;
+        }
+
+        private void ClearHost()
+        {
+            HWndHost = IntPtr.Zero;
+            HWndDUI = IntPtr.Zero;
+            _hasNativeFlyoutCreated = false;
         }
 
         private bool GetAllInfos()
         {
             IntPtr hWndHost = IntPtr.Zero;
-            IntPtr hWndDUI = IntPtr.Zero;
-
-            String build = RuntimeInformation.OSDescription.Substring(RuntimeInformation.OSDescription.LastIndexOf('.') + 1);
-            int buildNumber = int.Parse(build);
-
-            String outerClass = "";
-            String outerName = "";
-            String innerClass = "";
-            String innerName = "";
-            if (buildNumber >= 22620) // 22H2 changes the OSD
+            while ((hWndHost = FindWindowEx(IntPtr.Zero, hWndHost, HostClass, HostName)) != IntPtr.Zero)
             {
-                outerClass = "XamlExplorerHostIslandWindow";
-                innerClass = "Windows.UI.Composition.DesktopWindowContentBridge";
-                innerName = "DesktopWindowXamlSource";
-            }
-            else
-            {
-                outerClass = "NativeHWNDHost";
-                innerClass = "DirectUIHWND";
-            }
-
-            while ((hWndHost = FindWindowEx(IntPtr.Zero, hWndHost, outerClass, outerName)) != IntPtr.Zero)
-            {
-                if ((hWndDUI = FindWindowEx(hWndHost, IntPtr.Zero, innerClass, innerName)) != IntPtr.Zero)
+                if (TryGetFlyoutHost(hWndHost, true, out IntPtr hWndDUI, out uint pid))
                 {
-                    GetWindowThreadProcessId(hWndHost, out int pid);
-                    if (Process.GetProcessById(pid).ProcessName.ToLower() == "explorer")
-                    {
-                        UIntPtr pdwBand = UIntPtr.Zero;
-                        GetWindowBand(hWndHost, out pdwBand);
-                        if (pdwBand == (UIntPtr)ZBandID.AboveLockUX)
-                        {
-                            HWndHost = hWndHost;
-                            HWndDUI = hWndDUI;
-                            ShellProcessId = (uint)pid;
-                            return true;
-                        }
-                    }
+                    SetHost(hWndHost, hWndDUI, pid);
+                    return true;
                 }
             }
 
             return false;
         }
 
+        /// <summary>Keeps the known host while it is valid (it is the one just shown), else searches again.</summary>
+        private bool RefreshHost()
+        {
+            if (HWndHost != IntPtr.Zero && IsWindow(HWndHost)
+                && TryGetFlyoutHost(HWndHost, false, out IntPtr hWndDUI, out uint pid))
+            {
+                SetHost(HWndHost, hWndDUI, pid);
+                return true;
+            }
+
+            ClearHost();
+            return GetAllInfos();
+        }
+
         public void HideNativeFlyout()
         {
-            _hasNativeFlyoutCreated = GetAllInfos();
-            if (_hasNativeFlyoutCreated)
+            if (RefreshHost())
             {
                 ShowWindowAsync(HWndDUI, ShowWindowCommands.Minimize);
                 ShowWindowAsync(HWndHost, ShowWindowCommands.Hide);
@@ -417,10 +463,10 @@ namespace ModernFlyouts.Core.Interop
 
         public void VerifyNativeFlyoutCreated()
         {
+            CheckShell();
             if (!_hasNativeFlyoutCreated)
             {
-                GetAllInfos();
-                Rehook();
+                _hasNativeFlyoutCreated = GetAllInfos();
             }
         }
 
