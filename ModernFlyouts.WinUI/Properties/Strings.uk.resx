@@ -515,4 +515,7 @@
   <data name="AudioFlyoutHelper.UseThumbnailAsBackground" xml:space="preserve">
     <value>Використовувати обкладинку як фон елементів керування медіа</value>
   </data>
+  <data name="Settings.SourceCode" xml:space="preserve">
+    <value>Вихідний код</value>
+  </data>
 </root>

@@ -17,15 +17,23 @@
                     <ImageIcon Source="ms-appx:///Assets/Logo.ico" />
                 </toolkit:SettingsExpander.HeaderIcon>
                 <toolkit:SettingsExpander.Items>
-                    <toolkit:SettingsCard ContentAlignment="Left">
-                        <StackPanel Spacing="4">
-                            <TextBlock TextWrapping="Wrap" Text="{x:Bind res:Strings.About_AppDescription}" />
-                            <TextBlock TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                       Text="Personal combined build (WinUI 3): based on the usoppii fork (ModernFlyouts 0.10 line) with the enhanced media backend from GlobalFlyouts (Astear17, Kinfani)." />
-                        </StackPanel>
-                    </toolkit:SettingsCard>
+                    <!--
+                        Text-only item: the text goes in Header (and Description), as in the
+                        Windows Community Toolkit Gallery sample and TouchKeyboard, so it sits
+                        vertically centered like the other items.
+                    -->
+                    <toolkit:SettingsCard Header="{x:Bind res:Strings.About_AppDescription}"
+                                          Description="Personal combined build (WinUI 3): based on the usoppii fork (ModernFlyouts 0.10 line) with the enhanced media backend from GlobalFlyouts (Astear17, Kinfani)." />
                 </toolkit:SettingsExpander.Items>
             </toolkit:SettingsExpander>
+
+            <!-- This repository (as in TouchKeyboard's about page) -->
+            <toolkit:SettingsCard Header="{x:Bind res:Strings.Settings_SourceCode}"
+                                  Description="LunaProject-Discord/ModernFlyouts（MIT License）"
+                                  IsClickEnabled="True" Click="LinkCard_Click" Tag="https://github.com/LunaProject-Discord/ModernFlyouts">
+                <toolkit:SettingsCard.HeaderIcon><FontIcon Glyph="&#xE943;" /></toolkit:SettingsCard.HeaderIcon>
+                <toolkit:SettingsCard.ActionIcon><FontIcon Glyph="&#xE8A7;" /></toolkit:SettingsCard.ActionIcon>
+            </toolkit:SettingsCard>
 
             <TextBlock Style="{StaticResource SettingsSectionHeaderStyle}" Text="{x:Bind res:Strings.Settings_Credits}" />
 

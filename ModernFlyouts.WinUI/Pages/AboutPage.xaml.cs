@@ -10,7 +10,8 @@ namespace ModernFlyouts.WinUI.Pages
         public AboutPage()
         {
             InitializeComponent();
-            AppCard.Description = $"{Strings.About_Version} {GetVersion()}";
+            // The translations end with their own separator ("バージョン : ", "版本：").
+            AppCard.Description = $"{Strings.About_Version}{GetVersion()}";
         }
 
         /// <summary>The package version when installed (what Windows shows), else the assembly's.</summary>

@@ -515,4 +515,7 @@
   <data name="AudioFlyoutHelper.UseThumbnailAsBackground" xml:space="preserve">
     <value>Gunakan lakaran kecil media sebagai latar belakang kawalan media</value>
   </data>
+  <data name="Settings.SourceCode" xml:space="preserve">
+    <value>Kod sumber</value>
+  </data>
 </root>

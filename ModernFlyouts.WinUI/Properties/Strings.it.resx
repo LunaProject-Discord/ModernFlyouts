@@ -515,4 +515,7 @@
   <data name="AudioFlyoutHelper.UseThumbnailAsBackground" xml:space="preserve">
     <value>Usa la miniatura del contenuto come sfondo dei controlli multimediali</value>
   </data>
+  <data name="Settings.SourceCode" xml:space="preserve">
+    <value>Codice sorgente</value>
+  </data>
 </root>
