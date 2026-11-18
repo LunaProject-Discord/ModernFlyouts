@@ -18,11 +18,7 @@
                 </toolkit:SettingsExpander.HeaderIcon>
                 <toolkit:SettingsExpander.Items>
                     <toolkit:SettingsCard ContentAlignment="Left">
-                        <StackPanel Spacing="4">
-                            <TextBlock TextWrapping="Wrap" Text="{x:Bind res:Strings.About_AppDescription}" />
-                            <TextBlock TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                       Text="Personal combined build (WinUI 3): based on the usoppii fork (ModernFlyouts 0.10 line) with the enhanced media backend from GlobalFlyouts (Astear17, Kinfani)." />
-                        </StackPanel>
+                        <TextBlock TextWrapping="Wrap" Text="{x:Bind res:Strings.About_AppDescription}" />
                     </toolkit:SettingsCard>
                 </toolkit:SettingsExpander.Items>
             </toolkit:SettingsExpander>
