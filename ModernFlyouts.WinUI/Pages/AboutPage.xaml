@@ -17,9 +17,13 @@
                     <ImageIcon Source="ms-appx:///Assets/Logo.ico" />
                 </toolkit:SettingsExpander.HeaderIcon>
                 <toolkit:SettingsExpander.Items>
-                    <toolkit:SettingsCard ContentAlignment="Left">
-                        <TextBlock TextWrapping="Wrap" Text="{x:Bind res:Strings.About_AppDescription}" />
-                    </toolkit:SettingsCard>
+                    <!--
+                        Text-only item: the text goes in Header (and Description), as in the
+                        Windows Community Toolkit Gallery sample and TouchKeyboard, so it sits
+                        vertically centered like the other items.
+                    -->
+                    <toolkit:SettingsCard Header="{x:Bind res:Strings.About_AppDescription}"
+                                          Description="Personal combined build (WinUI 3): based on the usoppii fork (ModernFlyouts 0.10 line) with the enhanced media backend from GlobalFlyouts (Astear17, Kinfani)." />
                 </toolkit:SettingsExpander.Items>
             </toolkit:SettingsExpander>
 
